@@ -1,0 +1,6 @@
+order_id,user_id,product_id,quantity,status
+1,1,101,2,completed
+2,2,102,1,pending
+3,1,103,3,shipped
+4,3,101,1,completed
+5,2,104,2,canceled

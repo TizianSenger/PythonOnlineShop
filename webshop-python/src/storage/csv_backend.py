@@ -1,0 +1,209 @@
+import csv
+import json
+from pathlib import Path
+
+class CSVBackend:
+    def __init__(self, csv_folder):
+        self.csv_folder = Path(csv_folder)
+        self.csv_folder.mkdir(parents=True, exist_ok=True)
+        self._ensure_csv_files()
+        self._migrate_old_format()
+
+    def _migrate_old_format(self):
+        users_file = self.csv_folder / 'users.csv'
+        if users_file.exists():
+            users = self.read_csv('users.csv')
+            if users and 'username' in users[0]:
+                for user in users:
+                    if 'username' in user:
+                        user['name'] = user.pop('username')
+                self.write_csv('users.csv', users, fieldnames=['id', 'name', 'email', 'password', 'role'])
+
+    def _ensure_csv_files(self):
+        files = {
+            'users.csv': ['id', 'name', 'email', 'password', 'role'],
+            'products.csv': ['id', 'name', 'category', 'price', 'description', 'images', 'stock'],
+            'orders.csv': ['id', 'user_id', 'product_id', 'quantity', 'total']
+        }
+        for filename, headers in files.items():
+            filepath = self.csv_folder / filename
+            if not filepath.exists():
+                with open(filepath, 'w', newline='', encoding='utf-8') as f:
+                    writer = csv.DictWriter(f, fieldnames=headers)
+                    writer.writeheader()
+
+    def read_csv(self, filename):
+        filepath = self.csv_folder / filename
+        if not filepath.exists():
+            return []
+        with open(filepath, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            return list(reader) if reader else []
+
+    def write_csv(self, filename, data, fieldnames=None):
+        filepath = self.csv_folder / filename
+        defaults = {
+            'users.csv': ['id', 'name', 'email', 'password', 'role'],
+            'products.csv': ['id', 'name', 'category', 'price', 'description', 'images', 'stock'],
+            'orders.csv': ['id', 'user_id', 'product_id', 'quantity', 'total']
+        }
+        if fieldnames is None:
+            if data:
+                fieldnames = list(data[0].keys())
+            else:
+                fieldnames = defaults.get(filename, [])
+        # Normalize values: ensure lists are JSON-serialized and None -> ''
+        rows_to_write = []
+        for row in data:
+            normalized = {}
+            for k in fieldnames:
+                v = row.get(k, '')
+                if isinstance(v, list):
+                    try:
+                        normalized[k] = json.dumps(v, ensure_ascii=False)
+                    except Exception:
+                        normalized[k] = json.dumps([str(x) for x in v], ensure_ascii=False)
+                elif v is None:
+                    normalized[k] = ''
+                else:
+                    # Ensure it's a string for CSV (numbers kept as-is but cast to str)
+                    normalized[k] = v
+            rows_to_write.append(normalized)
+
+        with open(filepath, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            if rows_to_write:
+                writer.writerows(rows_to_write)
+
+    def get_all_users(self):
+        return self.read_csv('users.csv')
+
+    def get_all_products(self):
+        products = self.read_csv('products.csv')
+        for p in products:
+            # Parse JSON images list
+            if 'images' in p and p['images']:
+                try:
+                    p['images'] = json.loads(p['images'])
+                except Exception:
+                    # fallback: if it's Python list string repr or invalid JSON, try eval safely
+                    try:
+                        # avoid using plain eval on untrusted data; try to fix common patterns
+                        s = p['images'].strip()
+                        if s.startswith('[') and s.endswith(']'):
+                            # replace single quotes with double quotes for JSON
+                            s2 = s.replace("'", '"')
+                            p['images'] = json.loads(s2)
+                        else:
+                            p['images'] = []
+                    except Exception:
+                        p['images'] = []
+            else:
+                p['images'] = []
+        return products
+
+    def get_product(self, product_id):
+        products = self.get_all_products()
+        return next((p for p in products if p.get('id') == product_id), None)
+
+    def save_user(self, user):
+        users = self.get_all_users()
+        user_id = str(max([int(u.get('id', 0)) for u in users] + [0]) + 1)
+        user['id'] = user_id
+        users.append(user)
+        self.write_csv('users.csv', users, fieldnames=['id', 'name', 'email', 'password', 'role'])
+        return user_id
+
+    def save_product(self, product):
+        products = self.get_all_products()
+        product_id = str(max([int(p.get('id', 0)) for p in products] + [0]) + 1)
+        product['id'] = product_id
+
+        # Ensure images is a list -> will be serialized in write_csv
+        if 'images' not in product or not product['images']:
+            product['images'] = []
+        elif isinstance(product['images'], str):
+            # try to decode if someone passed JSON string
+            try:
+                product['images'] = json.loads(product['images'])
+            except:
+                # fallback to empty or list with single string
+                product['images'] = [product['images']]
+
+        if 'stock' not in product:
+            product['stock'] = '0'
+
+        products.append(product)
+        # write_csv will serialize lists
+        self.write_csv('products.csv', products, fieldnames=['id', 'name', 'category', 'price', 'description', 'images', 'stock'])
+        return product_id
+
+    def update_product(self, product_id, updates):
+        products = self.get_all_products()
+        updated = False
+        for p in products:
+            if p.get('id') == product_id:
+                for k, v in updates.items():
+                    if k == 'images':
+                        # ensure images stored as list here; write_csv will serialize
+                        if isinstance(v, str):
+                            try:
+                                p[k] = json.loads(v)
+                            except:
+                                p[k] = [v]
+                        else:
+                            p[k] = v
+                    else:
+                        p[k] = v
+                updated = True
+                break
+        if updated:
+            self.write_csv('products.csv', products, fieldnames=['id', 'name', 'category', 'price', 'description', 'images', 'stock'])
+        return updated
+
+    def add_product_image(self, product_id, image_filename):
+        """Add an image to a product's images list (max 20)"""
+        products = self.get_all_products()
+        for p in products:
+            if p.get('id') == product_id:
+                images = p.get('images', [])
+                if not isinstance(images, list):
+                    images = []
+                if len(images) < 20 and image_filename not in images:
+                    images.append(image_filename)
+                    p['images'] = images
+                    self.write_csv('products.csv', products, fieldnames=['id', 'name', 'category', 'price', 'description', 'images', 'stock'])
+                    return True
+        return False
+
+    def remove_product_image(self, product_id, image_filename):
+        """Remove an image from a product's images list"""
+        products = self.get_all_products()
+        for p in products:
+            if p.get('id') == product_id:
+                images = p.get('images', [])
+                if not isinstance(images, list):
+                    images = []
+                if image_filename in images:
+                    images.remove(image_filename)
+                    p['images'] = images
+                    self.write_csv('products.csv', products, fieldnames=['id', 'name', 'category', 'price', 'description', 'images', 'stock'])
+                    return True
+        return False
+
+    def delete_product(self, product_id):
+        products = self.get_all_products()
+        products = [p for p in products if p.get('id') != product_id]
+        self.write_csv('products.csv', products, fieldnames=['id', 'name', 'category', 'price', 'description', 'images', 'stock'])
+
+    def get_all_orders(self):
+        return self.read_csv('orders.csv')
+
+    def save_order(self, order):
+        orders = self.get_all_orders()
+        order_id = str(max([int(o.get('id', 0)) for o in orders] + [0]) + 1)
+        order['id'] = order_id
+        orders.append(order)
+        self.write_csv('orders.csv', orders, fieldnames=['id', 'user_id', 'product_id', 'quantity', 'total'])
+        return order_id

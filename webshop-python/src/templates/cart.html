@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warenkorb - WebShop</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="/" class="logo">🛍️ WebShop</a>
+            <ul class="nav-links">
+                <li><a href="/">Shop</a></li>
+                <li><a href="/cart">🛒 Warenkorb</a></li>
+                {% if session.get('user') %}
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/logout">Logout</a></li>
+                {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+                {% endif %}
+                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1 class="mb-4">🛒 Warenkorb</h1>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {% if cart %}
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Produkt</th>
+                            <th>Preis</th>
+                            <th>Menge</th>
+                            <th>Gesamt</th>
+                            <th>Aktion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart %}
+                        <tr>
+                            <td>{{ item.name }}</td>
+                            <td>€ {{ "%.2f"|format(item.price) }}</td>
+                            <td>
+                                <input type="number" value="{{ item.quantity }}" min="1"
+                                    onchange="updateCart('{{ item.product_id }}', this.value)"
+                                    style="width: 60px; padding: 0.5rem;">
+                            </td>
+                            <td>€ {{ "%.2f"|format(item.price * item.quantity) }}</td>
+                            <td>
+                                <form method="POST" action="/remove-from-cart/{{ item.product_id }}"
+                                    style="display: inline;">
+                                    <button type="submit" class="btn btn-danger">Entfernen</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="text-align: right; margin-top: 2rem;">
+                <h2>Gesamtbetrag: <span style="color: var(--primary);">€ {{ "%.2f"|format(total) }}</span></h2>
+                <button class="btn btn-success btn-block mt-3" style="max-width: 300px; margin-left: auto;">Zur
+                    Kasse</button>
+            </div>
+            {% else %}
+            <div class="card text-center">
+                <p class="text-muted" style="font-size: 1.1rem;">Dein Warenkorb ist leer.</p>
+                <a href="/" class="btn btn-primary">Weiteres Einkaufen</a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 WebShop. Alle Rechte vorbehalten.</p>
+    </footer>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton();
+        }
+
+        function updateThemeButton() {
+            const button = document.querySelector('.theme-toggle');
+            const theme = document.documentElement.getAttribute('data-theme');
+            button.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function updateCart(productId, quantity) {
+            fetch('/update-cart/' + productId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    quantity: quantity
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeButton();
+        });
+    </script>
+</body>
+
+</html>

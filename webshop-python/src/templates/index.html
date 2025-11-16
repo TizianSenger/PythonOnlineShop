@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>WebShop</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="/" class="logo">🛍️ WebShop</a>
+            <ul class="nav-links">
+                <li><a href="/">Shop</a></li>
+                <li><a href="/cart">🛒 Warenkorb (<span id="cart-count">{{ cart_count }}</span>)</a></li>
+                {% if session.get('user') %}
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/logout">Logout</a></li>
+                {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+                {% endif %}
+                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1 class="mb-4">Willkommen im WebShop</h1>
+
+            <form method="GET" class="card" style="margin-bottom:1rem; display:flex; gap:0.5rem; align-items:center;">
+                <input name="q" placeholder="Suche..." value="{{ request.args.get('q','') }}"
+                    style="flex:1; padding:0.6rem;">
+                <select name="category" style="width:180px; padding:0.6rem;">
+                    <option value="">Alle Kategorien</option>
+                    {% for c in categories %}
+                    <option value="{{ c }}" {% if request.args.get('category')==c %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                </select>
+                <input name="min_price" placeholder="min €" value="{{ request.args.get('min_price','') }}"
+                    style="width:90px; padding:0.6rem;">
+                <input name="max_price" placeholder="max €" value="{{ request.args.get('max_price','') }}"
+                    style="width:90px; padding:0.6rem;">
+                <button class="btn btn-primary" type="submit">Filtern</button>
+            </form>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <h2 class="mb-3">Unsere Produkte</h2>
+            <div class="grid grid-2">
+                {% for product in products %}
+                <div class="card product-card">
+                    <a href="/product/{{ product.id }}" style="text-decoration: none; color: inherit;">
+                        <div class="product-image"
+                            style="background-size:cover; background-position:center;{% if product.main_image %}background-image:url('{{ url_for('static', filename='uploads/' ~ product.main_image) }}');{% endif %}">
+                            {% if not product.main_image %}📦{% endif %}
+                        </div>
+                        <h3 class="product-name">{{ product.name }}</h3>
+                        <p class="product-description">{{ product.description or 'Keine Beschreibung verfügbar' }}</p>
+                        {% if product.category %}
+                        <p class="text-muted mb-2"><small>Kategorie: {{ product.category }}</small></p>
+                        {% endif %}
+                        <p class="product-price">€ {{ product.price }}</p>
+                        <p class="text-muted">Auf Lager: {{ product.stock or '0' }} | 🖼️ {{ (product.images|length if
+                            product.images else 0) }}</p>
+                    </a>
+                    <div style="display:flex; gap:0.5rem; align-items:center;">
+                        <input type="number" id="qty-{{ product.id }}" value="1" min="1"
+                            style="width:60px; padding:0.5rem;">
+                        <button class="btn btn-primary" onclick="addToCart('{{ product.id }}', this)">In den
+                            Warenkorb</button>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center">
+                    <p class="text-muted">Noch keine Produkte verfügbar.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 WebShop. Alle Rechte vorbehalten.</p>
+    </footer>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton();
+        }
+        function updateThemeButton() {
+            const button = document.querySelector('.theme-toggle');
+            const theme = document.documentElement.getAttribute('data-theme');
+            if (button) button.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+        function addToCart(productId, btn) {
+            const qtyInput = document.getElementById('qty-' + productId);
+            const quantity = qtyInput ? Math.max(1, parseInt(qtyInput.value) || 1) : 1;
+            fetch('/add-to-cart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_id: productId, quantity: quantity })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.success) {
+                        const countEl = document.getElementById('cart-count');
+                        if (countEl) countEl.textContent = data.cart_count;
+                        flashButton(btn);
+                    }
+                })
+                .catch(err => console.error(err));
+        }
+        function flashButton(btn) {
+            if (!btn) return;
+            btn.classList.add('btn-flash');
+            setTimeout(() => btn.classList.remove('btn-flash'), 450);
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeButton();
+        });
+    </script>
+</body>
+
+</html>

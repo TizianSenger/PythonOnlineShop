@@ -1,0 +1,5 @@
+Flask
+pandas
+sqlite3
+pytest
+flask-restful
