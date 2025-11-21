@@ -10,6 +10,7 @@ from werkzeug.utils import secure_filename
 
 from storage.csv_backend import CSVBackend
 from api.routes import api_bp
+from api.checkout_routes import checkout_bp
 from config import SECRET_KEY, SMTP_USER, SMTP_PASS, ADMIN_PIN, CSV_FOLDER_PATH
 
 # App initialisieren
@@ -20,6 +21,7 @@ app.secret_key = SECRET_KEY
 
 # API unter /api bereitstellen
 app.register_blueprint(api_bp, url_prefix="/api")
+app.register_blueprint(checkout_bp)  # Checkout-Routen
 
 # CSV-Backend initialisieren
 csv_backend = CSVBackend(str(CSV_FOLDER_PATH))

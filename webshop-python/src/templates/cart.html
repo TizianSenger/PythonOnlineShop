@@ -2,34 +2,77 @@
 <html lang="de">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Warenkorb - WebShop</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .cart-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cart-item .meta {
+            flex: 1;
+        }
+
+        .cart-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .totals {
+            text-align: right;
+            margin-top: 1rem;
+        }
+
+        .empty {
+            text-align: center;
+            color: var(--muted);
+            padding: 2rem 0;
+        }
+
+        header nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
     <header>
         <nav>
             <a href="/" class="logo">🛍️ WebShop</a>
-            <ul class="nav-links">
-                <li><a href="/">Shop</a></li>
-                <li><a href="/cart">🛒 Warenkorb</a></li>
-                {% if session.get('user') %}
-                <li><a href="/dashboard">Dashboard</a></li>
-                <li><a href="/logout">Logout</a></li>
-                {% else %}
-                <li><a href="/login">Login</a></li>
-                <li><a href="/register">Register</a></li>
-                {% endif %}
-                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-            </ul>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+                <a href="/" class="btn">Shop</a>
+                <button id="theme-toggle" class="theme-toggle" aria-label="Theme umschalten">🌙</button>
+            </div>
         </nav>
     </header>
 
     <main>
-        <div class="container">
-            <h1 class="mb-4">🛒 Warenkorb</h1>
+        <div class="container" style="max-width:980px; margin:1rem auto; padding:0 1rem;">
+            <h1>Warenkorb</h1>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -39,98 +82,102 @@
             {% endif %}
             {% endwith %}
 
-            {% if cart %}
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Produkt</th>
-                            <th>Preis</th>
-                            <th>Menge</th>
-                            <th>Gesamt</th>
-                            <th>Aktion</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in cart %}
-                        <tr>
-                            <td>{{ item.name }}</td>
-                            <td>€ {{ "%.2f"|format(item.price) }}</td>
-                            <td>
-                                <input type="number" value="{{ item.quantity }}" min="1"
-                                    onchange="updateCart('{{ item.product_id }}', this.value)"
-                                    style="width: 60px; padding: 0.5rem;">
-                            </td>
-                            <td>€ {{ "%.2f"|format(item.price * item.quantity) }}</td>
-                            <td>
-                                <form method="POST" action="/remove-from-cart/{{ item.product_id }}"
-                                    style="display: inline;">
-                                    <button type="submit" class="btn btn-danger">Entfernen</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            {% if cart and cart|length > 0 %}
+            <div class="card" style="max-width:900px;">
+                <ul class="cart-list">
+                    {% for item in cart %}
+                    <li class="cart-item">
+                        <div
+                            style="width:80px; height:80px; background:#f5f5f5; display:flex; align-items:center; justify-content:center; border-radius:6px;">
+                            {% if item._image %}
+                            <img src="{{ url_for('static', filename='uploads/' ~ item._image) }}" alt=""
+                                style="max-width:100%; max-height:100%; object-fit:cover; border-radius:6px;">
+                            {% else %}
+                            📦
+                            {% endif %}
+                        </div>
 
-            <div style="text-align: right; margin-top: 2rem;">
-                <h2>Gesamtbetrag: <span style="color: var(--primary);">€ {{ "%.2f"|format(total) }}</span></h2>
-                <button class="btn btn-success btn-block mt-3" style="max-width: 300px; margin-left: auto;">Zur
-                    Kasse</button>
+                        <div class="meta">
+                            <div><strong>{{ item.name }}</strong></div>
+                            <div class="text-muted">€ {{ "%.2f"|format(item.price) }} × {{ item.quantity }} = € {{
+                                "%.2f"|format(item.price * item.quantity) }}</div>
+                        </div>
+
+                        <div class="cart-actions">
+                            <form method="POST" action="{{ url_for('remove_from_cart', product_id=item.product_id) }}"
+                                style="display:inline;">
+                                <button type="submit" class="btn btn-danger">Entfernen</button>
+                            </form>
+
+                            <div>
+                                <input type="number" min="1" value="{{ item.quantity }}" id="qty-{{ item.product_id }}"
+                                    style="width:70px; padding:0.4rem;">
+                                <button class="btn" onclick="updateCart('{{ item.product_id }}')">Aktualisieren</button>
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="totals">
+                    <p><strong>Gesamt: € {{ "%.2f"|format(total) }}</strong></p>
+                    <a href="{{ url_for('checkout_bp.checkout_page') }}" class="btn btn-primary"
+                        style="margin-right:0.5rem;">Zur Kasse</a>
+                </div>
             </div>
             {% else %}
-            <div class="card text-center">
-                <p class="text-muted" style="font-size: 1.1rem;">Dein Warenkorb ist leer.</p>
-                <a href="/" class="btn btn-primary">Weiteres Einkaufen</a>
+            <div class="card empty" style="max-width:900px;">
+                <p>Dein Warenkorb ist leer.</p>
+                <a class="btn" href="/">Zum Shop</a>
             </div>
             {% endif %}
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2025 WebShop. Alle Rechte vorbehalten.</p>
+        <p style="text-align:center;">&copy; 2025 WebShop. Alle Rechte vorbehalten.</p>
     </footer>
 
     <script>
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeButton();
+        // Theme handling: read/save in localStorage like other pages
+        const themeToggle = document.getElementById('theme-toggle');
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            if (themeToggle) themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('theme') || 'light';
+            applyTheme(saved);
+        });
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const current = document.documentElement.getAttribute('data-theme') || 'light';
+                const next = current === 'dark' ? 'light' : 'dark';
+                applyTheme(next);
+                localStorage.setItem('theme', next);
+            });
         }
 
-        function updateThemeButton() {
-            const button = document.querySelector('.theme-toggle');
-            const theme = document.documentElement.getAttribute('data-theme');
-            button.textContent = theme === 'dark' ? '☀️' : '🌙';
-        }
-
-        function updateCart(productId, quantity) {
-            fetch('/update-cart/' + productId, {
+        function updateCart(productId) {
+            const qty = document.getElementById('qty-' + productId).value;
+            fetch(`/update-cart/${productId}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    quantity: quantity
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quantity: qty })
             })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success) {
+                    if (data && data.success) {
                         location.reload();
+                    } else {
+                        alert('Aktualisieren fehlgeschlagen');
                     }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Netzwerkfehler');
                 });
         }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            updateThemeButton();
-        });
     </script>
 </body>
 
