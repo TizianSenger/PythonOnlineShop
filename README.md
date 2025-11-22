@@ -70,6 +70,16 @@ cd webshop-python
 pip install -r requirements.txt
 ```
 
+**Note**: The requirements.txt includes the core dependencies. Additional packages that may be needed:
+- `python-dotenv` - For environment variable management
+- `stripe` - For Stripe payment integration
+- `requests` - For HTTP requests (used in PayPal integration)
+
+Install them if needed:
+```bash
+pip install python-dotenv stripe requests
+```
+
 ### 4. Configure Environment Variables
 
 Create a `.env` file in the project root with the following configuration:
@@ -222,7 +232,7 @@ The application supports two storage backends:
 
 2. **SQLite Backend**: Uses SQLite database
    - Better performance for larger datasets
-   - Database file: `data/app.db`
+   - Database file: `webshop-python/data/app.db`
 
 To switch backends, modify the storage initialization in `app.py`.
 
