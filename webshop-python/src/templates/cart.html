@@ -63,10 +63,18 @@
     <header>
         <nav>
             <a href="/" class="logo">🛍️ WebShop</a>
-            <div style="display:flex; align-items:center; gap:0.5rem;">
-                <a href="/" class="btn">Shop</a>
-                <button id="theme-toggle" class="theme-toggle" aria-label="Theme umschalten">🌙</button>
-            </div>
+            <ul class="nav-links">
+                <li><a href="/">Shop</a></li>
+                <li><a href="/cart">🛒 Warenkorb</a></li>
+                {% if session.get('user') %}
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/logout">Logout</a></li>
+                {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+                {% endif %}
+                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+            </ul>
         </nav>
     </header>
 

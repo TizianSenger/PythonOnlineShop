@@ -202,8 +202,23 @@ class CSVBackend:
 
     def save_order(self, order):
         orders = self.get_all_orders()
-        order_id = str(max([int(o.get('id', 0)) for o in orders] + [0]) + 1)
+        # Safely get order_id, handling empty strings
+        existing_ids = []
+        for o in orders:
+            id_val = o.get('id', '0')
+            if id_val and str(id_val).strip():
+                try:
+                    existing_ids.append(int(id_val))
+                except (ValueError, TypeError):
+                    pass
+        order_id = str(max(existing_ids + [0]) + 1)
         order['id'] = order_id
         orders.append(order)
-        self.write_csv('orders.csv', orders, fieldnames=['id', 'user_id', 'product_id', 'quantity', 'total'])
+        # Determine fieldnames from order keys if it's a new checkout order (has items, customer, etc.)
+        if 'items' in order or 'customer' in order:
+            fieldnames = ['id', 'user_id', 'items', 'total', 'customer', 'status', 'payment_provider', 'provider_id', 'created_at']
+        else:
+            # Legacy format for simple orders
+            fieldnames = ['id', 'user_id', 'product_id', 'quantity', 'total']
+        self.write_csv('orders.csv', orders, fieldnames=fieldnames)
         return order_id

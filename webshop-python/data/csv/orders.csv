@@ -5,3 +5,4 @@ id,user_id,items,total,customer,status,payment_provider,provider_id,created_at
 ,3,,,,,,,
 ,2,,,,,,,
 1,,,100.0,,paid,,2LJ16809YK2754340,
+2,,"[{""product_id"": ""4"", ""name"": ""Product D"", ""price"": 49.99, ""quantity"": 1}]",49.99,"{""name"": ""Tizian"", ""email"": ""tiziansengerps4@gmail.com"", ""address"": ""Georg-Krammel-Str.3"", ""city"": ""Geisenfeld"", ""zip"": ""85290"", ""country"": ""DE""}",paid,paypal,97951512JW4307626,2025-11-22T15:53:35.433702

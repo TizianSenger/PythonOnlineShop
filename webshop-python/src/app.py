@@ -387,5 +387,69 @@ def remove_product_image(product_id, image_name):
     
     return jsonify({"success": False, "error": "Bild nicht gefunden"}), 404
 
+# Bestellungs-Verwaltung
+@app.route("/orders")
+def orders():
+    user = session.get("user")
+    if not user:
+        flash("Bitte loggen Sie sich ein.", "danger")
+        return redirect(url_for("login"))
+    
+    all_orders = csv_backend.get_all_orders()
+    
+    # Normale User sehen nur ihre eigenen Bestellungen
+    if user.get("role") != "admin":
+        orders_to_show = [o for o in all_orders if o.get("user_id") == user.get("id")]
+    else:
+        # Admin sieht alle Bestellungen
+        orders_to_show = all_orders
+    
+    # Parse und formatiere Bestellungen
+    formatted_orders = []
+    for order in orders_to_show:
+        formatted_order = _parse_order(order, user)
+        if formatted_order:
+            formatted_orders.append(formatted_order)
+    
+    # Sortiere nach Datum (neueste zuerst)
+    formatted_orders.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+    
+    return render_template("orders.html", user=user, orders=formatted_orders)
+
+def _parse_order(order, current_user):
+    """Parse order data and handle JSON fields"""
+    try:
+        order_items = order.get("items", "[]")
+        if isinstance(order_items, str):
+            order_items = json.loads(order_items) if order_items else []
+        
+        customer = order.get("customer", "{}")
+        if isinstance(customer, str):
+            customer = json.loads(customer) if customer else {}
+        
+        # Hole User-Name wenn Admin
+        user_name = ""
+        if current_user.get("role") == "admin":
+            users = csv_backend.get_all_users()
+            user_obj = next((u for u in users if u.get("id") == order.get("user_id")), None)
+            user_name = user_obj.get("name", "Unbekannt") if user_obj else "Unbekannt"
+        
+        return {
+            "id": order.get("id", ""),
+            "user_id": order.get("user_id", ""),
+            "user_name": user_name,
+            "order_items": order_items,
+            "total": order.get("total", "0"),
+            "customer": customer,
+            "status": order.get("status", "pending"),
+            "payment_provider": order.get("payment_provider", ""),
+            "provider_id": order.get("provider_id", ""),
+            "created_at": order.get("created_at", "")
+        }
+    except ValueError:
+        return None
+    except TypeError:
+        return None
+
 if __name__ == "__main__":
     app.run(debug=True)

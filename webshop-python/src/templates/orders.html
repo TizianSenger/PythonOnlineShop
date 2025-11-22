@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bestellungen - WebShop</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-paid {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-shipped {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-delivered {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .order-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .order-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .order-header-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .order-header-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .order-header-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .order-items {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .item-info {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .item-price {
+            text-align: right;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .order-total {
+            display: flex;
+            justify-content: flex-end;
+            gap: 2rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .customer-info {
+            background: var(--bg);
+            padding: 0.75rem;
+            border-radius: 0.25rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .customer-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem 0;
+        }
+
+        .customer-info-label {
+            font-weight: 500;
+            color: var(--text-muted);
+            min-width: 120px;
+        }
+
+        .customer-info-value {
+            color: var(--text);
+            flex: 1;
+            text-align: right;
+        }
+
+        .no-orders {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .no-orders-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .order-header {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .order-item {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .item-price {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="/" class="logo">🛍️ WebShop</a>
+            <ul class="nav-links">
+                <li><a href="/">Shop</a></li>
+                <li><a href="/cart">🛒 Warenkorb</a></li>
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/logout">Logout</a></li>
+                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1 class="mb-4">📦 {% if user.role == 'admin' %}Alle Bestellungen{% else %}Meine Bestellungen{% endif %}
+            </h1>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {% if orders %}
+            {% for order in orders %}
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="order-header-item">
+                        <span class="order-header-label">Bestellnummer</span>
+                        <span class="order-header-value">#{{ order.id }}</span>
+                    </div>
+                    {% if user.role == 'admin' %}
+                    <div class="order-header-item">
+                        <span class="order-header-label">Kunde</span>
+                        <span class="order-header-value">{{ order.user_name }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="order-header-item">
+                        <span class="order-header-label">Datum</span>
+                        <span class="order-header-value">
+                            {% if order.created_at %}
+                            {{ order.created_at[:10] }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="order-header-item">
+                        <span class="order-header-label">Status</span>
+                        <span class="status-badge status-{{ order.status }}">
+                            {% if order.status == 'pending' %}
+                            ⏳ Ausstehend
+                            {% elif order.status == 'paid' %}
+                            ✓ Bezahlt
+                            {% elif order.status == 'shipped' %}
+                            📦 Versandt
+                            {% elif order.status == 'delivered' %}
+                            ✓ Zugestellt
+                            {% elif order.status == 'cancelled' %}
+                            ✗ Storniert
+                            {% else %}
+                            {{ order.status }}
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-items">
+                    <h3
+                        style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.75rem;">
+                        Artikel</h3>
+                    {% if order.order_items %}
+                    {% for item in order.order_items %}
+                    <div class="order-item">
+                        <div class="item-details">
+                            <div class="item-name">{{ item.name }}</div>
+                            <div class="item-info">Menge: {{ item.quantity }} × €{{ "%.2f"|format(item.price|float) }}
+                            </div>
+                        </div>
+                        <div class="item-price">€{{ "%.2f"|format((item.quantity|int) * (item.price|float)) }}</div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Keine Artikel in dieser Bestellung</p>
+                    {% endif %}
+                </div>
+
+                <div class="order-total">
+                    <span>Gesamtbetrag:</span>
+                    <span style="color: var(--success);">€{{ "%.2f"|format(order.total|float) }}</span>
+                </div>
+
+                {% if order.customer %}
+                <div class="customer-info">
+                    <h4
+                        style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem;">
+                        Lieferadresse</h4>
+                    {% if order.customer.name %}
+                    <div class="customer-info-row">
+                        <span class="customer-info-label">Name:</span>
+                        <span class="customer-info-value">{{ order.customer.name }}</span>
+                    </div>
+                    {% endif %}
+                    {% if order.customer.email %}
+                    <div class="customer-info-row">
+                        <span class="customer-info-label">E-Mail:</span>
+                        <span class="customer-info-value">{{ order.customer.email }}</span>
+                    </div>
+                    {% endif %}
+                    {% if order.customer.address %}
+                    <div class="customer-info-row">
+                        <span class="customer-info-label">Adresse:</span>
+                        <span class="customer-info-value">{{ order.customer.address }}</span>
+                    </div>
+                    {% endif %}
+                    {% if order.customer.city %}
+                    <div class="customer-info-row">
+                        <span class="customer-info-label">Stadt:</span>
+                        <span class="customer-info-value">{{ order.customer.city }} {{ order.customer.zip }}</span>
+                    </div>
+                    {% endif %}
+                    {% if order.customer.country %}
+                    <div class="customer-info-row">
+                        <span class="customer-info-label">Land:</span>
+                        <span class="customer-info-value">{{ order.customer.country }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if user.role == 'admin' %}
+                <div
+                    style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                    <strong>Zahlungsinfo:</strong>
+                    {% if order.payment_provider %}
+                    {{ order.payment_provider|capitalize }}
+                    {% if order.provider_id %} - {{ order.provider_id[:20] }}{% if order.provider_id|length > 20 %}...{%
+                    endif %}{% endif %}
+                    {% else %}
+                    -
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="no-orders">
+                <div class="no-orders-icon">📭</div>
+                <h2>Keine Bestellungen vorhanden</h2>
+                <p>{% if user.role == 'admin' %}Es gibt noch keine Bestellungen.{% else %}Du hast noch keine
+                    Bestellungen aufgegeben.{% endif %}</p>
+                <a href="/" class="btn btn-primary" style="margin-top: 1rem;">Zum Shop</a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 WebShop. Alle Rechte vorbehalten.</p>
+    </footer>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        });
+    </script>
+</body>
+
+</html>
