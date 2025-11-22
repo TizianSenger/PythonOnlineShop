@@ -34,6 +34,10 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXT
 
+def get_cart_item_count(cart):
+    """Berechne die Gesamtanzahl der Artikel im Warenkorb"""
+    return sum(int(item.get('quantity', 1)) for item in cart)
+
 def send_registration_email(to_email, name, role):
     msg = EmailMessage()
     msg["Subject"] = "Willkommen beim WebShop"
@@ -91,7 +95,8 @@ def index():
 
     filtered = [p for p in products if matches(p)]
     cart = session.get("cart", [])
-    return render_template("index.html", products=filtered, cart_count=len(cart), categories=categories)
+    cart_count = get_cart_item_count(cart)
+    return render_template("index.html", products=filtered, cart_count=cart_count, categories=categories)
 
 @app.route("/product/<product_id>")
 def product_detail(product_id):
@@ -105,12 +110,15 @@ def product_detail(product_id):
     product['images'] = product.get('images', [])
     
     cart = session.get("cart", [])
-    return render_template("product_detail.html", product=product, cart_count=len(cart))
+    cart_count = get_cart_item_count(cart)
+    return render_template("product_detail.html", product=product, cart_count=cart_count)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "GET":
-        return render_template("register.html")
+        cart = session.get("cart", [])
+        cart_count = get_cart_item_count(cart)
+        return render_template("register.html", cart_count=cart_count)
     name = request.form.get("name", "").strip()
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password", "")
@@ -149,7 +157,9 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        return render_template("login.html")
+        cart = session.get("cart", [])
+        cart_count = get_cart_item_count(cart)
+        return render_template("login.html", cart_count=cart_count)
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password", "")
     users = csv_backend.get_all_users()
@@ -175,11 +185,18 @@ def dashboard():
         flash("Bitte loggen Sie sich ein.", "danger")
         return redirect(url_for("login"))
     products = csv_backend.get_all_products()
-    return render_template("dashboard.html", user=user, products=products)
+    cart = session.get("cart", [])
+    cart_count = get_cart_item_count(cart)
+    return render_template("dashboard.html", user=user, products=products, cart_count=cart_count)
 
 # Warenkorb-Routes
 @app.route("/cart")
 def cart():
+    user = session.get("user")
+    if not user:
+        flash("Bitte loggen Sie sich ein, um den Warenkorb zu sehen.", "danger")
+        return redirect(url_for("login"))
+    
     cart_items = session.get("cart", [])
     products = csv_backend.get_all_products()
     cart_with_details = []
@@ -193,15 +210,21 @@ def cart():
                 cart_item["price"] = 0.0
             cart_with_details.append(cart_item)
     total = sum(item["price"] * item["quantity"] for item in cart_with_details)
-    return render_template("cart.html", cart=cart_with_details, total=total)
+    cart_count = get_cart_item_count(session.get("cart", []))
+    return render_template("cart.html", cart=cart_with_details, total=total, cart_count=cart_count)
 
 @app.route("/add-to-cart", methods=["POST"])
 def add_to_cart():
+    # Prüfe, ob User eingeloggt ist
+    user = session.get("user")
+    if not user:
+        return jsonify({"success": False, "error": "Bitte loggen Sie sich ein, um Produkte hinzuzufügen."}), 401
+    
     data = request.get_json() or {}
     product_id = data.get("product_id")
     try:
         quantity = int(data.get("quantity", 1))
-    except:
+    except (ValueError, TypeError):
         quantity = 1
 
     cart = session.get("cart", [])
@@ -212,7 +235,8 @@ def add_to_cart():
         cart.append({"product_id": product_id, "quantity": quantity})
     session["cart"] = cart
     session.modified = True
-    return jsonify({"success": True, "cart_count": len(cart)})
+    cart_count = get_cart_item_count(cart)
+    return jsonify({"success": True, "cart_count": cart_count})
 
 @app.route("/remove-from-cart/<product_id>", methods=["POST"])
 def remove_from_cart(product_id):
@@ -292,7 +316,9 @@ def admin_products():
         return redirect(url_for("admin_products"))
 
     products = csv_backend.get_all_products()
-    return render_template("admin_products.html", user=user, products=products)
+    cart = session.get("cart", [])
+    cart_count = get_cart_item_count(cart)
+    return render_template("admin_products.html", user=user, products=products, cart_count=cart_count)
 
 @app.route("/admin/edit-product/<product_id>", methods=["GET", "POST"])
 def edit_product(product_id):
@@ -350,7 +376,9 @@ def edit_product(product_id):
         flash("Produkt aktualisiert.", "success")
         return redirect(url_for("admin_products"))
 
-    return render_template("edit_product.html", user=user, product=product)
+    cart = session.get("cart", [])
+    cart_count = get_cart_item_count(cart)
+    return render_template("edit_product.html", user=user, product=product, cart_count=cart_count)
 
 @app.route("/admin/delete-product/<product_id>", methods=["POST"])
 def delete_product(product_id):
@@ -414,7 +442,9 @@ def orders():
     # Sortiere nach Datum (neueste zuerst)
     formatted_orders.sort(key=lambda x: x.get("created_at", ""), reverse=True)
     
-    return render_template("orders.html", user=user, orders=formatted_orders)
+    cart = session.get("cart", [])
+    cart_count = get_cart_item_count(cart)
+    return render_template("orders.html", user=user, orders=formatted_orders, cart_count=cart_count)
 
 def _parse_order(order, current_user):
     """Parse order data and handle JSON fields"""

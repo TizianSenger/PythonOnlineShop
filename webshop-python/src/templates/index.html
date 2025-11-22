@@ -14,8 +14,8 @@
             <a href="/" class="logo">🛍️ WebShop</a>
             <ul class="nav-links">
                 <li><a href="/">Shop</a></li>
-                <li><a href="/cart">🛒 Warenkorb (<span id="cart-count">{{ cart_count }}</span>)</a></li>
                 {% if session.get('user') %}
+                <li><a href="/cart">🛒 Warenkorb (<span id="cart-count">{{ cart_count }}</span>)</a></li>
                 <li><a href="/dashboard">Dashboard</a></li>
                 <li><a href="/logout">Logout</a></li>
                 {% else %}
@@ -121,6 +121,11 @@
                         const countEl = document.getElementById('cart-count');
                         if (countEl) countEl.textContent = data.cart_count;
                         flashButton(btn);
+                        showToast(`${quantity} Artikel hinzugefügt! 🛒`, 'success');
+                    } else if (data && data.error) {
+                        // Benutzer muss sich einloggen
+                        alert(data.error);
+                        window.location.href = '/login';
                     }
                 })
                 .catch(err => console.error(err));
@@ -128,8 +133,26 @@
         function flashButton(btn) {
             if (!btn) return;
             btn.classList.add('btn-flash');
-            setTimeout(() => btn.classList.remove('btn-flash'), 450);
+            setTimeout(() => btn.classList.remove('btn-flash'), 600);
         }
+        function showToast(message, type = 'success') {
+            let container = document.querySelector('.toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: '✓', error: '✕', warning: '⚠' };
+            toast.innerHTML = `<span class="toast-icon">${icons[type]}</span><div class="toast-content"><p class="toast-message">${message}</p></div>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('closing');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
