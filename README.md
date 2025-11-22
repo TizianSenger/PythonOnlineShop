@@ -160,7 +160,8 @@ PythonOnlineShop/
 │   │   └── utils/            # Utility functions
 │   ├── data/                 # Data storage
 │   │   ├── csv/              # CSV data files
-│   │   └── webshop.db        # SQLite database
+│   │   ├── app.db           # SQLite database (API routes)
+│   │   └── webshop.db        # SQLite database (alternative)
 │   ├── tests/                # Test suite
 │   ├── requirements.txt      # Python dependencies
 │   └── pyproject.toml        # Project configuration
@@ -232,7 +233,8 @@ The application supports two storage backends:
 
 2. **SQLite Backend**: Uses SQLite database
    - Better performance for larger datasets
-   - Database file: `webshop-python/data/app.db`
+   - Database files: `webshop-python/data/app.db` (used by API) or `webshop-python/data/webshop.db` (default for SQLiteBackend class)
+   - Note: sqlite3 is part of Python's standard library and doesn't need separate installation
 
 To switch backends, modify the storage initialization in `app.py`.
 
