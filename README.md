@@ -186,18 +186,14 @@ The application provides RESTful API endpoints under `/api/`:
 
 ### Products
 - `GET /api/products` - List all products
-- `GET /api/products/<id>` - Get product details
-- `POST /api/products` - Create new product (admin only)
-- `PUT /api/products/<id>` - Update product (admin only)
-- `DELETE /api/products/<id>` - Delete product (admin only)
 
 ### Users
-- `POST /api/users/register` - Register new user
-- `POST /api/users/login` - User login
+- `POST /api/register` - Register new user
 
 ### Orders
-- `GET /api/orders` - List user orders
-- `POST /api/orders` - Create new order
+- `POST /api/order` - Create new order
+
+**Note**: Product management, order viewing, and other administrative functions are available through the web interface at `/admin/products` and `/orders`.
 
 ## 🧪 Testing
 
@@ -226,7 +222,7 @@ The application supports two storage backends:
 
 2. **SQLite Backend**: Uses SQLite database
    - Better performance for larger datasets
-   - Database file: `data/webshop.db`
+   - Database file: `data/app.db`
 
 To switch backends, modify the storage initialization in `app.py`.
 
@@ -266,8 +262,9 @@ For email functionality to work:
 
 **Port already in use:**
 ```bash
-# Change port in app.py or use:
-python app.py --port 5001
+# Modify the port in app.py (last line) or set environment variable:
+export FLASK_RUN_PORT=5001
+flask run
 ```
 
 **Module not found errors:**
