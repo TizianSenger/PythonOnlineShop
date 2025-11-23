@@ -222,3 +222,22 @@ class CSVBackend:
             fieldnames = ['id', 'user_id', 'product_id', 'quantity', 'total']
         self.write_csv('orders.csv', orders, fieldnames=fieldnames)
         return order_id
+
+    def update_order(self, order_id, updates):
+        """Update order fields (e.g., status)"""
+        orders = self.get_all_orders()
+        updated = False
+        for o in orders:
+            if o.get('id') == order_id:
+                for k, v in updates.items():
+                    o[k] = v
+                updated = True
+                break
+        if updated:
+            # Determine fieldnames
+            if orders and ('items' in orders[0] or 'customer' in orders[0]):
+                fieldnames = ['id', 'user_id', 'items', 'total', 'customer', 'status', 'payment_provider', 'provider_id', 'created_at']
+            else:
+                fieldnames = ['id', 'user_id', 'product_id', 'quantity', 'total']
+            self.write_csv('orders.csv', orders, fieldnames=fieldnames)
+        return updated

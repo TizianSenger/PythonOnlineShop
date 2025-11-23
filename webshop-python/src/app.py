@@ -416,6 +416,9 @@ def remove_product_image(product_id, image_name):
     return jsonify({"success": False, "error": "Bild nicht gefunden"}), 404
 
 # Bestellungs-Verwaltung
+# Status-Abfolge für Bestellungen
+ORDER_STATUSES = ["paid", "in_bearbeitung", "vorbereitung_transport", "abgeschickt", "zugestellt"]
+
 @app.route("/orders")
 def orders():
     user = session.get("user")
@@ -444,7 +447,26 @@ def orders():
     
     cart = session.get("cart", [])
     cart_count = get_cart_item_count(cart)
-    return render_template("orders.html", user=user, orders=formatted_orders, cart_count=cart_count)
+    return render_template("orders.html", user=user, orders=formatted_orders, cart_count=cart_count, statuses=ORDER_STATUSES)
+
+@app.route("/admin/update-order-status/<order_id>", methods=["POST"])
+def update_order_status(order_id):
+    """Update the status of an order (admin only)"""
+    user = session.get("user")
+    if not user or user.get("role") != "admin":
+        return jsonify({"success": False, "error": "Zugriff verweigert"}), 403
+    
+    data = request.get_json() or {}
+    new_status = data.get("status", "").strip()
+    
+    if new_status not in ORDER_STATUSES:
+        return jsonify({"success": False, "error": "Ungültiger Status"}), 400
+    
+    updated = csv_backend.update_order(order_id, {"status": new_status})
+    if updated:
+        return jsonify({"success": True, "message": "Status aktualisiert"})
+    else:
+        return jsonify({"success": False, "error": "Bestellung nicht gefunden"}), 404
 
 def _parse_order(order, current_user):
     """Parse order data and handle JSON fields"""

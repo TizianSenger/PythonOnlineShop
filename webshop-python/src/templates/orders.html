@@ -176,7 +176,41 @@
                 text-align: left;
             }
         }
+
+        .status-dropdown {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            background-color: var(--bg-secondary);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            min-width: 180px;
+        }
+
+        .status-dropdown:hover {
+            border-color: var(--primary);
+        }
+
+        .status-update-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .status-update-section label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
     </style>
+
 </head>
 
 <body>
@@ -237,11 +271,42 @@
                     </div>
                     <div class="order-header-item">
                         <span class="order-header-label">Status</span>
+                        {% if user.role == 'admin' %}
+                        <select class="status-dropdown"
+                            onchange="updateOrderStatus('{{ order.id }}', this.value, this)">
+                            <option value="">-- Status ändern --</option>
+                            {% for status in statuses %}
+                            <option value="{{ status }}" {% if order.status==status %}selected{% endif %}>
+                                {% if status == 'paid' %}
+                                ✓ Bezahlt
+                                {% elif status == 'in_bearbeitung' %}
+                                ⚙️ In Bearbeitung
+                                {% elif status == 'vorbereitung_transport' %}
+                                📦 Vorbereitung auf Transport
+                                {% elif status == 'abgeschickt' %}
+                                📮 Abgeschickt
+                                {% elif status == 'zugestellt' %}
+                                ✓ Zugestellt
+                                {% else %}
+                                {{ status }}
+                                {% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% else %}
                         <span class="status-badge status-{{ order.status }}">
                             {% if order.status == 'pending' %}
                             ⏳ Ausstehend
                             {% elif order.status == 'paid' %}
                             ✓ Bezahlt
+                            {% elif order.status == 'in_bearbeitung' %}
+                            ⚙️ In Bearbeitung
+                            {% elif order.status == 'vorbereitung_transport' %}
+                            📦 Vorbereitung auf Transport
+                            {% elif order.status == 'abgeschickt' %}
+                            📮 Abgeschickt
+                            {% elif order.status == 'zugestellt' %}
+                            ✓ Zugestellt
                             {% elif order.status == 'shipped' %}
                             📦 Versandt
                             {% elif order.status == 'delivered' %}
@@ -252,6 +317,7 @@
                             {{ order.status }}
                             {% endif %}
                         </span>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -361,6 +427,61 @@
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
         });
+
+        async function updateOrderStatus(orderId, newStatus, selectElement) {
+            if (!newStatus) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/update-order-status/${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Zeige Erfolgsmeldung
+                    const originalText = selectElement.innerHTML;
+                    selectElement.style.backgroundColor = '#d4edda';
+
+                    // Update the badge display
+                    updateStatusDisplay(orderId, newStatus);
+
+                    setTimeout(() => {
+                        selectElement.style.backgroundColor = '';
+                    }, 2000);
+                } else {
+                    alert(`Fehler: ${data.error || 'Status konnte nicht aktualisiert werden'}`);
+                    // Revert the select element to the previous value
+                    selectElement.value = selectElement.getAttribute('data-original-status') || '';
+                }
+            } catch (error) {
+                console.error('Fehler:', error);
+                alert('Fehler beim Aktualisieren des Status');
+                selectElement.value = selectElement.getAttribute('data-original-status') || '';
+            }
+        }
+
+        function updateStatusDisplay(orderId, newStatus) {
+            // Find the corresponding status display element and update it
+            const orderCards = document.querySelectorAll('.order-card');
+            for (const card of orderCards) {
+                const headerItems = card.querySelectorAll('.order-header-item');
+                for (let i = 0; i < headerItems.length; i++) {
+                    const label = headerItems[i].querySelector('.order-header-label');
+                    if (label && label.textContent.includes('Status')) {
+                        // Refresh the page or update the status badge
+                        location.reload();
+                        return;
+                    }
+                }
+            }
+        }
     </script>
 </body>
 
