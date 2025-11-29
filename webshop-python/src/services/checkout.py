@@ -34,7 +34,7 @@ def save_order(csv_backend, order):
     }
     return csv_backend.save_order(order_obj)
 
-def create_stripe_session(csv_backend, cart_items, customer, success_url, cancel_url):
+def create_stripe_session(csv_backend, cart_items, customer, success_url, cancel_url, user_id):
     if not stripe.api_key:
         raise RuntimeError("Stripe API key not configured")
 
@@ -55,6 +55,7 @@ def create_stripe_session(csv_backend, cart_items, customer, success_url, cancel
 
     # create order record first (pending)
     order = {
+        "user_id": user_id,
         "items": cart_items,
         "total": total,
         "customer": customer,
@@ -85,7 +86,7 @@ def create_stripe_session(csv_backend, cart_items, customer, success_url, cancel
     csv_backend.write_csv('orders.csv', orders, fieldnames=['id','user_id','items','total','customer','status','payment_provider','provider_id','created_at'])
     return session.url, order_id
 
-def create_paypal_order(csv_backend, cart_items, customer, return_url, cancel_url):
+def create_paypal_order(csv_backend, cart_items, customer, return_url, cancel_url, user_id):
     # Get access token
     token_resp = requests.post(f"{paypal_base()}/v1/oauth2/token",
                                auth=(PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET),
@@ -126,6 +127,7 @@ def create_paypal_order(csv_backend, cart_items, customer, return_url, cancel_ur
 
     # create order record first (pending)
     order = {
+        "user_id": user_id,
         "items": cart_items,
         "total": total,
         "customer": customer,

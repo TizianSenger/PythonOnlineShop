@@ -209,6 +209,169 @@
             color: var(--text-muted);
             text-transform: uppercase;
         }
+
+        .status-timeline {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 1.5rem;
+            background: var(--bg);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .timeline-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 0 0 auto;
+            position: relative;
+            min-width: 80px;
+        }
+
+        .timeline-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+            border: 2px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .timeline-circle:hover {
+            transform: scale(1.1);
+            border-color: var(--primary);
+        }
+
+        .timeline-circle.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
+        }
+
+        .timeline-circle.completed {
+            background-color: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .timeline-label {
+            font-size: 0.75rem;
+            text-align: center;
+            color: var(--text-muted);
+            max-width: 70px;
+            line-height: 1.2;
+            font-weight: 500;
+        }
+
+        .timeline-circle.active~.timeline-label,
+        .timeline-label.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .timeline-circle.completed~.timeline-label,
+        .timeline-label.completed {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .timeline-connector {
+            width: 30px;
+            height: 2px;
+            background-color: var(--border-color);
+            flex: 0 0 auto;
+            margin-bottom: 28px;
+            transition: background-color 0.3s ease;
+        }
+
+        .timeline-connector.completed {
+            background-color: #28a745;
+        }
+
+        .timeline-connector.active {
+            background-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .timeline-step {
+                min-width: 70px;
+            }
+
+            .timeline-circle {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+
+            .timeline-connector {
+                width: 20px;
+            }
+
+            .timeline-label {
+                font-size: 0.7rem;
+                max-width: 60px;
+            }
+        }
+
+        .admin-status-controls {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .admin-status-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .admin-status-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .status-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            background-color: var(--bg-secondary);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .status-btn:hover {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .status-btn.current {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
     </style>
 
 </head>
@@ -269,145 +432,140 @@
                             {% endif %}
                         </span>
                     </div>
-                    <div class="order-header-item">
-                        <span class="order-header-label">Status</span>
-                        {% if user.role == 'admin' %}
-                        <select class="status-dropdown"
-                            onchange="updateOrderStatus('{{ order.id }}', this.value, this)">
-                            <option value="">-- Status ändern --</option>
-                            {% for status in statuses %}
-                            <option value="{{ status }}" {% if order.status==status %}selected{% endif %}>
-                                {% if status == 'paid' %}
-                                ✓ Bezahlt
-                                {% elif status == 'in_bearbeitung' %}
-                                ⚙️ In Bearbeitung
-                                {% elif status == 'vorbereitung_transport' %}
-                                📦 Vorbereitung auf Transport
-                                {% elif status == 'abgeschickt' %}
-                                📮 Abgeschickt
-                                {% elif status == 'zugestellt' %}
-                                ✓ Zugestellt
-                                {% else %}
-                                {{ status }}
-                                {% endif %}
-                            </option>
-                            {% endfor %}
-                        </select>
-                        {% else %}
-                        <span class="status-badge status-{{ order.status }}">
-                            {% if order.status == 'pending' %}
-                            ⏳ Ausstehend
-                            {% elif order.status == 'paid' %}
-                            ✓ Bezahlt
-                            {% elif order.status == 'in_bearbeitung' %}
-                            ⚙️ In Bearbeitung
-                            {% elif order.status == 'vorbereitung_transport' %}
-                            📦 Vorbereitung auf Transport
-                            {% elif order.status == 'abgeschickt' %}
-                            📮 Abgeschickt
-                            {% elif order.status == 'zugestellt' %}
-                            ✓ Zugestellt
-                            {% elif order.status == 'shipped' %}
-                            📦 Versandt
-                            {% elif order.status == 'delivered' %}
-                            ✓ Zugestellt
-                            {% elif order.status == 'cancelled' %}
-                            ✗ Storniert
-                            {% else %}
-                            {{ order.status }}
-                            {% endif %}
-                        </span>
-                        {% endif %}
-                    </div>
                 </div>
 
-                <div class="order-items">
-                    <h3
-                        style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.75rem;">
-                        Artikel</h3>
-                    {% if order.order_items %}
-                    {% for item in order.order_items %}
-                    <div class="order-item">
-                        <div class="item-details">
-                            <div class="item-name">{{ item.name }}</div>
-                            <div class="item-info">Menge: {{ item.quantity }} × €{{ "%.2f"|format(item.price|float) }}
-                            </div>
+                <!-- Status Timeline -->
+                <div class="status-timeline">
+                    {% set status_order = ['paid', 'in_bearbeitung', 'vorbereitung_transport', 'abgeschickt',
+                    'zugestellt'] %}
+                    {% set status_icons = {'paid': '✓', 'in_bearbeitung': '⚙️', 'vorbereitung_transport': '📦',
+                    'abgeschickt': '📮', 'zugestellt': '✓'} %}
+                    {% set status_labels = {'paid': 'Bezahlt', 'in_bearbeitung': 'In Bearbeitung',
+                    'vorbereitung_transport': 'Vorbereitung', 'abgeschickt': 'Abgeschickt', 'zugestellt': 'Zugestellt'}
+                    %}
+
+                    {% for status in statuses %}
+                    {% set is_completed = status_order.index(status) < status_order.index(order.status) %} {% set
+                        is_active=status==order.status %} <div class="timeline-step">
+                        <div class="timeline-circle {% if is_active %}active{% elif is_completed %}completed{% endif %}"
+                            onclick="{% if user.role == 'admin' %}updateOrderStatus('{{ order.id }}', '{{ status }}'){% endif %}"
+                            title="{{ status_labels.get(status, status) }}"
+                            style="{% if user.role != 'admin' %}cursor: default;{% endif %}">
+                            {{ status_icons.get(status, '') }}
                         </div>
-                        <div class="item-price">€{{ "%.2f"|format((item.quantity|int) * (item.price|float)) }}</div>
-                    </div>
-                    {% endfor %}
-                    {% else %}
-                    <p style="color: var(--text-muted); font-size: 0.9rem;">Keine Artikel in dieser Bestellung</p>
-                    {% endif %}
+                        <div class="timeline-label {% if is_active %}active{% elif is_completed %}completed{% endif %}">
+                            {{ status_labels.get(status, status) }}
+                        </div>
                 </div>
 
-                <div class="order-total">
-                    <span>Gesamtbetrag:</span>
-                    <span style="color: var(--success);">€{{ "%.2f"|format(order.total|float) }}</span>
-                </div>
-
-                {% if order.customer %}
-                <div class="customer-info">
-                    <h4
-                        style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem;">
-                        Lieferadresse</h4>
-                    {% if order.customer.name %}
-                    <div class="customer-info-row">
-                        <span class="customer-info-label">Name:</span>
-                        <span class="customer-info-value">{{ order.customer.name }}</span>
-                    </div>
-                    {% endif %}
-                    {% if order.customer.email %}
-                    <div class="customer-info-row">
-                        <span class="customer-info-label">E-Mail:</span>
-                        <span class="customer-info-value">{{ order.customer.email }}</span>
-                    </div>
-                    {% endif %}
-                    {% if order.customer.address %}
-                    <div class="customer-info-row">
-                        <span class="customer-info-label">Adresse:</span>
-                        <span class="customer-info-value">{{ order.customer.address }}</span>
-                    </div>
-                    {% endif %}
-                    {% if order.customer.city %}
-                    <div class="customer-info-row">
-                        <span class="customer-info-label">Stadt:</span>
-                        <span class="customer-info-value">{{ order.customer.city }} {{ order.customer.zip }}</span>
-                    </div>
-                    {% endif %}
-                    {% if order.customer.country %}
-                    <div class="customer-info-row">
-                        <span class="customer-info-label">Land:</span>
-                        <span class="customer-info-value">{{ order.customer.country }}</span>
-                    </div>
-                    {% endif %}
+                {% if not loop.last %}
+                <div class="timeline-connector {% if is_completed %}completed{% elif is_active %}active{% endif %}">
                 </div>
                 {% endif %}
-
-                {% if user.role == 'admin' %}
-                <div
-                    style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                    <strong>Zahlungsinfo:</strong>
-                    {% if order.payment_provider %}
-                    {{ order.payment_provider|capitalize }}
-                    {% if order.provider_id %} - {{ order.provider_id[:20] }}{% if order.provider_id|length > 20 %}...{%
-                    endif %}{% endif %}
-                    {% else %}
-                    -
-                    {% endif %}
-                </div>
-                {% endif %}
+                {% endfor %}
             </div>
-            {% endfor %}
-            {% else %}
-            <div class="no-orders">
-                <div class="no-orders-icon">📭</div>
-                <h2>Keine Bestellungen vorhanden</h2>
-                <p>{% if user.role == 'admin' %}Es gibt noch keine Bestellungen.{% else %}Du hast noch keine
-                    Bestellungen aufgegeben.{% endif %}</p>
-                <a href="/" class="btn btn-primary" style="margin-top: 1rem;">Zum Shop</a>
+
+            {% if user.role == 'admin' %}
+            <div class="admin-status-controls">
+                <label class="admin-status-label">Status ändern:</label>
+                <div class="admin-status-buttons">
+                    {% for status in statuses %}
+                    <button class="status-btn {% if status == order.status %}current{% endif %}"
+                        onclick="updateOrderStatus('{{ order.id }}', '{{ status }}')">
+                        {{ status_icons.get(status, '') }} {{ status_labels.get(status, status) }}
+                    </button>
+                    {% endfor %}
+                </div>
             </div>
             {% endif %}
+
+            <div class="order-items">
+                <h3
+                    style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.75rem;">
+                    Artikel</h3>
+                {% if order.order_items %}
+                {% for item in order.order_items %}
+                <div class="order-item">
+                    <div class="item-details">
+                        <div class="item-name">{{ item.name }}</div>
+                        <div class="item-info">Menge: {{ item.quantity }} × €{{ "%.2f"|format(item.price|float) }}
+                        </div>
+                    </div>
+                    <div class="item-price">€{{ "%.2f"|format((item.quantity|int) * (item.price|float)) }}</div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Keine Artikel in dieser Bestellung</p>
+                {% endif %}
+            </div>
+
+            <div class="order-total">
+                <span>Gesamtbetrag:</span>
+                <span style="color: var(--success);">€{{ "%.2f"|format(order.total|float) }}</span>
+            </div>
+
+            {% if order.customer %}
+            <div class="customer-info">
+                <h4
+                    style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem;">
+                    Lieferadresse</h4>
+                {% if order.customer.name %}
+                <div class="customer-info-row">
+                    <span class="customer-info-label">Name:</span>
+                    <span class="customer-info-value">{{ order.customer.name }}</span>
+                </div>
+                {% endif %}
+                {% if order.customer.email %}
+                <div class="customer-info-row">
+                    <span class="customer-info-label">E-Mail:</span>
+                    <span class="customer-info-value">{{ order.customer.email }}</span>
+                </div>
+                {% endif %}
+                {% if order.customer.address %}
+                <div class="customer-info-row">
+                    <span class="customer-info-label">Adresse:</span>
+                    <span class="customer-info-value">{{ order.customer.address }}</span>
+                </div>
+                {% endif %}
+                {% if order.customer.city %}
+                <div class="customer-info-row">
+                    <span class="customer-info-label">Stadt:</span>
+                    <span class="customer-info-value">{{ order.customer.city }} {{ order.customer.zip }}</span>
+                </div>
+                {% endif %}
+                {% if order.customer.country %}
+                <div class="customer-info-row">
+                    <span class="customer-info-label">Land:</span>
+                    <span class="customer-info-value">{{ order.customer.country }}</span>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% if user.role == 'admin' %}
+            <div
+                style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                <strong>Zahlungsinfo:</strong>
+                {% if order.payment_provider %}
+                {{ order.payment_provider|capitalize }}
+                {% if order.provider_id %} - {{ order.provider_id[:20] }}{% if order.provider_id|length > 20 %}...{%
+                endif %}{% endif %}
+                {% else %}
+                -
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="no-orders">
+            <div class="no-orders-icon">📭</div>
+            <h2>Keine Bestellungen vorhanden</h2>
+            <p>{% if user.role == 'admin' %}Es gibt noch keine Bestellungen.{% else %}Du hast noch keine
+                Bestellungen aufgegeben.{% endif %}</p>
+            <a href="/" class="btn btn-primary" style="margin-top: 1rem;">Zum Shop</a>
+        </div>
+        {% endif %}
         </div>
     </main>
 
@@ -445,42 +603,22 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Zeige Erfolgsmeldung
-                    const originalText = selectElement.innerHTML;
-                    selectElement.style.backgroundColor = '#d4edda';
-
-                    // Update the badge display
-                    updateStatusDisplay(orderId, newStatus);
-
+                    // Refresh the page to show updated timeline
                     setTimeout(() => {
-                        selectElement.style.backgroundColor = '';
-                    }, 2000);
+                        location.reload();
+                    }, 500);
                 } else {
                     alert(`Fehler: ${data.error || 'Status konnte nicht aktualisiert werden'}`);
-                    // Revert the select element to the previous value
-                    selectElement.value = selectElement.getAttribute('data-original-status') || '';
                 }
             } catch (error) {
                 console.error('Fehler:', error);
                 alert('Fehler beim Aktualisieren des Status');
-                selectElement.value = selectElement.getAttribute('data-original-status') || '';
             }
         }
 
         function updateStatusDisplay(orderId, newStatus) {
-            // Find the corresponding status display element and update it
-            const orderCards = document.querySelectorAll('.order-card');
-            for (const card of orderCards) {
-                const headerItems = card.querySelectorAll('.order-header-item');
-                for (let i = 0; i < headerItems.length; i++) {
-                    const label = headerItems[i].querySelector('.order-header-label');
-                    if (label && label.textContent.includes('Status')) {
-                        // Refresh the page or update the status badge
-                        location.reload();
-                        return;
-                    }
-                }
-            }
+            // Refresh the page or update the status badge
+            location.reload();
         }
     </script>
 </body>

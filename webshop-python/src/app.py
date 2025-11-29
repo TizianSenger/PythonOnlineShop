@@ -169,12 +169,16 @@ def login():
         return redirect(url_for("login"))
 
     session["user"] = {"id": user.get("id"), "name": user.get("name"), "email": user.get("email"), "role": user.get("role", "user")}
+    session["cart"] = []  # Clear cart on login
+    session.modified = True
     flash("Eingeloggt.", "success")
     return redirect(url_for("dashboard"))
 
 @app.route("/logout")
 def logout():
     session.pop("user", None)
+    session.pop("cart", None)  # Clear cart on logout
+    session.modified = True
     flash("Ausgeloggt.", "info")
     return redirect(url_for("index"))
 

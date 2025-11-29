@@ -40,6 +40,12 @@ def checkout_page():
 
 @checkout_bp.route("/checkout/create", methods=["POST"])
 def create_checkout():
+    # Check if user is logged in
+    user = session.get("user")
+    if not user:
+        flash("Bitte melden Sie sich an, um eine Bestellung zu erstellen.", "danger")
+        return redirect(url_for("checkout_bp.checkout_page"))
+    
     data = request.form.to_dict()
     payment_method = data.get("payment_method", "stripe")
     # Collect customer info
@@ -63,10 +69,10 @@ def create_checkout():
 
     try:
         if payment_method == "stripe":
-            session_url, order_id = create_stripe_session(csv_backend, cart_items, customer, success_url, cancel_url)
+            session_url, order_id = create_stripe_session(csv_backend, cart_items, customer, success_url, cancel_url, user.get("id"))
             return redirect(session_url)
         elif payment_method == "paypal":
-            approve_url, order_id = create_paypal_order(csv_backend, cart_items, customer, f"{APP_BASE_URL}/api/checkout/paypal-return", cancel_url)
+            approve_url, order_id = create_paypal_order(csv_backend, cart_items, customer, f"{APP_BASE_URL}/api/checkout/paypal-return", cancel_url, user.get("id"))
             return redirect(approve_url)
         else:
             flash("Unbekannte Zahlungsart", "danger")
