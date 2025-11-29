@@ -464,21 +464,6 @@
                 {% endif %}
                 {% endfor %}
             </div>
-
-            {% if user.role == 'admin' %}
-            <div class="admin-status-controls">
-                <label class="admin-status-label">Status ändern:</label>
-                <div class="admin-status-buttons">
-                    {% for status in statuses %}
-                    <button class="status-btn {% if status == order.status %}current{% endif %}"
-                        onclick="updateOrderStatus('{{ order.id }}', '{{ status }}')">
-                        {{ status_icons.get(status, '') }} {{ status_labels.get(status, status) }}
-                    </button>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
             <div class="order-items">
                 <h3
                     style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.75rem;">
