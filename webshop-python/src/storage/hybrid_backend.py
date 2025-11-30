@@ -292,6 +292,25 @@ class HybridBackend:
                 break
         self.csv.write_csv('orders.csv', orders)
 
+    def delete_order(self, order_id):
+        """Lösche eine Bestellung aus beiden Systemen"""
+        # Versuche SQLite zu löschen
+        if self.sqlite:
+            try:
+                self.sqlite.delete_order(order_id)
+            except Exception as e:
+                self._log_fallback('delete_order', e)
+        
+        # Lösche auch aus CSV
+        try:
+            orders = self.csv.read_csv('orders.csv')
+            orders = [o for o in orders if str(o.get('id')) != str(order_id)]
+            self.csv.write_csv('orders.csv', orders)
+        except Exception as e:
+            self._log_fallback('delete_order_csv', e)
+        
+        return True
+
     # ===== CONSENT OPERATIONS =====
     
     def save_consent(self, user_id, consent_type, value):

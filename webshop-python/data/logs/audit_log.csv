@@ -6,3 +6,6 @@ timestamp,event_type,user_id,user_email,action,resource_type,resource_id,details
 2025-11-30T16:27:12.833112,cookie_consent,3,tiziansengerbw@gmail.com,Cookie consent provided,,,"{""essential"": true, ""analytics"": false, ""marketing"": false, ""timestamp"": ""2025-11-30T16:27:12.829Z""}",127.0.0.1,success
 2025-11-30T16:49:12.512338,cookie_consent,2,tiziansengerps4@gmail.com,Cookie consent provided,,,"{""essential"": true, ""analytics"": true, ""marketing"": true, ""timestamp"": ""2025-11-30T16:49:12.511Z""}",127.0.0.1,success
 2025-11-30T16:49:27.982181,cookie_consent,2,tiziansengerps4@gmail.com,Cookie consent provided,,,"{""essential"": true, ""analytics"": false, ""marketing"": false, ""timestamp"": ""2025-11-30T16:49:27.668Z""}",127.0.0.1,success
+2025-11-30T18:55:07.206080,admin_action,2,tiziansengerps4@gmail.com,delete_order,order,4,,127.0.0.1,success
+2025-11-30T18:55:14.282334,admin_action,2,tiziansengerps4@gmail.com,delete_order,order,1,,127.0.0.1,success
+2025-11-30T18:55:21.190493,admin_action,2,tiziansengerps4@gmail.com,delete_order,order,2,,127.0.0.1,success

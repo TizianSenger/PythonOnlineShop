@@ -517,6 +517,29 @@ def update_order_status(order_id):
     else:
         return jsonify({"success": False, "error": "Bestellung nicht gefunden"}), 404
 
+@app.route("/admin/delete-order/<order_id>", methods=["POST"])
+def delete_order(order_id):
+    """Delete an order (admin only)"""
+    user = session.get("user")
+    if not user or user.get("role") != "admin":
+        return jsonify({"success": False, "error": "Zugriff verweigert"}), 403
+    
+    try:
+        backend.delete_order(order_id)
+        audit_logger.log(
+            event_type=AuditLogType.ADMIN_ACTION,
+            user_id=user.get("id"),
+            user_email=user.get("email"),
+            action="delete_order",
+            resource_type="order",
+            resource_id=order_id,
+            ip_address=request.remote_addr
+        )
+        return jsonify({"success": True, "message": "Bestellung gelöscht"})
+    except Exception as e:
+        app.logger.error(f"Fehler beim Löschen der Bestellung: {e}")
+        return jsonify({"success": False, "error": "Fehler beim Löschen"}), 500
+
 def _parse_order(order, current_user):
     """Parse order data and handle JSON fields"""
     try:

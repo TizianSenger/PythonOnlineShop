@@ -271,6 +271,13 @@ class SQLiteBackend:
         self.connection.commit()
         return cursor.rowcount > 0
 
+    def delete_order(self, order_id):
+        """Lösche eine Bestellung"""
+        cursor = self.connection.cursor()
+        cursor.execute('DELETE FROM orders WHERE id = ?', (order_id,))
+        self.connection.commit()
+        return cursor.rowcount > 0
+
     # ===== CONSENT OPERATIONS =====
     
     def save_consent(self, user_id, consent_type, value):
