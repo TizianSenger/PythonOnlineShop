@@ -1,0 +1,2 @@
+timestamp,event_type,user_id,user_email,action,resource_type,resource_id,details,ip_address,status
+2025-11-30T16:24:52.708143,cookie_consent,3,tiziansengerbw@gmail.com,Cookie consent provided,,,"{""essential"": true, ""analytics"": true, ""marketing"": true, ""timestamp"": ""2025-11-30T16:24:52.704Z""}",127.0.0.1,success

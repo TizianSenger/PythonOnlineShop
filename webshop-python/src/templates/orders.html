@@ -600,12 +600,13 @@
                 alert('Fehler beim Aktualisieren des Status');
             }
         }
-
         function updateStatusDisplay(orderId, newStatus) {
             // Refresh the page or update the status badge
             location.reload();
         }
     </script>
+
+    {% include "cookie_banner.html" %}
 </body>
 
 </html>

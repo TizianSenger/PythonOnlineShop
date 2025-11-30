@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Datenexport - WebShop{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1>📋 Ihre persönlichen Daten</h1>
+    <p class="text-muted">DSGVO Art. 15 - Recht auf Auskunft</p>
+
+    {% if export_data %}
+    <div class="row mt-4">
+        <!-- Profildaten -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">👤 Profildaten</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Name:</dt>
+                        <dd class="col-sm-8">{{ export_data.profile.get('name', 'N/A') }}</dd>
+
+                        <dt class="col-sm-4">E-Mail:</dt>
+                        <dd class="col-sm-8">{{ export_data.profile.get('email', 'N/A') }}</dd>
+
+                        <dt class="col-sm-4">Rolle:</dt>
+                        <dd class="col-sm-8">{{ export_data.profile.get('role', 'user') }}</dd>
+
+                        <dt class="col-sm-4">Erstellt:</dt>
+                        <dd class="col-sm-8">{{ export_data.profile.get('created_at', 'N/A') }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Einwilligungen -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">✅ Ihre Einwilligungen</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Datenschutzerklärung akzeptiert:</strong>
+                        <span
+                            class="badge bg-{% if export_data.profile.get('privacy_accept') == 'True' %}success{% else %}danger{% endif %}">
+                            {{ export_data.profile.get('privacy_accept', 'Nein') }}
+                        </span>
+                    </p>
+                    <p><strong>Marketing E-Mails:</strong>
+                        <span
+                            class="badge bg-{% if export_data.profile.get('marketing_consent') == 'True' %}success{% else %}secondary{% endif %}">
+                            {{ export_data.profile.get('marketing_consent', 'Nein') }}
+                        </span>
+                    </p>
+                    <p><strong>Analytics:</strong>
+                        <span
+                            class="badge bg-{% if export_data.profile.get('analytics_consent') == 'True' %}success{% else %}secondary{% endif %}">
+                            {{ export_data.profile.get('analytics_consent', 'Nein') }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bestellhistorie -->
+    {% if export_data.orders %}
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">📦 Ihre Bestellungen ({{ export_data.orders|length }})</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Bestellungs-ID</th>
+                        <th>Datum</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in export_data.orders %}
+                    <tr>
+                        <td><strong>#{{ order.get('id') }}</strong></td>
+                        <td>{{ order.get('created_at', 'N/A') }}</td>
+                        <td>{{ order.get('total', '0') }}€</td>
+                        <td>
+                            <span
+                                class="badge bg-{% if order.get('status') == 'paid' %}success{% elif order.get('status') == 'pending' %}warning{% else %}info{% endif %}">
+                                {{ order.get('status', 'unknown') }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Einwilligungshistorie -->
+    {% if export_data.consents %}
+    <div class="card mt-4">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">📝 Einwilligungshistorie</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Typ</th>
+                        <th>Wert</th>
+                        <th>Zeitstempel</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for consent in export_data.consents %}
+                    <tr>
+                        <td>{{ consent.get('consent_type') }}</td>
+                        <td>
+                            <span
+                                class="badge bg-{% if consent.get('value') == 'true' or consent.get('value') == 'True' %}success{% else %}secondary{% endif %}">
+                                {{ consent.get('value') }}
+                            </span>
+                        </td>
+                        <td><small>{{ consent.get('timestamp') }}</small></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="mt-4 d-flex gap-2">
+        <form method="post" action="{{ url_for('gdpr_export_data') }}" class="d-inline">
+            <select name="format" class="form-select d-inline-block w-auto me-2">
+                <option value="json">JSON</option>
+                <option value="csv">CSV</option>
+            </select>
+            <button type="submit" class="btn btn-primary">
+                💾 Daten exportieren
+            </button>
+        </form>
+        <a href="{{ url_for('gdpr_rights') }}" class="btn btn-secondary">
+            ← Zurück
+        </a>
+    </div>
+
+    {% else %}
+    <div class="alert alert-danger">
+        Keine Daten gefunden
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -372,12 +372,13 @@
 
         if (payStripe) payStripe.addEventListener('click', handlePayClick);
         if (payPaypal) payPaypal.addEventListener('click', handlePayClick);
-
         // initial check (in case prefilled user email)
         window.addEventListener('load', () => {
             checkValidity();
         });
     </script>
+
+    {% include "cookie_banner.html" %}
 </body>
 
 </html>

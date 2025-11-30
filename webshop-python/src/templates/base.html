@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - WebShop</title>
+    <title>{% block title %}WebShop{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block extra_css %}{% endblock %}
 </head>
 
 <body>
@@ -14,8 +15,11 @@
             <a href="/" class="logo">🛍️ WebShop</a>
             <ul class="nav-links">
                 <li><a href="/">Shop</a></li>
+                <li><a href="{{ url_for('privacy_policy') }}">Datenschutz</a></li>
+                <li><a href="{{ url_for('impressum') }}">Impressum</a></li>
                 {% if session.get('user') %}
-                <li><a href="/cart">🛒 Warenkorb (<span id="cart-count">{{ cart_count }}</span>)</a></li>
+                <li><a href="/cart">🛒 Warenkorb (<span id="cart-count">{{ cart_count or 0 }}</span>)</a></li>
+                <li><a href="{{ url_for('gdpr_rights') }}">Betroffenenrechte</a></li>
                 <li><a href="/dashboard">Dashboard</a></li>
                 <li><a href="/logout">Logout</a></li>
                 {% else %}
@@ -28,41 +32,15 @@
     </header>
 
     <main>
-        <div class="container">
-            <div style="max-width: 400px; margin: 3rem auto;">
-                <h1 class="text-center mb-4">Login</h1>
-
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-                {% endif %}
-                {% endwith %}
-
-                <div class="card">
-                    <form method="POST">
-                        <div class="form-group">
-                            <label for="email">Email:</label>
-                            <input type="email" id="email" name="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Passwort:</label>
-                            <input type="password" id="password" name="password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block">Login</button>
-                    </form>
-                    <p class="text-center mt-3 text-muted">
-                        Noch kein Konto? <a href="/register" style="color: var(--primary); text-decoration: none;">Hier
-                            registrieren</a>
-                    </p>
-                </div>
-            </div>
-        </div>
+        {% block content %}{% endblock %}
     </main>
 
     <footer>
-        <p>&copy; 2025 WebShop. Alle Rechte vorbehalten.</p>
+        <p>&copy; 2025 WebShop. Alle Rechte vorbehalten.
+            <a href="{{ url_for('privacy_policy') }}">Datenschutz</a> |
+            <a href="{{ url_for('impressum') }}">Impressum</a> |
+            <a href="{{ url_for('terms_of_service') }}">AGB</a>
+        </p>
     </footer>
 
     <script>
@@ -89,6 +67,8 @@
     </script>
 
     {% include "cookie_banner.html" %}
+
+    {% block extra_js %}{% endblock %}
 </body>
 
 </html>

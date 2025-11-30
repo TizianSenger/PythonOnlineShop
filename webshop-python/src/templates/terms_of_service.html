@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Allgemeine Geschäftsbedingungen - WebShop{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1>Allgemeine Geschäftsbedingungen (AGB)</h1>
+    <p class="text-muted">Gültig ab: {{ current_date }}</p>
+
+    <h2 class="mt-4">1. Geltungsbereich und Vertragspartner</h2>
+    <p>
+        Diese Bedingungen gelten für alle Verträge zwischen der WebShop GmbH ("Verkäufer") und Käufern ("Kunde").
+        Abweichende Bedingungen des Kunden werden nicht akzeptiert.
+    </p>
+
+    <h2 class="mt-4">2. Registrierung und Kundenkonto</h2>
+    <ul>
+        <li>Kunden müssen sich registrieren, um Produkte zu kaufen</li>
+        <li>Kundendaten müssen korrekt und vollständig sein</li>
+        <li>Kunden sind für die Geheimhaltung ihres Passworts verantwortlich</li>
+        <li>Wiederverkauf von Konten ist nicht gestattet</li>
+    </ul>
+
+    <h2 class="mt-4">3. Warenkorb und Bestellung</h2>
+    <h3>3.1 Abgabe und Bestätigung</h3>
+    <p>
+        Die Anzeige von Produkten stellt kein rechtsverbindliches Angebot dar.
+        Die Bestellung durch den Kunden ist ein Angebot zum Abschluss eines Kaufvertrages.
+        Der Vertrag kommt zustande durch unsere Annahme (Bestellbestätigung per E-Mail).
+    </p>
+
+    <h3>3.2 Lagerbestände</h3>
+    <p>
+        Alle Preise und Verfügbarkeiten sind unter Vorbehalt. Wir behalten uns das Recht vor,
+        Bestellungen aufgrund von Lagerbeständen abzulehnen.
+    </p>
+
+    <h2 class="mt-4">4. Preise und Zahlung</h2>
+    <h3>4.1 Preise</h3>
+    <ul>
+        <li>Alle Preise enthalten die MwSt. (19%)</li>
+        <li>Versandkosten werden separat berechnet (falls nicht kostenlos)</li>
+        <li>Preisangaben sind freibleibend</li>
+    </ul>
+
+    <h3>4.2 Zahlungsmittel</h3>
+    <p>
+        Zahlungen erfolgen über Stripe oder PayPal. Kartendaten werden nicht auf unseren Servern gespeichert.
+        Alle Zahlungen sind PCI-DSS konform.
+    </p>
+
+    <h3>4.3 Zahlungsverzug</h3>
+    <p>
+        Bei Zahlungsverzug berechnen wir Verzugszinsen nach § 288 BGB.
+    </p>
+
+    <h2 class="mt-4">5. Lieferung</h2>
+    <h3>5.1 Lieferzeiten</h3>
+    <p>
+        Lieferzeiten sind Orientierungswerte. Eine Nichteinhaltung begründet keinen Anspruch auf Schadensersatz.
+    </p>
+
+    <h3>5.2 Versand</h3>
+    <p>
+        Der Versand erfolgt auf Risiko des Kunden. Versicherung kann auf Anfrage arrangiert werden.
+    </p>
+
+    <h2 class="mt-4">6. Mängelhaftung und Rückgabe</h2>
+    <h3>6.1 Rückgaberecht (14 Tage)</h3>
+    <p>
+        Sie haben das Recht, die gekauften Produkte innerhalb von 14 Tagen ohne Angabe von Gründen zurückzugeben.
+        Die Kosten für die Rückgabe trägt der Kunde.
+    </p>
+
+    <h3>6.2 Gewährleistung</h3>
+    <p>
+        Mängel müssen innerhalb von 2 Wochen nach Erhalt gemeldet werden.
+        Die Gewährleistung beträgt 2 Jahre ab Kaufdatum.
+    </p>
+
+    <h2 class="mt-4">7. Haftung</h2>
+    <p>
+        Die Haftung für leichte Fahrlässigkeit ist ausgeschlossen. Wir haften nicht für:
+    </p>
+    <ul>
+        <li>Datenverlust oder technische Fehler</li>
+        <li>Entgangene Gewinne</li>
+        <li>Höhere Gewalt oder Naturereignisse</li>
+    </ul>
+
+    <h2 class="mt-4">8. Datenschutz</h2>
+    <p>
+        Alle Kundendaten werden nach DSGVO verarbeitet.
+        Siehe unsere <a href="{{ url_for('privacy_policy') }}">Datenschutzerklärung</a>.
+    </p>
+
+    <h2 class="mt-4">9. Verbraucherschutz</h2>
+    <p>
+        Für Verbraucher gelten zusätzliche Schutzbestimmungen nach deutschem Verbraucherschutzrecht.
+        Bei Streitigkeiten können Sie sich an die Online-Streitbeilegungsplattform wenden:
+        <a href="https://ec.europa.eu/consumers/odr/" target="_blank">https://ec.europa.eu/consumers/odr/</a>
+    </p>
+
+    <h2 class="mt-4">10. Schlussbestimmungen</h2>
+    <p>
+        Es gilt deutsches Recht. Gerichtsstand ist [Ihre Stadt].
+    </p>
+
+    <hr class="my-5">
+    <p class="text-muted">Für Fragen kontaktieren Sie uns unter: <a
+            href="mailto:support@webshop.de">support@webshop.de</a></p>
+
+</div>
+{% endblock %}

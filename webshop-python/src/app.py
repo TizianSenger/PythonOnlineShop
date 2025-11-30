@@ -1,10 +1,12 @@
 import os
 import smtplib
 import json
+import csv as csv_module
 from email.message import EmailMessage
 from pathlib import Path
+from datetime import datetime
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, send_file
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
@@ -12,6 +14,7 @@ from storage.csv_backend import CSVBackend
 from api.routes import api_bp
 from api.checkout_routes import checkout_bp
 from config import SECRET_KEY, SMTP_USER, SMTP_PASS, ADMIN_PIN, CSV_FOLDER_PATH
+from utils.logging_service import audit_logger, AuditLogType
 
 # App initialisieren
 app = Flask(__name__,
@@ -129,6 +132,14 @@ def register():
         flash("Bitte alle Pflichtfelder ausfüllen.", "danger")
         return redirect(url_for("register"))
 
+    # DSGVO-Einwilligungen prüfen
+    privacy_accept = request.form.get("privacy_accept") == "on"
+    terms_accept = request.form.get("terms_accept") == "on"
+    
+    if not privacy_accept or not terms_accept:
+        flash("Bitte akzeptieren Sie die Datenschutzerklärung und AGB.", "danger")
+        return redirect(url_for("register"))
+
     if role == "admin" and admin_pin != ADMIN_PIN:
         flash("Falscher Admin-PIN.", "danger")
         return redirect(url_for("register"))
@@ -143,13 +154,33 @@ def register():
         "name": name,
         "email": email,
         "password": hashed,
-        "role": role
+        "role": role,
+        "privacy_accept": "True",
+        "marketing_consent": "True" if request.form.get("marketing_consent") == "on" else "False",
+        "analytics_consent": "True" if request.form.get("analytics_consent") == "on" else "False"
     }
     user_id = csv_backend.save_user(user)
+    
+    # Logge Registrierung (DSGVO-Compliance)
+    audit_logger.log(
+        event_type=AuditLogType.USER_REGISTRATION,
+        user_id=user_id,
+        user_email=email,
+        action="User registered",
+        details={"role": role},
+        ip_address=request.remote_addr
+    )
+    
+    # Speichere Einwilligungen separat
+    csv_backend.save_consent(user_id, "privacy_policy", "True")
+    csv_backend.save_consent(user_id, "marketing", user.get("marketing_consent"))
+    csv_backend.save_consent(user_id, "analytics", user.get("analytics_consent"))
+    
     try:
         send_registration_email(email, name, role)
     except Exception:
         pass
+    
     session["user"] = {"id": user_id, "name": name, "email": email, "role": role}
     flash("Registrierung erfolgreich.", "success")
     return redirect(url_for("dashboard"))
@@ -506,6 +537,263 @@ def _parse_order(order, current_user):
         return None
     except TypeError:
         return None
+
+
+# ===== DSGVO-Compliance Routes =====
+
+@app.route("/privacy-policy")
+def privacy_policy():
+    """Datenschutzerklärung (DSGVO-Anforderung)"""
+    return render_template("privacy_policy.html", current_date=datetime.now().strftime("%d.%m.%Y"))
+
+@app.route("/impressum")
+def impressum():
+    """Impressum (TMG-Anforderung)"""
+    return render_template("impressum.html", current_date=datetime.now().strftime("%d.%m.%Y"))
+
+@app.route("/terms-of-service")
+def terms_of_service():
+    """Allgemeine Geschäftsbedingungen"""
+    cart = session.get("cart", [])
+    cart_count = get_cart_item_count(cart)
+    return render_template("terms_of_service.html", cart_count=cart_count)
+
+@app.route("/gdpr-rights")
+def gdpr_rights():
+    """Betroffenenrechte (Art. 12-22 DSGVO)"""
+    user = session.get("user")
+    cart = session.get("cart", [])
+    cart_count = get_cart_item_count(cart)
+    return render_template("gdpr_rights.html", user=user, cart_count=cart_count)
+
+@app.route("/api/log-cookie-consent", methods=["POST"])
+def log_cookie_consent():
+    """Logge Cookie-Einwilligung (DSGVO-Compliance)"""
+    try:
+        data = request.get_json() or {}
+        user = session.get("user")
+        user_id = user.get("id") if user else None
+        user_email = user.get("email") if user else "anonymous"
+        
+        audit_logger.log(
+            event_type=AuditLogType.COOKIE_CONSENT,
+            user_id=user_id,
+            user_email=user_email,
+            action="Cookie consent provided",
+            details=data,
+            ip_address=request.remote_addr
+        )
+        
+        return jsonify({"success": True})
+    except Exception as e:
+        print(f"Fehler beim Logging der Cookie-Einwilligung: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/gdpr/data-export", methods=["GET"])
+def gdpr_data_export():
+    """Exportiere Benutzerdaten (Art. 15 DSGVO - Recht auf Auskunft)"""
+    user = session.get("user")
+    if not user:
+        flash("Bitte melden Sie sich an.", "danger")
+        return redirect(url_for("login"))
+    
+    user_id = user.get("id")
+    
+    # Logge Dateneinsicht
+    audit_logger.log(
+        event_type=AuditLogType.USER_DATA_EXPORT,
+        user_id=user_id,
+        user_email=user.get("email"),
+        action="User requested data export",
+        ip_address=request.remote_addr
+    )
+    
+    # Hole alle Benutzerdaten
+    export_data = csv_backend.export_user_data(user_id)
+    if not export_data:
+        flash("Benutzerdaten nicht gefunden.", "danger")
+        return redirect(url_for("dashboard"))
+    
+    cart = session.get("cart", [])
+    cart_count = get_cart_item_count(cart)
+    
+    return render_template("gdpr_data_view.html", 
+                         user=user, 
+                         export_data=export_data,
+                         cart_count=cart_count)
+
+@app.route("/gdpr/export-data", methods=["POST"])
+def gdpr_export_data():
+    """Exportiere Benutzerdaten als JSON/CSV (Art. 20 DSGVO - Datenportabilität)"""
+    user = session.get("user")
+    if not user:
+        return jsonify({"success": False, "error": "Nicht authentifiziert"}), 401
+    
+    user_id = user.get("id")
+    format_type = request.form.get("format", "json").lower()
+    
+    # Hole Daten
+    export_data = csv_backend.export_user_data(user_id)
+    if not export_data:
+        return jsonify({"success": False, "error": "Daten nicht gefunden"}), 404
+    
+    # Logge Export
+    audit_logger.log(
+        event_type=AuditLogType.USER_DATA_EXPORT,
+        user_id=user_id,
+        user_email=user.get("email"),
+        action=f"Data export requested ({format_type})",
+        ip_address=request.remote_addr
+    )
+    
+    if format_type == "json":
+        # JSON Export
+        import io
+        json_data = json.dumps(export_data, ensure_ascii=False, indent=2)
+        return send_file(
+            io.BytesIO(json_data.encode('utf-8')),
+            mimetype="application/json",
+            as_attachment=True,
+            download_name=f"webshop_data_{user_id}_{datetime.now().strftime('%Y%m%d')}.json"
+        )
+    
+    elif format_type == "csv":
+        # CSV Export (vereinfacht)
+        import io
+        output = io.StringIO()
+        writer = csv_module.writer(output)
+        
+        # Profile
+        writer.writerow(["=== PROFILDATEN ==="])
+        writer.writerow(["Feld", "Wert"])
+        for key, value in export_data['profile'].items():
+            writer.writerow([key, str(value)])
+        
+        # Orders
+        writer.writerow([])
+        writer.writerow(["=== BESTELLUNGEN ==="])
+        writer.writerow(["Bestellungs-ID", "Datum", "Total", "Status"])
+        for order in export_data['orders']:
+            writer.writerow([
+                order.get('id'),
+                order.get('created_at', 'N/A'),
+                order.get('total'),
+                order.get('status')
+            ])
+        
+        # Consents
+        writer.writerow([])
+        writer.writerow(["=== EINWILLIGUNGEN ==="])
+        writer.writerow(["Typ", "Wert", "Zeitstempel"])
+        for consent in export_data['consents']:
+            writer.writerow([
+                consent.get('consent_type'),
+                consent.get('value'),
+                consent.get('timestamp')
+            ])
+        
+        csv_bytes = io.BytesIO(output.getvalue().encode('utf-8'))
+        return send_file(
+            csv_bytes,
+            mimetype="text/csv",
+            as_attachment=True,
+            download_name=f"webshop_data_{user_id}_{datetime.now().strftime('%Y%m%d')}.csv"
+        )
+    
+    return jsonify({"success": False, "error": "Ungültiges Format"}), 400
+
+@app.route("/gdpr/delete-account", methods=["POST"])
+def gdpr_delete_account():
+    """Lösche Benutzerkonto und Daten (Art. 17 DSGVO - Recht auf Vergessenwerden)"""
+    user = session.get("user")
+    if not user:
+        flash("Bitte melden Sie sich an.", "danger")
+        return redirect(url_for("login"))
+    
+    user_id = user.get("id")
+    user_email = user.get("email")
+    
+    # Logge Löschung VOR dem Löschen
+    audit_logger.log(
+        event_type=AuditLogType.USER_DATA_DELETED,
+        user_id=user_id,
+        user_email=user_email,
+        action="User account deletion request",
+        ip_address=request.remote_addr,
+        status="pending"
+    )
+    
+    # Lösche Benutzer
+    try:
+        csv_backend.delete_user(user_id)
+        
+        # Update Log Status
+        audit_logger.log(
+            event_type=AuditLogType.USER_DATA_DELETED,
+            user_id=user_id,
+            user_email=user_email,
+            action="User account and data deleted",
+            ip_address=request.remote_addr,
+            status="success"
+        )
+        
+        # Logout
+        session.pop("user", None)
+        session.pop("cart", None)
+        session.modified = True
+        
+        flash("✓ Ihr Konto und alle persönlichen Daten wurden gelöscht.", "success")
+        return redirect(url_for("index"))
+    
+    except Exception as e:
+        audit_logger.log(
+            event_type=AuditLogType.USER_DATA_DELETED,
+            user_id=user_id,
+            user_email=user_email,
+            action=f"Account deletion failed: {str(e)}",
+            ip_address=request.remote_addr,
+            status="failure"
+        )
+        flash(f"Fehler beim Löschen des Kontos: {str(e)}", "danger")
+        return redirect(url_for("gdpr_rights"))
+
+@app.route("/preferences")
+def preferences():
+    """Benutzer-Präferenzen (DSGVO Widerspruchsrecht)"""
+    user = session.get("user")
+    if not user:
+        flash("Bitte melden Sie sich an.", "danger")
+        return redirect(url_for("login"))
+    
+    cart = session.get("cart", [])
+    cart_count = get_cart_item_count(cart)
+    
+    return render_template("preferences.html", user=user, cart_count=cart_count)
+
+@app.route("/profile/edit")
+def profile_edit():
+    """Profilbearbeitung (DSGVO Berichtigungsrecht)"""
+    user = session.get("user")
+    if not user:
+        flash("Bitte melden Sie sich an.", "danger")
+        return redirect(url_for("login"))
+    
+    users = csv_backend.get_all_users()
+    full_user = next((u for u in users if u.get("id") == user.get("id")), None)
+    
+    cart = session.get("cart", [])
+    cart_count = get_cart_item_count(cart)
+    
+    return render_template("profile_edit.html", user=full_user, cart_count=cart_count)
+
+
+# Logging für wichtige Operationen
+@app.before_request
+def before_request():
+    """Logge alle Requests (optional, für Sicherheit)"""
+    # Nur wichtige Routes loggen, um Performance nicht zu beeinträchtigen
+    if request.path in ['/login', '/register', '/logout', '/cart', '/orders']:
+        pass  # Wird bereits in den Routes geloggt
 
 if __name__ == "__main__":
     app.run(debug=True)

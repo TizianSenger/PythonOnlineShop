@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Präferenzen - WebShop{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1>⚙️ Deine Einstellungen & Präferenzen</h1>
+    <p class="text-muted">DSGVO Art. 21 - Widerspruchsrecht</p>
+
+    <div class="row mt-4">
+        <!-- Marketing-Präferenzen -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📧 Marketing & E-Mails</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="/api/update-preferences" class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="marketing-emails"
+                                name="marketing_emails">
+                            <label class="form-check-label" for="marketing-emails">
+                                <strong>Marketing E-Mails erhalten</strong>
+                                <small class="d-block text-muted">
+                                    Erhalte Angebote, neue Produkte und Neuigkeiten
+                                </small>
+                            </label>
+                        </div>
+                        <hr>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="newsletter" name="newsletter">
+                            <label class="form-check-label" for="newsletter">
+                                <strong>Newsletter</strong>
+                                <small class="d-block text-muted">
+                                    Wöchentliche Zusammenfassung von Angeboten
+                                </small>
+                            </label>
+                        </div>
+                        <hr>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="order-notifications"
+                                name="order_notifications" checked>
+                            <label class="form-check-label" for="order-notifications">
+                                <strong>Bestellbestätigungen (erforderlich)</strong>
+                                <small class="d-block text-muted">
+                                    Kann nicht deaktiviert werden
+                                </small>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-primary mt-3">Speichern</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Datenschutz & Tracking -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">🔒 Datenschutz & Tracking</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="analytics" name="analytics">
+                        <label class="form-check-label" for="analytics">
+                            <strong>Website-Analyse deaktivieren</strong>
+                            <small class="d-block text-muted">
+                                Blockiere Google Analytics & ähnliche Tools
+                            </small>
+                        </label>
+                    </div>
+                    <hr>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="marketing-cookies" name="marketing_cookies">
+                        <label class="form-check-label" for="marketing-cookies">
+                            <strong>Marketing-Cookies ablehnen</strong>
+                            <small class="d-block text-muted">
+                                Verweigere personalisierte Werbung von Drittanbietern
+                            </small>
+                        </label>
+                    </div>
+                    <hr>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="do-not-track" name="do_not_track">
+                        <label class="form-check-label" for="do-not-track">
+                            <strong>Do Not Track</strong>
+                            <small class="d-block text-muted">
+                                Sende "Do Not Track" Signal an Websites
+                            </small>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-success mt-3">Speichern</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4 border-danger">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">🗑️ Konto-Verwaltung</h5>
+        </div>
+        <div class="card-body">
+            <h6>Datenlöschung</h6>
+            <p>
+                Sie können Ihr Konto und alle persönlichen Daten jederzeit löschen.
+                Dies ist nicht rückgängig zu machen.
+            </p>
+            <a href="{{ url_for('gdpr_rights') }}" class="btn btn-sm btn-danger">
+                Konto löschen
+            </a>
+
+            <hr>
+
+            <h6 class="mt-3">Datenexport</h6>
+            <p>
+                Laden Sie alle Ihre Daten in strukturiertem Format herunter.
+            </p>
+            <a href="{{ url_for('gdpr_data_export') }}" class="btn btn-sm btn-primary">
+                Daten exportieren
+            </a>
+        </div>
+    </div>
+
+    <div class="alert alert-info mt-4">
+        <strong>ℹ️ Diese Einstellungen basieren auf der DSGVO Art. 21 (Widerspruchsrecht)</strong>
+        <p class="mb-0">Sie können Ihre Einstellungen jederzeit ändern. Änderungen werden sofort wirksam.</p>
+    </div>
+
+</div>
+{% endblock %}

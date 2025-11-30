@@ -17,13 +17,14 @@ class CSVBackend:
                 for user in users:
                     if 'username' in user:
                         user['name'] = user.pop('username')
-                self.write_csv('users.csv', users, fieldnames=['id', 'name', 'email', 'password', 'role'])
+                self.write_csv('users.csv', users, fieldnames=['id', 'name', 'email', 'password', 'role', 'privacy_accept', 'marketing_consent', 'analytics_consent', 'created_at'])
 
     def _ensure_csv_files(self):
         files = {
-            'users.csv': ['id', 'name', 'email', 'password', 'role'],
+            'users.csv': ['id', 'name', 'email', 'password', 'role', 'privacy_accept', 'marketing_consent', 'analytics_consent', 'created_at'],
             'products.csv': ['id', 'name', 'category', 'price', 'description', 'images', 'stock'],
-            'orders.csv': ['id', 'user_id', 'product_id', 'quantity', 'total']
+            'orders.csv': ['id', 'user_id', 'product_id', 'quantity', 'total'],
+            'user_consents.csv': ['id', 'user_id', 'consent_type', 'value', 'timestamp']
         }
         for filename, headers in files.items():
             filepath = self.csv_folder / filename
@@ -240,4 +241,88 @@ class CSVBackend:
             else:
                 fieldnames = ['id', 'user_id', 'product_id', 'quantity', 'total']
             self.write_csv('orders.csv', orders, fieldnames=fieldnames)
+
+    # ===== DSGVO-Compliance Methoden =====
+    
+    def save_consent(self, user_id, consent_type, value):
+        """Speichere Benutzer-Einwilligung (DSGVO-Compliance)"""
+        from datetime import datetime
+        consent = {
+            'id': str(max([int(c.get('id', 0)) for c in self.read_csv('user_consents.csv')] + [0]) + 1),
+            'user_id': user_id,
+            'consent_type': consent_type,
+            'value': str(value),
+            'timestamp': datetime.utcnow().isoformat()
+        }
+        consents = self.read_csv('user_consents.csv')
+        consents.append(consent)
+        self.write_csv('user_consents.csv', consents, 
+                      fieldnames=['id', 'user_id', 'consent_type', 'value', 'timestamp'])
+        return consent['id']
+    
+    def get_user_consents(self, user_id):
+        """Hole alle Einwilligungen eines Benutzers"""
+        consents = self.read_csv('user_consents.csv')
+        return [c for c in consents if c.get('user_id') == user_id]
+    
+    def export_user_data(self, user_id, include_orders=True):
+        """Exportiere alle Daten eines Benutzers (Art. 15 + 20 DSGVO)"""
+        users = self.get_all_users()
+        user = next((u for u in users if u.get('id') == user_id), None)
+        
+        if not user:
+            return None
+        
+        # Entferne Passwort aus Export
+        user_copy = user.copy()
+        user_copy.pop('password', None)
+        
+        export_data = {
+            'profile': user_copy,
+            'consents': self.get_user_consents(user_id),
+            'orders': []
+        }
+        
+        if include_orders:
+            orders = self.get_all_orders()
+            user_orders = [o for o in orders if o.get('user_id') == user_id]
+            export_data['orders'] = user_orders
+        
+        return export_data
+    
+    def delete_user(self, user_id):
+        """Lösche einen Benutzer und seine Daten (Art. 17 DSGVO - Right to be forgotten)"""
+        users = self.get_all_users()
+        users = [u for u in users if u.get('id') != user_id]
+        self.write_csv('users.csv', users, 
+                      fieldnames=['id', 'name', 'email', 'password', 'role', 'privacy_accept', 'marketing_consent', 'analytics_consent', 'created_at'])
+        
+        # Lösche auch Einwilligungen
+        consents = self.read_csv('user_consents.csv')
+        consents = [c for c in consents if c.get('user_id') != user_id]
+        self.write_csv('user_consents.csv', consents, 
+                      fieldnames=['id', 'user_id', 'consent_type', 'value', 'timestamp'])
+        
+        return True
+    
+    def update_user_consents(self, user_id, privacy_accept=None, marketing_consent=None, analytics_consent=None):
+        """Update Benutzer-Einwilligung nach Registrierung"""
+        users = self.get_all_users()
+        from datetime import datetime
+        
+        for user in users:
+            if user.get('id') == user_id:
+                if privacy_accept is not None:
+                    user['privacy_accept'] = str(privacy_accept)
+                if marketing_consent is not None:
+                    user['marketing_consent'] = str(marketing_consent)
+                if analytics_consent is not None:
+                    user['analytics_consent'] = str(analytics_consent)
+                if 'created_at' not in user:
+                    user['created_at'] = datetime.utcnow().isoformat()
+                break
+        
+        self.write_csv('users.csv', users, 
+                      fieldnames=['id', 'name', 'email', 'password', 'role', 'privacy_accept', 'marketing_consent', 'analytics_consent', 'created_at'])
+        return True
         return updated

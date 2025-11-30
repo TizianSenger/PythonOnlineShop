@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Datenschutz & Betroffenenrechte - WebShop{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    {% if user %}
+    <h1>Datenschutz & Betroffenenrechte</h1>
+    <p class="text-muted">Nach der DSGVO haben Sie folgende Rechte bezüglich Ihrer Daten:</p>
+
+    <div class="row mt-4">
+        <!-- Recht auf Auskunft -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📋 Recht auf Auskunft (Art. 15 DSGVO)</h5>
+                </div>
+                <div class="card-body">
+                    <p>Sehen Sie alle Daten, die wir über Sie gespeichert haben:</p>
+                    <ul class="small">
+                        <li>Profildetails (Name, E-Mail, Adresse)</li>
+                        <li>Bestellhistorie</li>
+                        <li>Audit-Logs (Login, Aktivitäten)</li>
+                        <li>Cookie-Einwilligungen</li>
+                    </ul>
+                    <form method="get" action="{{ url_for('gdpr_data_export') }}">
+                        <button type="submit" class="btn btn-sm btn-info mt-2">
+                            Meine Daten ansehen
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Datenportabilität -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">💾 Datenportabilität (Art. 20 DSGVO)</h5>
+                </div>
+                <div class="card-body">
+                    <p>Exportieren Sie Ihre Daten in maschinenlesbarem Format:</p>
+                    <ul class="small">
+                        <li>JSON oder CSV Export</li>
+                        <li>Alle persönlichen Informationen</li>
+                        <li>Transferierbar zu anderen Anbietern</li>
+                    </ul>
+                    <form method="post" action="{{ url_for('gdpr_export_data') }}">
+                        <div class="mb-2">
+                            <label for="export-format" class="form-label">Format:</label>
+                            <select id="export-format" name="format" class="form-select form-select-sm">
+                                <option value="json">JSON</option>
+                                <option value="csv">CSV</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            Daten exportieren
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Berichtigungsrecht -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">✏️ Recht auf Berichtigung (Art. 16 DSGVO)</h5>
+                </div>
+                <div class="card-body">
+                    <p>Aktualisieren Sie Ihre persönlichen Daten:</p>
+                    <ul class="small">
+                        <li>Name und Kontaktdaten</li>
+                        <li>Lieferadressen</li>
+                        <li>Fehlerhafte Informationen</li>
+                    </ul>
+                    <a href="{{ url_for('profile_edit') }}" class="btn btn-sm btn-warning">
+                        Profil bearbeiten
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Löschungsrecht -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">🗑️ Recht auf Vergessenwerden (Art. 17 DSGVO)</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Löschen Sie Ihr Konto und alle persönlichen Daten:</strong></p>
+                    <ul class="small">
+                        <li>✓ Benutzerkonto wird gelöscht</li>
+                        <li>✓ Persönliche Daten werden gelöscht</li>
+                        <li>⚠️ Rechnungen bleiben aus rechtlichen Gründen</li>
+                        <li>⚠️ Diese Aktion kann nicht rückgängig gemacht werden</li>
+                    </ul>
+                    <button type="button" class="btn btn-sm btn-danger mt-2" data-bs-toggle="modal"
+                        data-bs-target="#deleteAccountModal">
+                        Konto löschen
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Widerspruchsrecht -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">🚫 Widerspruchsrecht (Art. 21 DSGVO)</h5>
+                </div>
+                <div class="card-body">
+                    <p>Widersprechen Sie der Verarbeitung Ihrer Daten:</p>
+                    <ul class="small">
+                        <li>Marketing E-Mails deaktivieren</li>
+                        <li>Analytics deaktivieren</li>
+                        <li>Personalisierte Werbung ablehnen</li>
+                    </ul>
+                    <a href="{{ url_for('preferences') }}" class="btn btn-sm btn-secondary">
+                        Präferenzen verwalten
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Einschränkungsrecht -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">⏸️ Einschränkungsrecht (Art. 18 DSGVO)</h5>
+                </div>
+                <div class="card-body">
+                    <p>Fordern Sie die Einschränkung der Datenverarbeitung an:</p>
+                    <ul class="small">
+                        <li>Vorübergehende Pausierung der Verarbeitung</li>
+                        <li>Für die Dauer von Rechtsverletzungsprüfungen</li>
+                        <li>Per E-Mail anforderbar</li>
+                    </ul>
+                    <a href="mailto:datenschutz@webshop.de?subject=Einschränkung%20Datenverarbeitung"
+                        class="btn btn-sm btn-success">
+                        Per E-Mail anfragen
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5">
+
+    <div class="alert alert-info">
+        <h5>ℹ️ Häufig gestellte Fragen</h5>
+        <dl>
+            <dt>Wie lange dauert eine Anfrage?</dt>
+            <dd>Nach DSGVO müssen wir innerhalb von <strong>30 Tagen</strong> antworten (kann um 60 Tage verlängert
+                werden).</dd>
+
+            <dt>Welche Daten exportiere ich mit "Datenportabilität"?</dt>
+            <dd>Sie erhalten alle Ihre personenbezogenen Daten in strukturiertem, maschinenlesbarem Format (JSON/CSV).
+            </dd>
+
+            <dt>Was passiert, wenn ich mein Konto lösche?</dt>
+            <dd>
+                Ihr Konto und alle persönlichen Daten werden gelöscht. Bestellungen und Rechnungen bleiben
+                aus steuerlichen Gründen (7 Jahre Aufbewahrungspflicht) gespeichert.
+            </dd>
+
+            <dt>Kann ich meine Cookie-Einstellungen jederzeit ändern?</dt>
+            <dd>Ja! Öffnen Sie einfach das Cookie-Banner in der Website oder nutzen Sie Ihre Browser-Einstellungen.</dd>
+
+            <dt>Wen kontaktiere ich bei Fragen?</dt>
+            <dd>
+                Datenschutzbeauftragter: <a href="mailto:datenschutz@webshop.de">datenschutz@webshop.de</a><br>
+                Telefon: +49 123 456789
+            </dd>
+        </dl>
+    </div>
+
+    <div class="alert alert-warning">
+        <strong>⚠️ Wichtig:</strong> Diese Funktionen sind DSGVO-konform. Alle Anfragen werden geloggt und
+        können von unseren Administratoren überprüft werden.
+    </div>
+
+    {% else %}
+    <div class="alert alert-warning">
+        <strong>⚠️ Bitte melden Sie sich an</strong>, um Ihre DSGVO-Rechte zu verwalten.
+    </div>
+    <a href="{{ url_for('login') }}" class="btn btn-primary">Jetzt anmelden</a>
+    {% endif %}
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">⚠️ Konto löschen - Bestätigung erforderlich</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Achtung:</strong> Diese Aktion kann <u>nicht rückgängig gemacht werden</u>.</p>
+                <p>Wenn Sie Ihr Konto löschen:</p>
+                <ul>
+                    <li>✗ Ihr Benutzerkonto wird gelöscht</li>
+                    <li>✗ Alle persönlichen Daten werden gelöscht</li>
+                    <li>✗ Sie können sich nicht mehr anmelden</li>
+                    <li>✓ Bestellungen bleiben als Referenz erhalten</li>
+                </ul>
+                <div class="form-check mt-3">
+                    <input class="form-check-input" type="checkbox" id="confirmDelete">
+                    <label class="form-check-label" for="confirmDelete">
+                        Ich verstehe, dass diese Aktion nicht rückgängig gemacht werden kann
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <form method="post" action="{{ url_for('gdpr_delete_account') }}" style="display: inline;">
+                    <button type="submit" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+                        Konto permanent löschen
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Enable delete button only when checkbox is checked
+    document.getElementById('confirmDelete')?.addEventListener('change', (e) => {
+        document.getElementById('confirmDeleteBtn').disabled = !e.target.checked;
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Profil bearbeiten - WebShop{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-6 offset-lg-3">
+            <h1>✏️ Profil bearbeiten</h1>
+            <p class="text-muted">DSGVO Art. 16 - Recht auf Berichtigung</p>
+
+            {% if user %}
+            <div class="card mt-4">
+                <div class="card-body">
+                    <form method="post" action="/api/update-profile">
+                        <div class="form-group mb-3">
+                            <label for="name" class="form-label">Name:</label>
+                            <input type="text" id="name" name="name" class="form-control"
+                                value="{{ user.get('name', '') }}" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="email" class="form-label">E-Mail:</label>
+                            <input type="email" id="email" name="email" class="form-control"
+                                value="{{ user.get('email', '') }}" required readonly>
+                            <small class="text-muted">E-Mail kann nicht geändert werden</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="new-password" class="form-label">Neues Passwort (optional):</label>
+                            <input type="password" id="new-password" name="new_password" class="form-control">
+                            <small class="text-muted">Lassen Sie leer, um es nicht zu ändern</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="confirm-password" class="form-label">Passwort bestätigen:</label>
+                            <input type="password" id="confirm-password" name="confirm_password" class="form-control">
+                        </div>
+
+                        <div class="alert alert-info">
+                            <strong>ℹ️ Ihre Änderungen sind geschützt:</strong>
+                            <ul class="mb-0 small">
+                                <li>Passwortänderungen werden geloggt</li>
+                                <li>Alle Änderungen können Sie einsehen</li>
+                                <li>Sie erhalten eine Bestätigung per E-Mail</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                Änderungen speichern
+                            </button>
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                                Abbrechen
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="alert alert-warning mt-4">
+                <strong>⚠️ Datensicherheit:</strong>
+                <ul class="mb-0 small">
+                    <li>✓ Passwörter sind verschlüsselt (bcrypt SHA-256)</li>
+                    <li>✓ HTTPS-Verbindung ist erforderlich</li>
+                    <li>✓ Ihre Daten werden nicht an Dritte weitergegeben</li>
+                </ul>
+            </div>
+
+            {% else %}
+            <div class="alert alert-danger">
+                Bitte melden Sie sich an
+            </div>
+            <a href="{{ url_for('login') }}" class="btn btn-primary">Zur Anmeldung</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
