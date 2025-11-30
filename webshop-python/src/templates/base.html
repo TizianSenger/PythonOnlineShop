@@ -15,11 +15,8 @@
             <a href="/" class="logo">🛍️ WebShop</a>
             <ul class="nav-links">
                 <li><a href="/">Shop</a></li>
-                <li><a href="{{ url_for('privacy_policy') }}">Datenschutz</a></li>
-                <li><a href="{{ url_for('impressum') }}">Impressum</a></li>
                 {% if session.get('user') %}
                 <li><a href="/cart">🛒 Warenkorb (<span id="cart-count">{{ cart_count or 0 }}</span>)</a></li>
-                <li><a href="{{ url_for('gdpr_rights') }}">Betroffenenrechte</a></li>
                 <li><a href="/dashboard">Dashboard</a></li>
                 <li><a href="/logout">Logout</a></li>
                 {% else %}

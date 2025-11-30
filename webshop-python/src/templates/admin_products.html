@@ -1,168 +1,125 @@
-<!DOCTYPE html>
-<html lang="de">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Produktverwaltung - WebShop</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% block title %}Produktverwaltung - WebShop{% endblock %}
 
-<body>
-    <header>
-        <nav>
-            <a href="/" class="logo">🛍️ WebShop</a>
-            <ul class="nav-links">
-                <li><a href="/">Shop</a></li>
-                {% if session.get('user') %}
-                <li><a href="/cart">🛒 Warenkorb (<span id="cart-count">{{ cart_count }}</span>)</a></li>
-                <li><a href="/dashboard">Dashboard</a></li>
-                <li><a href="/logout">Logout</a></li>
-                {% else %}
-                <li><a href="/login">Login</a></li>
-                <li><a href="/register">Register</a></li>
-                {% endif %}
-                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-            </ul>
-        </nav>
-    </header>
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">⚙️ Produktverwaltung</h1>
 
-    <main>
-        <div class="container">
-            <h1 class="mb-4">⚙️ Produktverwaltung</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
 
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-            {% endif %}
-            {% endwith %}
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
-                <div class="card">
-                    <h2 class="mb-4">📝 Neues Produkt</h2>
-                    <form method="POST" enctype="multipart/form-data">
-                        <div class="form-group">
-                            <label for="name">Produktname *</label>
-                            <input type="text" id="name" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="category">Kategorie *</label>
-                            <input type="text" id="category" name="category" placeholder="z.B. Elektronik" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="price">Preis (€) *</label>
-                            <input type="number" id="price" name="price" step="0.01" min="0" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="stock">Anzahl auf Lager *</label>
-                            <input type="number" id="stock" name="stock" step="1" min="0" value="0" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="description">Beschreibung</label>
-                            <textarea id="description" name="description" rows="4" style="resize: vertical;"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="images">Bilder (bis zu 20 Dateien)</label>
-                            <input type="file" id="images" name="images" accept="image/*" multiple>
-                            <small class="text-muted" style="display: block; margin-top: 0.5rem;">Du kannst bis zu 20
-                                Bilder auswählen</small>
-                        </div>
-                        <button type="submit" class="btn btn-success btn-block">Produkt hinzufügen</button>
-                    </form>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+        <div class="card">
+            <h2 class="mb-4">📝 Neues Produkt</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="name">Produktname *</label>
+                    <input type="text" id="name" name="name" required>
                 </div>
-
-                <div class="card">
-                    <h2 class="mb-4">📊 Statistiken</h2>
-                    <div class="mb-3">
-                        <p class="text-muted">Gesamtprodukte</p>
-                        <h3 style="font-size: 2rem; color: var(--primary);">{{ products|length }}</h3>
-                    </div>
-                    <div class="mb-3">
-                        <p class="text-muted">Kategorien</p>
-                        <h3 style="font-size: 2rem; color: var(--primary);">
-                            {{ (products | map(attribute='category') | unique | list | length) if products else 0 }}
-                        </h3>
-                    </div>
-                    <div>
-                        <p class="text-muted">Gesamtwert Inventar</p>
-                        <h3 style="font-size: 2rem; color: var(--success);">
-                            € {{ "%.2f"|format(products | map(attribute='price') | map('float') | sum) if products else
-                            0 }}
-                        </h3>
-                    </div>
+                <div class="form-group">
+                    <label for="category">Kategorie *</label>
+                    <input type="text" id="category" name="category" placeholder="z.B. Elektronik" required>
                 </div>
+                <div class="form-group">
+                    <label for="price">Preis (€) *</label>
+                    <input type="number" id="price" name="price" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="stock">Anzahl auf Lager *</label>
+                    <input type="number" id="stock" name="stock" step="1" min="0" value="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Beschreibung</label>
+                    <textarea id="description" name="description" rows="4" style="resize: vertical;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="images">Bilder (bis zu 20 Dateien)</label>
+                    <input type="file" id="images" name="images" accept="image/*" multiple>
+                    <small class="text-muted" style="display: block; margin-top: 0.5rem;">Du kannst bis zu 20
+                        Bilder auswählen</small>
+                </div>
+                <button type="submit" class="btn btn-success btn-block">Produkt hinzufügen</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2 class="mb-4">📊 Statistiken</h2>
+            <div class="mb-3">
+                <p class="text-muted">Gesamtprodukte</p>
+                <h3 style="font-size: 2rem; color: var(--primary);">{{ products|length }}</h3>
             </div>
-
-            <div class="card">
-                <h2 class="mb-3">📦 Alle Produkte</h2>
-                {% if products %}
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Kategorie</th>
-                                <th>Preis</th>
-                                <th>Stückzahl</th>
-                                <th>Bilder</th>
-                                <th>Beschreibung</th>
-                                <th>Aktion</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for product in products %}
-                            <tr>
-                                <td>{{ product.id }}</td>
-                                <td><strong>{{ product.name }}</strong></td>
-                                <td><span class="badge badge-primary">{{ product.category }}</span></td>
-                                <td>€ {{ product.price }}</td>
-                                <td>{{ product.stock or '0' }}</td>
-                                <td><span class="badge">{{ (product.images|length if product.images else 0) }}/20</span>
-                                </td>
-                                <td><small>{{ product.description[:50] }}{% if product.description|length > 50 %}...{%
-                                        endif %}</small></td>
-                                <td>
-                                    <a class="btn" href="/admin/edit-product/{{ product.id }}">Bearbeiten</a>
-                                    <form method="POST" action="/admin/delete-product/{{ product.id }}"
-                                        style="display:inline;">
-                                        <button type="submit" class="btn btn-danger"
-                                            onclick="return confirm('Wirklich löschen?')">Löschen</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <p class="text-muted">Noch keine Produkte vorhanden.</p>
-                {% endif %}
+            <div class="mb-3">
+                <p class="text-muted">Kategorien</p>
+                <h3 style="font-size: 2rem; color: var(--primary);">
+                    {{ (products | map(attribute='category') | unique | list | length) if products else 0 }}
+                </h3>
+            </div>
+            <div>
+                <p class="text-muted">Gesamtwert Inventar</p>
+                <h3 style="font-size: 2rem; color: var(--success);">
+                    € {{ "%.2f"|format(products | map(attribute='price') | map('float') | sum) if products else
+                    0 }}
+                </h3>
             </div>
         </div>
-    </main>
+    </div>
 
-    <footer>
-        <p>&copy; 2025 WebShop. Alle Rechte vorbehalten.</p>
-    </footer>
+    <div class="card">
+        <h2 class="mb-3">📦 Alle Produkte</h2>
+        {% if products %}
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Kategorie</th>
+                        <th>Preis</th>
+                        <th>Stückzahl</th>
+                        <th>Bilder</th>
+                        <th>Beschreibung</th>
+                        <th>Aktion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td><strong>{{ product.name }}</strong></td>
+                        <td><span class="badge badge-primary">{{ product.category }}</span></td>
+                        <td>€ {{ product.price }}</td>
+                        <td>{{ product.stock or '0' }}</td>
+                        <td><span class="badge">{{ (product.images|length if product.images else 0) }}/20</span>
+                        </td>
+                        <td><small>{{ product.description[:50] }}{% if product.description|length > 50 %}...{%
+                                endif %}</small></td>
+                        <td>
+                            <a class="btn" href="/admin/edit-product/{{ product.id }}">Bearbeiten</a>
+                            <form method="POST" action="/admin/delete-product/{{ product.id }}" style="display:inline;">
+                                <button type="submit" class="btn btn-danger"
+                                    onclick="return confirm('Wirklich löschen?')">Löschen</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">Noch keine Produkte vorhanden.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
 
-    <script>
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        }
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        });
-    </script>
-
-    {% include "cookie_banner.html" %}
-</body>
-
-</html>
+{% block extra_js %}
+<script>
+    // Admin products scripts if needed
+</script>
+{% endblock %}

@@ -1,384 +1,337 @@
-<!DOCTYPE html>
-<html lang="de">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Zur Kasse - WebShop</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        :root {
-            --pay-border: #dcdcdc;
-            --pay-shadow: rgba(0, 0, 0, 0.06);
-            --paypal-yellow: #ffc439;
-            --paypal-text: #111;
-            --stripe-bg: #fff;
-            --stripe-text: #111;
-            --btn-radius: 10px;
-        }
+{% block title %}Zur Kasse - WebShop{% endblock %}
 
-        .form-group {
-            margin-bottom: 0.75rem;
-            display: block;
-        }
+{% block extra_css %}
+<style>
+    :root {
+        --pay-border: #dcdcdc;
+        --pay-shadow: rgba(0, 0, 0, 0.06);
+        --paypal-yellow: #ffc439;
+        --paypal-text: #111;
+        --stripe-bg: #fff;
+        --stripe-text: #111;
+        --btn-radius: 10px;
+    }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 0.25rem;
-            font-weight: 600;
-        }
+    .form-group {
+        margin-bottom: 0.75rem;
+        display: block;
+    }
 
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 0.6rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background: var(--bg-input);
-            color: var(--text);
-        }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.25rem;
+        font-weight: 600;
+    }
 
-        .card {
-            background: var(--bg-secondary);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 0.6rem;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--bg-input);
+        color: var(--text);
+    }
 
-        .container {
-            max-width: 980px;
-            margin: 1rem auto;
-            padding: 0 1rem;
-        }
+    .card {
+        background: var(--bg-secondary);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
 
-        header nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 1rem;
-        }
+    .container {
+        max-width: 980px;
+        margin: 1rem auto;
+        padding: 0 1rem;
+    }
 
-        .theme-toggle {
-            background: none;
-            border: 1px solid var(--border);
-            padding: 0.4rem 0.6rem;
-            border-radius: 6px;
-            cursor: pointer;
-        }
+    header nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+    }
 
-        .cart-list {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 1rem 0;
-        }
+    .theme-toggle {
+        background: none;
+        border: 1px solid var(--border);
+        padding: 0.4rem 0.6rem;
+        border-radius: 6px;
+        cursor: pointer;
+    }
 
-        .cart-list li {
-            padding: 0.4rem 0;
-            border-bottom: 1px dashed var(--border);
-            display: flex;
-            justify-content: space-between;
-            gap: 1rem;
-            align-items: center;
-        }
+    .cart-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 1rem 0;
+    }
 
-        .pay-grid {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 0.5rem;
-            flex-wrap: wrap;
-        }
+    .cart-list li {
+        padding: 0.4rem 0;
+        border-bottom: 1px dashed var(--border);
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: center;
+    }
 
-        .pay-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            border-radius: var(--btn-radius);
-            border: 1px solid var(--pay-border);
-            background: var(--stripe-bg);
-            color: var(--stripe-text);
-            box-shadow: 0 3px 6px var(--pay-shadow);
-            cursor: pointer;
-            font-weight: 600;
-            min-width: 220px;
-            justify-content: center;
-            transition: transform .08s ease, box-shadow .08s ease, opacity .12s ease;
-        }
+    .pay-grid {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+        flex-wrap: wrap;
+    }
 
-        .pay-btn:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
+    .pay-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        border-radius: var(--btn-radius);
+        border: 1px solid var(--pay-border);
+        background: var(--stripe-bg);
+        color: var(--stripe-text);
+        box-shadow: 0 3px 6px var(--pay-shadow);
+        cursor: pointer;
+        font-weight: 600;
+        min-width: 220px;
+        justify-content: center;
+        transition: transform .08s ease, box-shadow .08s ease, opacity .12s ease;
+    }
 
-        .pay-btn:active:not(:disabled) {
-            transform: translateY(1px);
-        }
+    .pay-btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
 
-        .pay-btn.stripe {
-            background: #fff;
-            color: #111;
-            border: 1px solid #e6e6e6;
-        }
+    .pay-btn:active:not(:disabled) {
+        transform: translateY(1px);
+    }
 
-        .pay-btn.stripe .cards {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
+    .pay-btn.stripe {
+        background: #fff;
+        color: #111;
+        border: 1px solid #e6e6e6;
+    }
 
-        .card-icon {
-            width: 36px;
-            height: 24px;
-            display: inline-block;
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: contain;
-        }
+    .pay-btn.stripe .cards {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
 
-        .card-icon.visa {
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="24" viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="%23007CBF"/></svg>');
-        }
+    .card-icon {
+        width: 36px;
+        height: 24px;
+        display: inline-block;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+    }
 
-        .card-icon.master {
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="24" viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="%23EB001B"/></svg>');
-        }
+    .card-icon.visa {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="24" viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="%23007CBF"/></svg>');
+    }
 
-        .pay-btn.paypal {
-            background: var(--paypal-yellow);
-            color: var(--paypal-text);
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            min-width: 220px;
-        }
+    .card-icon.master {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="24" viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="%23EB001B"/></svg>');
+    }
 
-        .paypal-logo {
-            height: 24px;
-            display: inline-block;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="96" height="24"><rect width="256" height="256" fill="none"/><path fill="%23023EA4" d="M208 96h-24l-5 24h-80l-6 28h78l-8 38H87l-9 40H64L93 40h104z"/></svg>');
-            background-size: contain;
-            background-repeat: no-repeat;
-        }
+    .pay-btn.paypal {
+        background: var(--paypal-yellow);
+        color: var(--paypal-text);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        min-width: 220px;
+    }
 
-        .pay-note {
-            font-size: 0.9rem;
-            color: var(--muted);
-            margin-top: 0.5rem;
-        }
+    .paypal-logo {
+        height: 24px;
+        display: inline-block;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="96" height="24"><rect width="256" height="256" fill="none"/><path fill="%23023EA4" d="M208 96h-24l-5 24h-80l-6 28h78l-8 38H87l-9 40H64L93 40h104z"/></svg>');
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
 
-        .actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-            align-items: center;
-        }
-    </style>
-</head>
+    .pay-note {
+        font-size: 0.9rem;
+        color: var(--muted);
+        margin-top: 0.5rem;
+    }
 
-<body>
-    <header>
-        <nav>
-            <a href="/" class="logo">🛍️ WebShop</a>
-            <ul class="nav-links">
-                <li><a href="/">Shop</a></li>
-                {% if session.get('user') %}
-                <li><a href="/cart">🛒 Warenkorb</a></li>
-                <li><a href="/dashboard">Dashboard</a></li>
-                <li><a href="/logout">Logout</a></li>
-                {% else %}
-                <li><a href="/login">Login</a></li>
-                {% endif %}
-                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-            </ul>
-        </nav>
-    </header>
+    .actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        align-items: center;
+    }
+</style>
+{% endblock %}
 
-    <main>
-        <div class="container">
-            <h1>Zur Kasse</h1>
+{% block content %}
+<div class="container">
+    <h1>Zur Kasse</h1>
 
-            <div class="card">
-                <h2>Warenkorb</h2>
-                {% if cart %}
-                <ul class="cart-list">
-                    {% for it in cart %}
-                    <li>
-                        <div>
-                            <strong>{{ it.name }}</strong><br>
-                            <small>€ {{ "%.2f"|format(it.price) }} × {{ it.quantity }}</small>
-                        </div>
-                        <div><strong>€ {{ "%.2f"|format(it.price * it.quantity) }}</strong></div>
-                    </li>
-                    {% endfor %}
-                </ul>
-                <p><strong>Gesamt: € {{ "%.2f"|format(total) }}</strong></p>
-                {% else %}
-                <p>Dein Warenkorb ist leer.</p>
-                {% endif %}
-            </div>
-
-            <form method="POST" action="{{ url_for('checkout_bp.create_checkout') }}" class="card" id="checkout-form"
-                novalidate>
-                <input type="hidden" name="payment_method" id="payment_method" value="stripe">
-                <h2>Liefer- und Rechnungsadresse</h2>
-
-                <div class="form-group">
-                    <label for="name">Name*</label>
-                    <input id="name" name="name" required value="{{ user.name if user else '' }}">
+    <div class="card">
+        <h2>Warenkorb</h2>
+        {% if cart %}
+        <ul class="cart-list">
+            {% for it in cart %}
+            <li>
+                <div>
+                    <strong>{{ it.name }}</strong><br>
+                    <small>€ {{ "%.2f"|format(it.price) }} × {{ it.quantity }}</small>
                 </div>
+                <div><strong>€ {{ "%.2f"|format(it.price * it.quantity) }}</strong></div>
+            </li>
+            {% endfor %}
+        </ul>
+        <p><strong>Gesamt: € {{ "%.2f"|format(total) }}</strong></p>
+        {% else %}
+        <p>Dein Warenkorb ist leer.</p>
+        {% endif %}
+    </div>
 
-                <div class="form-group">
-                    <label for="email">E‑Mail*</label>
-                    <input id="email" name="email" type="email" required value="{{ user.email if user else '' }}">
-                </div>
+    <form method="POST" action="{{ url_for('checkout_bp.create_checkout') }}" class="card" id="checkout-form"
+        novalidate>
+        <input type="hidden" name="payment_method" id="payment_method" value="stripe">
+        <h2>Liefer- und Rechnungsadresse</h2>
 
-                <div class="form-group">
-                    <label for="address">Adresse*</label>
-                    <input id="address" name="address" required value="">
-                </div>
-
-                <div class="form-group">
-                    <label for="city">Stadt*</label>
-                    <input id="city" name="city" required value="">
-                </div>
-
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
-                    <div class="form-group">
-                        <label for="zip">PLZ*</label>
-                        <input id="zip" name="zip" required value="">
-                    </div>
-                    <div class="form-group">
-                        <label for="country">Land*</label>
-                        <select id="country" name="country" required>
-                            <option value="">Bitte wählen</option>
-                            <option value="DE" {% if user and user.get('country','DE')=='DE' %}selected{% endif %}>
-                                Deutschland (DE)</option>
-                            <option value="AT">Österreich
-                                (AT)</option>
-                            <option value="CH">Schweiz
-                                (CH)</option>
-                            <option value="US">USA (US)
-                            </option>
-                            <option value="GB" {% if user and user.get('country')=='GB' %}selected{% endif %}>
-                                Vereinigtes Königreich (GB)</option>
-                            <option value="FR" {% if user and user.get('country')=='FR' %}selected{% endif %}>Frankreich
-                                (FR)</option>
-                            <option value="IT" {% if user and user.get('country')=='IT' %}selected{% endif %}>Italien
-                                (IT)</option>
-                            <option value="ES" {% if user and user.get('country')=='ES' %}selected{% endif %}>Spanien
-                                (ES)</option>
-                            <option value="NL" {% if user and user.get('country')=='NL' %}selected{% endif %}>
-                                Niederlande (NL)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <h2>Zahlungsart</h2>
-                <div class="pay-grid" role="tablist" aria-label="Zahlungsoptionen">
-                    <button type="button" class="pay-btn stripe" id="pay-stripe" data-method="stripe" disabled
-                        aria-pressed="false">
-                        <span class="cards" aria-hidden="true">
-                            <span class="card-icon visa" title="Visa"></span>
-                            <span class="card-icon master" title="Mastercard"></span>
-                        </span>
-                        <span>Mit Kreditkarte bezahlen</span>
-                    </button>
-
-                    <button type="button" class="pay-btn paypal" id="pay-paypal" data-method="paypal" disabled
-                        aria-pressed="false">
-                        <span class="paypal-logo" aria-hidden="true"></span>
-                        <span>Mit PayPal bezahlen</span>
-                    </button>
-                </div>
-                <div class="actions">
-                    <a class="btn" href="{{ url_for('cart') }}">Zurück zum Warenkorb</a>
-                </div>
-            </form>
+        <div class="form-group">
+            <label for="name">Name*</label>
+            <input id="name" name="name" required value="{{ user.name if user else '' }}">
         </div>
-    </main>
 
-    <footer>
-        <p style="text-align:center;">&copy; 2025 WebShop</p>
-    </footer>
+        <div class="form-group">
+            <label for="email">E‑Mail*</label>
+            <input id="email" name="email" type="email" required value="{{ user.email if user else '' }}">
+        </div>
 
-    <script>
-        // Theme handling: read/save in localStorage like other pages
-        const themeToggle = document.getElementById('theme-toggle');
-        function applyTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            if (themeToggle) themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+        <div class="form-group">
+            <label for="address">Adresse*</label>
+            <input id="address" name="address" required value="">
+        </div>
+
+        <div class="form-group">
+            <label for="city">Stadt*</label>
+            <input id="city" name="city" required value="">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+            <div class="form-group">
+                <label for="zip">PLZ*</label>
+                <input id="zip" name="zip" required value="">
+            </div>
+            <div class="form-group">
+                <label for="country">Land*</label>
+                <select id="country" name="country" required>
+                    <option value="">Bitte wählen</option>
+                    <option value="DE" {% if user and user.get('country','DE')=='DE' %}selected{% endif %}>
+                        Deutschland (DE)</option>
+                    <option value="AT">Österreich
+                        (AT)</option>
+                    <option value="CH">Schweiz
+                        (CH)</option>
+                    <option value="US">USA (US)
+                    </option>
+                    <option value="GB" {% if user and user.get('country')=='GB' %}selected{% endif %}>
+                        Vereinigtes Königreich (GB)</option>
+                    <option value="FR" {% if user and user.get('country')=='FR' %}selected{% endif %}>Frankreich
+                        (FR)</option>
+                    <option value="IT" {% if user and user.get('country')=='IT' %}selected{% endif %}>Italien
+                        (IT)</option>
+                    <option value="ES" {% if user and user.get('country')=='ES' %}selected{% endif %}>Spanien
+                        (ES)</option>
+                    <option value="NL" {% if user and user.get('country')=='NL' %}selected{% endif %}>
+                        Niederlande (NL)</option>
+                </select>
+            </div>
+        </div>
+
+        <h2>Zahlungsart</h2>
+        <div class="pay-grid" role="tablist" aria-label="Zahlungsoptionen">
+            <button type="button" class="pay-btn stripe" id="pay-stripe" data-method="stripe" disabled
+                aria-pressed="false">
+                <span class="cards" aria-hidden="true">
+                    <span class="card-icon visa" title="Visa"></span>
+                    <span class="card-icon master" title="Mastercard"></span>
+                </span>
+                <span>Mit Kreditkarte bezahlen</span>
+            </button>
+
+            <button type="button" class="pay-btn paypal" id="pay-paypal" data-method="paypal" disabled
+                aria-pressed="false">
+                <span class="paypal-logo" aria-hidden="true"></span>
+                <span>Mit PayPal bezahlen</span>
+            </button>
+        </div>
+        <div class="actions">
+            <a class="btn" href="{{ url_for('cart') }}">Zurück zum Warenkorb</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Form validation + payment buttons
+    const form = document.getElementById('checkout-form');
+    const inputs = ['name', 'email', 'address', 'city', 'zip', 'country'].map(id => document.getElementById(id));
+    const payStripe = document.getElementById('pay-stripe');
+    const payPaypal = document.getElementById('pay-paypal');
+    const hiddenMethod = document.getElementById('payment_method');
+
+    function isEmailValid(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function checkValidity() {
+        // ensure all required are non-empty and email valid
+        for (const el of inputs) {
+            if (!el) return false;
+            const val = (el.value || '').trim();
+            if (!val) return false;
+            if (el.id === 'email' && !isEmailValid(val)) return false;
         }
-        window.addEventListener('DOMContentLoaded', () => {
-            const saved = localStorage.getItem('theme') || 'light';
-            applyTheme(saved);
-        });
-        if (themeToggle) {
-            themeToggle.addEventListener('click', () => {
-                const current = document.documentElement.getAttribute('data-theme') || 'light';
-                const next = current === 'dark' ? 'light' : 'dark';
-                applyTheme(next);
-                localStorage.setItem('theme', next);
-            });
+        // enable buttons if cart not empty (server already prevents if empty)
+        const enabled = true;
+        payStripe.disabled = !enabled;
+        payPaypal.disabled = !enabled;
+        return enabled;
+    }
+
+    // enable/disable based on input
+    inputs.forEach(el => el.addEventListener('input', () => {
+        const ok = checkValidity();
+        if (ok) {
+            payStripe.classList.remove('disabled');
+            payPaypal.classList.remove('disabled');
         }
+    }));
 
-        // Form validation + payment buttons
-        const form = document.getElementById('checkout-form');
-        const inputs = ['name', 'email', 'address', 'city', 'zip', 'country'].map(id => document.getElementById(id));
-        const payStripe = document.getElementById('pay-stripe');
-        const payPaypal = document.getElementById('pay-paypal');
-        const hiddenMethod = document.getElementById('payment_method');
-
-        function isEmailValid(email) {
-            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    // click handlers: set payment method and submit form
+    function handlePayClick(e) {
+        const method = e.currentTarget.getAttribute('data-method');
+        if (e.currentTarget.disabled) return;
+        // final validation
+        if (!checkValidity()) {
+            alert('Bitte fülle alle Pflichtfelder korrekt aus.');
+            return;
         }
+        hiddenMethod.value = method;
+        // submit form
+        form.submit();
+    }
 
-        function checkValidity() {
-            // ensure all required are non-empty and email valid
-            for (const el of inputs) {
-                if (!el) return false;
-                const val = (el.value || '').trim();
-                if (!val) return false;
-                if (el.id === 'email' && !isEmailValid(val)) return false;
-            }
-            // enable buttons if cart not empty (server already prevents if empty)
-            const enabled = true;
-            payStripe.disabled = !enabled;
-            payPaypal.disabled = !enabled;
-            return enabled;
-        }
-
-        // enable/disable based on input
-        inputs.forEach(el => el.addEventListener('input', () => {
-            const ok = checkValidity();
-            if (ok) {
-                payStripe.classList.remove('disabled');
-                payPaypal.classList.remove('disabled');
-            }
-        }));
-
-        // click handlers: set payment method and submit form
-        function handlePayClick(e) {
-            const method = e.currentTarget.getAttribute('data-method');
-            if (e.currentTarget.disabled) return;
-            // final validation
-            if (!checkValidity()) {
-                alert('Bitte fülle alle Pflichtfelder korrekt aus.');
-                return;
-            }
-            hiddenMethod.value = method;
-            // submit form
-            form.submit();
-        }
-
-        if (payStripe) payStripe.addEventListener('click', handlePayClick);
-        if (payPaypal) payPaypal.addEventListener('click', handlePayClick);
-        // initial check (in case prefilled user email)
-        window.addEventListener('load', () => {
-            checkValidity();
-        });
-    </script>
-
-    {% include "cookie_banner.html" %}
-</body>
-
-</html>
+    if (payStripe) payStripe.addEventListener('click', handlePayClick);
+    if (payPaypal) payPaypal.addEventListener('click', handlePayClick);
+    // initial check (in case prefilled user email)
+    window.addEventListener('load', () => {
+        checkValidity();
+    });
+</script>
+{% endblock %}

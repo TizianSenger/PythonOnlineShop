@@ -1,378 +1,332 @@
-<!DOCTYPE html>
-<html lang="de">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>{{ product.name }} - WebShop</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        .carousel-container {
-            position: relative;
-            background: var(--bg-secondary);
-            border-radius: 0.75rem;
-            overflow: hidden;
-            margin-bottom: 2rem;
+{% block title %}{{ product.name }} - WebShop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .carousel-container {
+        position: relative;
+        background: var(--bg-secondary);
+        border-radius: 0.75rem;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .carousel-main {
+        width: 100%;
+        height: 500px;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: var(--text-light);
+    }
+
+    .carousel-controls {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 1rem;
+        transform: translateY(-50%);
+        pointer-events: none;
+    }
+
+    .carousel-btn {
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        pointer-events: all;
+    }
+
+    .carousel-btn:hover {
+        background: rgba(0, 0, 0, 0.8);
+    }
+
+    .carousel-thumbnails {
+        display: flex;
+        gap: 0.5rem;
+        padding: 1rem;
+        background: var(--bg-light);
+        overflow-x: auto;
+    }
+
+    .carousel-thumb {
+        width: 80px;
+        height: 80px;
+        background-size: cover;
+        background-position: center;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: border-color 0.3s;
+        flex-shrink: 0;
+    }
+
+    .carousel-thumb.active {
+        border-color: var(--primary);
+    }
+
+    .carousel-thumb:hover {
+        border-color: var(--primary);
+        opacity: 0.8;
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .image-counter {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+        .product-grid {
+            grid-template-columns: 1fr;
         }
 
         .carousel-main {
-            width: 100%;
-            height: 500px;
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            color: var(--text-light);
+            height: 300px;
         }
+    }
+</style>
+{% endblock %}
 
-        .carousel-controls {
-            position: absolute;
-            top: 50%;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 1rem;
-            transform: translateY(-50%);
-            pointer-events: none;
-        }
+{% block content %}
+<div class="container">
+    <a href="/" style="color: var(--primary); text-decoration: none; margin-bottom: 1rem; display: inline-block;">←
+        Zurück zum Shop</a>
 
-        .carousel-btn {
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            pointer-events: all;
-        }
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
 
-        .carousel-btn:hover {
-            background: rgba(0, 0, 0, 0.8);
-        }
+    <div class="product-grid">
+        <!-- Bildkarussell -->
+        <div>
+            <div class="carousel-container">
+                <div class="carousel-main" id="carousel-main"
+                    style="{% if product.images %}background-image: url('{{ url_for('static', filename='uploads/' ~ product.images[0]) }}');{% endif %}">
+                    {% if not product.images %}📦{% endif %}
+                </div>
 
-        .carousel-thumbnails {
-            display: flex;
-            gap: 0.5rem;
-            padding: 1rem;
-            background: var(--bg-light);
-            overflow-x: auto;
-        }
-
-        .carousel-thumb {
-            width: 80px;
-            height: 80px;
-            background-size: cover;
-            background-position: center;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: border-color 0.3s;
-            flex-shrink: 0;
-        }
-
-        .carousel-thumb.active {
-            border-color: var(--primary);
-        }
-
-        .carousel-thumb:hover {
-            border-color: var(--primary);
-            opacity: 0.8;
-        }
-
-        .product-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
-
-        .image-counter {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 768px) {
-            .product-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .carousel-main {
-                height: 300px;
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <header>
-        <nav>
-            <a href="/" class="logo">🛍️ WebShop</a>
-            <ul class="nav-links">
-                <li><a href="/">Shop</a></li>
-                {% if session.get('user') %}
-                <li><a href="/cart">🛒 Warenkorb</a></li>
-                <li><a href="/dashboard">Dashboard</a></li>
-                <li><a href="/logout">Logout</a></li>
-                {% else %}
-                <li><a href="/login">Login</a></li>
-                <li><a href="/register">Register</a></li>
+                {% if product.images|length > 1 %}
+                <div class="carousel-controls">
+                    <button class="carousel-btn" onclick="prevImage()">❮</button>
+                    <button class="carousel-btn" onclick="nextImage()">❯</button>
+                </div>
                 {% endif %}
-                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-            </ul>
-        </nav>
-    </header>
 
-    <main>
-        <div class="container">
-            <a href="/"
-                style="color: var(--primary); text-decoration: none; margin-bottom: 1rem; display: inline-block;">←
-                Zurück zum Shop</a>
+                {% if product.images %}
+                <div class="image-counter">
+                    <span id="current-image">1</span> / {{ product.images|length }}
+                </div>
+                {% endif %}
+            </div>
 
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
+            <!-- Thumbnails -->
+            {% if product.images %}
+            <div class="carousel-thumbnails">
+                {% for img in product.images %}
+                <div class="carousel-thumb {% if loop.index0 == 0 %}active{% endif %}"
+                    style="background-image: url('{{ url_for('static', filename='uploads/' ~ img) }}')"
+                    onclick="goToImage({{ loop.index0 }})" title="{{ loop.index }}"></div>
+                {% endfor %}
+            </div>
             {% endif %}
-            {% endwith %}
+        </div>
 
-            <div class="product-grid">
-                <!-- Bildkarussell -->
-                <div>
-                    <div class="carousel-container">
-                        <div class="carousel-main" id="carousel-main"
-                            style="{% if product.images %}background-image: url('{{ url_for('static', filename='uploads/' ~ product.images[0]) }}');{% endif %}">
-                            {% if not product.images %}📦{% endif %}
-                        </div>
+        <!-- Produktinformationen -->
+        <div>
+            <h1 class="mb-2">{{ product.name }}</h1>
 
-                        {% if product.images|length > 1 %}
-                        <div class="carousel-controls">
-                            <button class="carousel-btn" onclick="prevImage()">❮</button>
-                            <button class="carousel-btn" onclick="nextImage()">❯</button>
-                        </div>
-                        {% endif %}
+            {% if product.category %}
+            <p class="text-muted mb-3"><span class="badge badge-primary">{{ product.category }}</span></p>
+            {% endif %}
 
-                        {% if product.images %}
-                        <div class="image-counter">
-                            <span id="current-image">1</span> / {{ product.images|length }}
-                        </div>
-                        {% endif %}
-                    </div>
+            <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem;">
+                <p class="text-muted mb-1">Preis</p>
+                <h2 style="color: var(--primary); font-size: 2.5rem;">€ {{ product.price }}</h2>
+            </div>
 
-                    <!-- Thumbnails -->
-                    {% if product.images %}
-                    <div class="carousel-thumbnails">
-                        {% for img in product.images %}
-                        <div class="carousel-thumb {% if loop.index0 == 0 %}active{% endif %}"
-                            style="background-image: url('{{ url_for('static', filename='uploads/' ~ img) }}')"
-                            onclick="goToImage({{ loop.index0 }})" title="{{ loop.index }}"></div>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                </div>
+            <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem;">
+                <p class="text-muted mb-1">Verfügbarkeit</p>
+                <h3>{{ product.stock }} auf Lager</h3>
+                {% if product.stock == '0' %}
+                <p style="color: var(--danger);">Nicht verfügbar</p>
+                {% else %}
+                <p style="color: var(--success);">Verfügbar</p>
+                {% endif %}
+            </div>
 
-                <!-- Produktinformationen -->
-                <div>
-                    <h1 class="mb-2">{{ product.name }}</h1>
+            <div class="card mb-3">
+                <h3 class="mb-2">Beschreibung</h3>
+                <p>{{ product.description or 'Keine Beschreibung verfügbar' }}</p>
+            </div>
 
-                    {% if product.category %}
-                    <p class="text-muted mb-3"><span class="badge badge-primary">{{ product.category }}</span></p>
-                    {% endif %}
+            <!-- In den Warenkorb -->
+            {% if product.stock != '0' %}
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                <input type="number" id="qty" value="1" min="1" max="{{ product.stock }}"
+                    style="width: 100px; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem;">
+                <button class="btn btn-primary" onclick="addToCart('{{ product.id }}', this)" style="flex: 1;">
+                    In den Warenkorb
+                </button>
+            </div>
+            {% else %}
+            <div class="alert alert-danger">
+                Dieses Produkt ist momentan nicht verfügbar.
+            </div>
+            {% endif %}
 
-                    <div
-                        style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem;">
-                        <p class="text-muted mb-1">Preis</p>
-                        <h2 style="color: var(--primary); font-size: 2.5rem;">€ {{ product.price }}</h2>
-                    </div>
-
-                    <div
-                        style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem;">
-                        <p class="text-muted mb-1">Verfügbarkeit</p>
-                        <h3>{{ product.stock }} auf Lager</h3>
-                        {% if product.stock == '0' %}
-                        <p style="color: var(--danger);">Nicht verfügbar</p>
-                        {% else %}
-                        <p style="color: var(--success);">Verfügbar</p>
-                        {% endif %}
-                    </div>
-
-                    <div class="card mb-3">
-                        <h3 class="mb-2">Beschreibung</h3>
-                        <p>{{ product.description or 'Keine Beschreibung verfügbar' }}</p>
-                    </div>
-
-                    <!-- In den Warenkorb -->
-                    {% if product.stock != '0' %}
-                    <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
-                        <input type="number" id="qty" value="1" min="1" max="{{ product.stock }}"
-                            style="width: 100px; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem;">
-                        <button class="btn btn-primary" onclick="addToCart('{{ product.id }}', this)" style="flex: 1;">
-                            In den Warenkorb
-                        </button>
-                    </div>
-                    {% else %}
-                    <div class="alert alert-danger">
-                        Dieses Produkt ist momentan nicht verfügbar.
-                    </div>
-                    {% endif %}
-
-                    <!-- Produktdetails -->
-                    <div class="card">
-                        <h3 class="mb-2">Produktdetails</h3>
-                        <table style="width: 100%;">
-                            <tr>
-                                <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
-                                    <strong>Artikel-ID:</strong>
-                                </td>
-                                <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">{{ product.id }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
-                                    <strong>Kategorie:</strong>
-                                </td>
-                                <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">{{
-                                    product.category }}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 0.5rem 0;"><strong>Lagerbestand:</strong></td>
-                                <td style="padding: 0.5rem 0;">{{ product.stock }} Stück</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
+            <!-- Produktdetails -->
+            <div class="card">
+                <h3 class="mb-2">Produktdetails</h3>
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                            <strong>Artikel-ID:</strong>
+                        </td>
+                        <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">{{ product.id }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                            <strong>Kategorie:</strong>
+                        </td>
+                        <td style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">{{
+                            product.category }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem 0;"><strong>Lagerbestand:</strong></td>
+                        <td style="padding: 0.5rem 0;">{{ product.stock }} Stück</td>
+                    </tr>
+                </table>
             </div>
         </div>
-    </main>
+    </div>
+</div>
+</main>
 
-    <footer>
-        <p>&copy; 2025 WebShop. Alle Rechte vorbehalten.</p>
-    </footer>
+<footer>
+    <p>&copy; 2025 WebShop. Alle Rechte vorbehalten.</p>
+</footer>
 
-    <script>
-        let currentImageIndex = 0;
-        const images = {{ product.images| tojson }};
+<script>
+    let currentImageIndex = 0;
+    const images = {{ product.images| tojson }};
 
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeButton();
+    function goToImage(index) {
+        if (index < 0 || index >= images.length) return;
+        currentImageIndex = index;
+        updateCarousel();
+    }
+
+    function nextImage() {
+        currentImageIndex = (currentImageIndex + 1) % images.length;
+        updateCarousel();
+    }
+
+    function prevImage() {
+        currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+        updateCarousel();
+    }
+
+    function updateCarousel() {
+        const main = document.getElementById('carousel-main');
+        const counter = document.getElementById('current-image');
+        if (images[currentImageIndex]) {
+            main.style.backgroundImage = `url('{{ url_for('static', filename='uploads/') }}${images[currentImageIndex]}')`;
+        }
+        if (counter) {
+            counter.textContent = currentImageIndex + 1;
         }
 
-        function updateThemeButton() {
-            const button = document.querySelector('.theme-toggle');
-            const theme = document.documentElement.getAttribute('data-theme');
-            if (button) button.textContent = theme === 'dark' ? '☀️' : '🌙';
-        }
-
-        function goToImage(index) {
-            if (index < 0 || index >= images.length) return;
-            currentImageIndex = index;
-            updateCarousel();
-        }
-
-        function nextImage() {
-            currentImageIndex = (currentImageIndex + 1) % images.length;
-            updateCarousel();
-        }
-
-        function prevImage() {
-            currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
-            updateCarousel();
-        }
-
-        function updateCarousel() {
-            const main = document.getElementById('carousel-main');
-            const counter = document.getElementById('current-image');
-            if (images[currentImageIndex]) {
-                main.style.backgroundImage = `url('{{ url_for('static', filename='uploads/') }}${images[currentImageIndex]}')`;
+        // Update active thumbnail
+        const thumbs = document.querySelectorAll('.carousel-thumb');
+        thumbs.forEach((thumb, idx) => {
+            thumb.classList.remove('active');
+            if (idx === currentImageIndex) {
+                thumb.classList.add('active');
             }
-            if (counter) {
-                counter.textContent = currentImageIndex + 1;
-            }
-
-            // Update active thumbnail
-            const thumbs = document.querySelectorAll('.carousel-thumb');
-            thumbs.forEach((thumb, idx) => {
-                thumb.classList.remove('active');
-                if (idx === currentImageIndex) {
-                    thumb.classList.add('active');
-                }
-            });
-        }
-
-        function addToCart(productId, btn) {
-            const qtyInput = document.getElementById('qty');
-            const quantity = qtyInput ? Math.max(1, parseInt(qtyInput.value) || 1) : 1;
-            fetch('/add-to-cart', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ product_id: productId, quantity: quantity })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data && data.success) {
-                        const countEl = document.getElementById('cart-count');
-                        if (countEl) countEl.textContent = data.cart_count;
-                        flashButton(btn);
-                        showToast(`${quantity} Artikel hinzugefügt! 🛒`, 'success');
-                    } else if (data && data.error) {
-                        // Benutzer muss sich einloggen
-                        alert(data.error);
-                        window.location.href = '/login';
-                    }
-                })
-                .catch(err => console.error(err));
-        }
-
-        function flashButton(btn) {
-            if (!btn) return;
-            btn.classList.add('btn-flash');
-            setTimeout(() => btn.classList.remove('btn-flash'), 600);
-        }
-
-        function showToast(message, type = 'success') {
-            let container = document.querySelector('.toast-container');
-            if (!container) {
-                container = document.createElement('div');
-                container.className = 'toast-container';
-                document.body.appendChild(container);
-            }
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            const icons = { success: '✓', error: '✕', warning: '⚠' };
-            toast.innerHTML = `<span class="toast-icon">${icons[type]}</span><div class="toast-content"><p class="toast-message">${message}</p></div>`;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.add('closing');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            updateThemeButton();
         });
-    </script>
+    }
 
-    {% include "cookie_banner.html" %}
-</body>
+    function addToCart(productId, btn) {
+        const qtyInput = document.getElementById('qty');
+        const quantity = qtyInput ? Math.max(1, parseInt(qtyInput.value) || 1) : 1;
+        fetch('/add-to-cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product_id: productId, quantity: quantity })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success) {
+                    const countEl = document.getElementById('cart-count');
+                    if (countEl) countEl.textContent = data.cart_count;
+                    flashButton(btn);
+                    showToast(`${quantity} Artikel hinzugefügt! 🛒`, 'success');
+                } else if (data && data.error) {
+                    // Benutzer muss sich einloggen
+                    alert(data.error);
+                    window.location.href = '/login';
+                }
+            })
+            .catch(err => console.error(err));
+    }
 
-</html>
+    function flashButton(btn) {
+        if (!btn) return;
+        btn.classList.add('btn-flash');
+        setTimeout(() => btn.classList.remove('btn-flash'), 600);
+    }
+
+    function showToast(message, type = 'success') {
+        let container = document.querySelector('.toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+        }
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        const icons = { success: '✓', error: '✕', warning: '⚠' };
+        toast.innerHTML = `<span class="toast-icon">${icons[type]}</span><div class="toast-content"><p class="toast-message">${message}</p></div>`;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.classList.add('closing');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        updateCarousel();
+    });
+</script>
+{% endblock %}

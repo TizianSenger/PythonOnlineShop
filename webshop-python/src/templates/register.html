@@ -1,164 +1,110 @@
-<!DOCTYPE html>
-<html lang="de">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - WebShop</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% block title %}Registrierung - WebShop{% endblock %}
 
-<body>
-    <header>
-        <nav>
-            <a href="/" class="logo">🛍️ WebShop</a>
-            <ul class="nav-links">
-                <li><a href="/">Shop</a></li>
-                {% if session.get('user') %}
-                <li><a href="/cart">🛒 Warenkorb (<span id="cart-count">{{ cart_count }}</span>)</a></li>
-                <li><a href="/dashboard">Dashboard</a></li>
-                <li><a href="/logout">Logout</a></li>
-                {% else %}
-                <li><a href="/login">Login</a></li>
-                <li><a href="/register">Register</a></li>
-                {% endif %}
-                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-            </ul>
-        </nav>
-    </header>
+{% block content %}
+<div class="container">
+    <div style="max-width: 500px; margin: 2rem auto;">
+        <h1 class="text-center mb-4">Registrierung</h1>
 
-    <main>
-        <div class="container">
-            <div style="max-width: 500px; margin: 2rem auto;">
-                <h1 class="text-center mb-4">Registrierung</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
 
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-                {% endif %}
-                {% endwith %}
-
-                <div class="card">
-                    <form method="POST">
-                        <div class="form-group">
-                            <label for="name">Name:</label>
-                            <input type="text" id="name" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email:</label>
-                            <input type="email" id="email" name="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Passwort:</label>
-                            <input type="password" id="password" name="password" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="role">Rolle:</label>
-                            <select id="role" name="role" onchange="toggleAdminPin()">
-                                <option value="user">Kunde</option>
-                                <option value="admin">Admin</option>
-                            </select>
-                        </div>
-                        <div class="form-group" id="admin-pin-group" style="display: none;">
-                            <label for="admin_pin">Admin-PIN:</label>
-                            <input type="password" id="admin_pin" name="admin_pin">
-                        </div>
-
-                        <!-- DSGVO Einwilligungen -->
-                        <hr class="my-3">
-                        <h5 class="mb-3">Datenschutz & Einwilligungen</h5>
-
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="privacy_accept" name="privacy_accept"
-                                required>
-                            <label class="form-check-label" for="privacy_accept">
-                                <small>Ich akzeptiere die <a href="{{ url_for('privacy_policy') }}"
-                                        target="_blank">Datenschutzerklärung</a>
-                                    und <a href="{{ url_for('impressum') }}" target="_blank">Impressum</a>
-                                    (erforderlich)</small>
-                            </label>
-                        </div>
-
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="terms_accept" name="terms_accept"
-                                required>
-                            <label class="form-check-label" for="terms_accept">
-                                <small>Ich akzeptiere die <a href="{{ url_for('terms_of_service') }}"
-                                        target="_blank">Allgemeinen Geschäftsbedingungen</a> (erforderlich)</small>
-                            </label>
-                        </div>
-
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="marketing_consent"
-                                name="marketing_consent">
-                            <label class="form-check-label" for="marketing_consent">
-                                <small>Ich möchte Marketing-E-Mails und Newsletter erhalten (optional)</small>
-                            </label>
-                        </div>
-
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="analytics_consent"
-                                name="analytics_consent">
-                            <label class="form-check-label" for="analytics_consent">
-                                <small>Ich ermögliche Analyse meines Verhaltens zur Verbesserung des Services
-                                    (optional)</small>
-                            </label>
-                        </div>
-
-                        <div class="alert alert-info" style="font-size: 0.85rem;">
-                            <strong>ℹ️ Ihre Daten sind sicher:</strong> Wir speichern keine Kartendaten.
-                            Zahlungen erfolgen über Stripe/PayPal (PCI-DSS konform).
-                            Lesen Sie unsere <a href="{{ url_for('gdpr_rights') }}"
-                                target="_blank">Betroffenenrechte</a>.
-                        </div>
-
-                        <button type="submit" class="btn btn-primary btn-block">Registrieren</button>
-                    </form>
-                    <p class="text-center mt-3 text-muted">
-                        Bereits registriert? <a href="/login" style="color: var(--primary); text-decoration: none;">Hier
-                            anmelden</a>
-                    </p>
+        <div class="card">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
                 </div>
-            </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Passwort:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Rolle:</label>
+                    <select id="role" name="role" onchange="toggleAdminPin()">
+                        <option value="user">Kunde</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group" id="admin-pin-group" style="display: none;">
+                    <label for="admin_pin">Admin-PIN:</label>
+                    <input type="password" id="admin_pin" name="admin_pin">
+                </div>
+
+                <!-- DSGVO Einwilligungen -->
+                <hr class="my-3">
+                <h5 class="mb-3">Datenschutz & Einwilligungen</h5>
+
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="privacy_accept" name="privacy_accept" required>
+                    <label class="form-check-label" for="privacy_accept">
+                        <small>Ich akzeptiere die <a href="{{ url_for('privacy_policy') }}"
+                                target="_blank">Datenschutzerklärung</a>
+                            und <a href="{{ url_for('impressum') }}" target="_blank">Impressum</a>
+                            (erforderlich)</small>
+                    </label>
+                </div>
+
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="terms_accept" name="terms_accept" required>
+                    <label class="form-check-label" for="terms_accept">
+                        <small>Ich akzeptiere die <a href="{{ url_for('terms_of_service') }}"
+                                target="_blank">Allgemeinen Geschäftsbedingungen</a> (erforderlich)</small>
+                    </label>
+                </div>
+
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="marketing_consent" name="marketing_consent">
+                    <label class="form-check-label" for="marketing_consent">
+                        <small>Ich möchte Marketing-E-Mails und Newsletter erhalten (optional)</small>
+                    </label>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="analytics_consent" name="analytics_consent">
+                    <label class="form-check-label" for="analytics_consent">
+                        <small>Ich ermögliche Analyse meines Verhaltens zur Verbesserung des Services
+                            (optional)</small>
+                    </label>
+                </div>
+
+                <div class="alert alert-info" style="font-size: 0.85rem;">
+                    <strong>ℹ️ Ihre Daten sind sicher:</strong> Wir speichern keine Kartendaten.
+                    Zahlungen erfolgen über Stripe/PayPal (PCI-DSS konform).
+                    Lesen Sie unsere <a href="{{ url_for('gdpr_rights') }}" target="_blank">Betroffenenrechte</a>.
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Registrieren</button>
+            </form>
+            <p class="text-center mt-3 text-muted">
+                Bereits registriert? <a href="/login" style="color: var(--primary); text-decoration: none;">Hier
+                    anmelden</a>
+            </p>
         </div>
-    </main>
+    </div>
+</div>
+{% endblock %}
 
-    <footer>
-        <p>&copy; 2025 WebShop. Alle Rechte vorbehalten.</p>
-    </footer>
+{% block extra_js %}
+<script>
+    function toggleAdminPin() {
+        const role = document.getElementById('role').value;
+        const adminPinGroup = document.getElementById('admin-pin-group');
+        adminPinGroup.style.display = role === 'admin' ? 'block' : 'none';
+    }
 
-    <script>
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeButton();
-        }
-
-        function updateThemeButton() {
-            const button = document.querySelector('.theme-toggle');
-            const theme = document.documentElement.getAttribute('data-theme');
-            button.textContent = theme === 'dark' ? '☀️' : '🌙';
-        }
-
-        function toggleAdminPin() {
-            const role = document.getElementById('role').value;
-            const adminPinGroup = document.getElementById('admin-pin-group');
-            adminPinGroup.style.display = role === 'admin' ? 'block' : 'none';
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            updateThemeButton();
-        });
-    </script>
-
-    {% include "cookie_banner.html" %}
-</body>
-
-</html>
+    window.addEventListener('DOMContentLoaded', () => {
+        toggleAdminPin();
+    });
+</script>
+{% endblock %}

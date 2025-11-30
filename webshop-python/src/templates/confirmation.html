@@ -1,55 +1,23 @@
-<!DOCTYPE html>
-<html lang="de">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Bestellbestätigung - WebShop</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% block title %}Bestellbestätigung - WebShop{% endblock %}
 
-<body>
-    <header>
-        <nav>
-            <a href="/" class="logo">🛍️ WebShop</a>
-            <ul class="nav-links">
-                <li><a href="/">Shop</a></li>
-                {% if session.get('user') %}
-                <li><a href="/cart">🛒 Warenkorb (<span id="cart-count">{{ cart_count }}</span>)</a></li>
-                <li><a href="/dashboard">Dashboard</a></li>
-                <li><a href="/logout">Logout</a></li>
-                {% else %}
-                <li><a href="/login">Login</a></li>
-                {% endif %}
-                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-            </ul>
-        </nav>
-    </header>
+{% block content %}
+<div class="container">
+    <h1>Vielen Dank für deine Bestellung</h1>
 
-    <main>
-        <div class="container">
-            <h1>Vielen Dank für deine Bestellung</h1>
+    {% if paid %}
+    <p>Deine Zahlung wurde erfolgreich verarbeitet.</p>
+    {% else %}
+    <p>Deine Bestellung wurde aufgenommen. Bitte begleiche noch die Zahlung.</p>
+    {% endif %}
 
-            {% if paid %}
-            <p>Deine Zahlung wurde erfolgreich verarbeitet.</p>
-            {% else %}
-            <p>Deine Bestellung wurde aufgenommen. Bitte begleiche noch die Zahlung.</p>
-            {% endif %}
+    {% if order_id %}
+    <p><strong>Bestellnummer:</strong> {{ order_id }}</p>
+    {% endif %}
 
-            {% if order_id %}
-            <p><strong>Bestellnummer:</strong> {{ order_id }}</p>
-            {% endif %}
+    <p>Eine Bestätigungs‑E‑Mail wird an dich gesendet (falls angegeben).</p>
 
-            <p>Eine Bestätigungs‑E‑Mail wird an dich gesendet (falls angegeben).</p>
-
-            <a class="btn btn-primary" href="{{ url_for('index') }}">Weiter einkaufen</a>
-        </div>
-    </main>
-    <footer>
-        <p>&copy; 2025 WebShop</p>
-    </footer>
-
-    {% include "cookie_banner.html" %}
-</body>
-
-</html>
+    <a class="btn btn-primary" href="{{ url_for('index') }}">Weiter einkaufen</a>
+</div>
+{% endblock %}
