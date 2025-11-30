@@ -46,7 +46,17 @@
                         class="badge {% if user.role == 'admin' %}badge-success{% else %}badge-primary{% endif %}">{{
                         user.role }}</span></p>
             </div>
-
+            <div class="card mb-4">
+                <h3>ℹ️ Allgemeine Informationen</h3>
+                <p class="mt-3">
+                    Willkommen in deinem WebShop Dashboard! Hier kannst du deine Kontoeinstellungen verwalten
+                    {% if user.role == 'admin' %}
+                    und deine Produkte hinzufügen oder bearbeiten.
+                    {% else %}
+                    und deine Einkäufe verfolgen.
+                    {% endif %}
+                </p>
+            </div>
             {% if user.role == 'admin' %}
             <div class="grid grid-2 mb-4">
                 <a href="/admin/products" class="card"
@@ -82,18 +92,6 @@
                 </a>
             </div>
             {% endif %}
-
-            <div class="card">
-                <h3>ℹ️ Allgemeine Informationen</h3>
-                <p class="mt-3">
-                    Willkommen in deinem WebShop Dashboard! Hier kannst du deine Kontoeinstellungen verwalten
-                    {% if user.role == 'admin' %}
-                    und deine Produkte hinzufügen oder bearbeiten.
-                    {% else %}
-                    und deine Einkäufe verfolgen.
-                    {% endif %}
-                </p>
-            </div>
         </div>
     </main>
 
