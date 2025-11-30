@@ -24,6 +24,11 @@ ADMIN_PIN = os.getenv("ADMIN_PIN", "1234")
 # CSV Speicherort
 CSV_FOLDER_PATH = DATA_DIR
 
+# Datenbank-Konfiguration
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///webshop.db")
+USE_DATABASE = os.getenv("USE_DATABASE", "true").lower() == "true"
+DB_PATH = BASE_DIR.parent / "data" / "webshop.db"
+
 # Stripe (Test keys)
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "")

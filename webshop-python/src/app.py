@@ -11,9 +11,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 from storage.csv_backend import CSVBackend
+from storage.sqlite_backend import SQLiteBackend
+from storage.hybrid_backend import HybridBackend
 from api.routes import api_bp
 from api.checkout_routes import checkout_bp
-from config import SECRET_KEY, SMTP_USER, SMTP_PASS, ADMIN_PIN, CSV_FOLDER_PATH
+from config import SECRET_KEY, SMTP_USER, SMTP_PASS, ADMIN_PIN, CSV_FOLDER_PATH, USE_DATABASE, DB_PATH
 from utils.logging_service import audit_logger, AuditLogType
 
 # App initialisieren
@@ -26,8 +28,20 @@ app.secret_key = SECRET_KEY
 app.register_blueprint(api_bp, url_prefix="/api")
 app.register_blueprint(checkout_bp)  # Checkout-Routen
 
-# CSV-Backend initialisieren
+# Backend initialisieren: Hybrid (SQLite + CSV)
 csv_backend = CSVBackend(str(CSV_FOLDER_PATH))
+
+# Versuche SQLite Backend zu initialisieren
+sqlite_backend = None
+if USE_DATABASE:
+    try:
+        sqlite_backend = SQLiteBackend(str(DB_PATH))
+        app.logger.info(f"SQLite Backend initialisiert: {DB_PATH}")
+    except Exception as e:
+        app.logger.warning(f"SQLite Backend Initialisierung fehlgeschlagen: {e}. Nutze nur CSV-Backend.")
+
+# Nutze Hybrid-Backend für Fallback-Logik
+backend = HybridBackend(csv_backend, sqlite_backend)
 
 # Upload-Konfiguration
 ALLOWED_EXT = {'png', 'jpg', 'jpeg', 'gif'}
@@ -65,7 +79,7 @@ def index():
     min_price = request.args.get('min_price', '')
     max_price = request.args.get('max_price', '')
 
-    products = csv_backend.get_all_products()
+    products = backend.get_all_products()
     for p in products:
         p['price'] = p.get('price', '') or '0'
         p['stock'] = p.get('stock', '') or '0'
@@ -103,7 +117,7 @@ def index():
 
 @app.route("/product/<product_id>")
 def product_detail(product_id):
-    product = csv_backend.get_product(product_id)
+    product = backend.get_product(product_id)
     if not product:
         flash("Produkt nicht gefunden.", "danger")
         return redirect(url_for("index"))
@@ -144,7 +158,7 @@ def register():
         flash("Falscher Admin-PIN.", "danger")
         return redirect(url_for("register"))
 
-    users = csv_backend.get_all_users()
+    users = backend.get_all_users()
     if any(u.get("email", "").lower() == email for u in users):
         flash("E-Mail bereits registriert.", "danger")
         return redirect(url_for("register"))
@@ -159,7 +173,7 @@ def register():
         "marketing_consent": "True" if request.form.get("marketing_consent") == "on" else "False",
         "analytics_consent": "True" if request.form.get("analytics_consent") == "on" else "False"
     }
-    user_id = csv_backend.save_user(user)
+    user_id = backend.save_user(user)
     
     # Logge Registrierung (DSGVO-Compliance)
     audit_logger.log(
@@ -172,9 +186,9 @@ def register():
     )
     
     # Speichere Einwilligungen separat
-    csv_backend.save_consent(user_id, "privacy_policy", "True")
-    csv_backend.save_consent(user_id, "marketing", user.get("marketing_consent"))
-    csv_backend.save_consent(user_id, "analytics", user.get("analytics_consent"))
+    backend.save_consent(user_id, "privacy_policy", "True")
+    backend.save_consent(user_id, "marketing", user.get("marketing_consent"))
+    backend.save_consent(user_id, "analytics", user.get("analytics_consent"))
     
     try:
         send_registration_email(email, name, role)
@@ -193,7 +207,7 @@ def login():
         return render_template("login.html", cart_count=cart_count)
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password", "")
-    users = csv_backend.get_all_users()
+    users = backend.get_all_users()
     user = next((u for u in users if u.get("email", "").lower() == email), None)
     if not user or not check_password_hash(user.get("password", ""), password):
         flash("Email oder Passwort falsch.", "danger")
@@ -219,7 +233,7 @@ def dashboard():
     if not user:
         flash("Bitte loggen Sie sich ein.", "danger")
         return redirect(url_for("login"))
-    products = csv_backend.get_all_products()
+    products = backend.get_all_products()
     cart = session.get("cart", [])
     cart_count = get_cart_item_count(cart)
     return render_template("dashboard.html", user=user, products=products, cart_count=cart_count)
@@ -233,7 +247,7 @@ def cart():
         return redirect(url_for("login"))
     
     cart_items = session.get("cart", [])
-    products = csv_backend.get_all_products()
+    products = backend.get_all_products()
     cart_with_details = []
     for cart_item in cart_items:
         product = next((p for p in products if p.get("id") == cart_item["product_id"]), None)
@@ -346,11 +360,11 @@ def admin_products():
             "stock": str(int(stock) if stock.isdigit() else 0)
         }
 
-        csv_backend.save_product(product)
+        backend.save_product(product)
         flash(f"Produkt '{name}' erfolgreich hinzugefügt.", "success")
         return redirect(url_for("admin_products"))
 
-    products = csv_backend.get_all_products()
+    products = backend.get_all_products()
     cart = session.get("cart", [])
     cart_count = get_cart_item_count(cart)
     return render_template("admin_products.html", user=user, products=products, cart_count=cart_count)
@@ -362,7 +376,7 @@ def edit_product(product_id):
         flash("Zugriff verweigert.", "danger")
         return redirect(url_for("index"))
 
-    product = csv_backend.get_product(product_id)
+    product = backend.get_product(product_id)
     if not product:
         flash("Produkt nicht gefunden.", "danger")
         return redirect(url_for("admin_products"))
@@ -407,7 +421,7 @@ def edit_product(product_id):
             "images": images_list,
             "stock": str(int(stock) if stock.isdigit() else 0)
         }
-        csv_backend.update_product(product_id, updates)
+        backend.update_product(product_id, updates)
         flash("Produkt aktualisiert.", "success")
         return redirect(url_for("admin_products"))
 
@@ -421,7 +435,7 @@ def delete_product(product_id):
     if not user or user.get("role") != "admin":
         return jsonify({"success": False, "error": "Zugriff verweigert"}), 403
 
-    csv_backend.delete_product(product_id)
+    backend.delete_product(product_id)
     flash("Produkt gelöscht.", "success")
     return redirect(url_for("admin_products"))
 
@@ -431,14 +445,14 @@ def remove_product_image(product_id, image_name):
     if not user or user.get("role") != "admin":
         return jsonify({"success": False, "error": "Zugriff verweigert"}), 403
 
-    product = csv_backend.get_product(product_id)
+    product = backend.get_product(product_id)
     if not product:
         return jsonify({"success": False, "error": "Produkt nicht gefunden"}), 404
 
     images = product.get('images', [])
     if image_name in images:
         images.remove(image_name)
-        csv_backend.update_product(product_id, {"images": images})
+        backend.update_product(product_id, {"images": images})
         # Optional: Delete file from uploads
         try:
             file_path = os.path.join(UPLOAD_FOLDER, image_name)
@@ -461,7 +475,7 @@ def orders():
         flash("Bitte loggen Sie sich ein.", "danger")
         return redirect(url_for("login"))
     
-    all_orders = csv_backend.get_all_orders()
+    all_orders = backend.get_all_orders()
     
     # Normale User sehen nur ihre eigenen Bestellungen
     if user.get("role") != "admin":
@@ -497,7 +511,7 @@ def update_order_status(order_id):
     if new_status not in ORDER_STATUSES:
         return jsonify({"success": False, "error": "Ungültiger Status"}), 400
     
-    updated = csv_backend.update_order(order_id, {"status": new_status})
+    updated = backend.update_order(order_id, {"status": new_status})
     if updated:
         return jsonify({"success": True, "message": "Status aktualisiert"})
     else:
@@ -517,7 +531,7 @@ def _parse_order(order, current_user):
         # Hole User-Name wenn Admin
         user_name = ""
         if current_user.get("role") == "admin":
-            users = csv_backend.get_all_users()
+            users = backend.get_all_users()
             user_obj = next((u for u in users if u.get("id") == order.get("user_id")), None)
             user_name = user_obj.get("name", "Unbekannt") if user_obj else "Unbekannt"
         
@@ -609,7 +623,7 @@ def gdpr_data_export():
     )
     
     # Hole alle Benutzerdaten
-    export_data = csv_backend.export_user_data(user_id)
+    export_data = backend.export_user_data(user_id)
     if not export_data:
         flash("Benutzerdaten nicht gefunden.", "danger")
         return redirect(url_for("dashboard"))
@@ -633,7 +647,7 @@ def gdpr_export_data():
     format_type = request.form.get("format", "json").lower()
     
     # Hole Daten
-    export_data = csv_backend.export_user_data(user_id)
+    export_data = backend.export_user_data(user_id)
     if not export_data:
         return jsonify({"success": False, "error": "Daten nicht gefunden"}), 404
     
@@ -725,7 +739,7 @@ def gdpr_delete_account():
     
     # Lösche Benutzer
     try:
-        csv_backend.delete_user(user_id)
+        backend.delete_user(user_id)
         
         # Update Log Status
         audit_logger.log(
@@ -778,7 +792,7 @@ def profile_edit():
         flash("Bitte melden Sie sich an.", "danger")
         return redirect(url_for("login"))
     
-    users = csv_backend.get_all_users()
+    users = backend.get_all_users()
     full_user = next((u for u in users if u.get("id") == user.get("id")), None)
     
     cart = session.get("cart", [])
