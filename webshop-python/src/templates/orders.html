@@ -639,19 +639,21 @@
                     location.reload();
                 }, 500);
             } else {
-                alert(`Fehler: ${data.error || 'Status konnte nicht aktualisiert werden'}`);
+                showDialog(`Fehler: ${data.error || 'Status konnte nicht aktualisiert werden'}`, 'error');
             }
         } catch (error) {
             console.error('Fehler:', error);
-            alert('Fehler beim Aktualisieren des Status');
+            showDialog('Fehler beim Aktualisieren des Status', 'error');
         }
     }
 
     async function deleteOrder(orderId, orderName) {
-        if (!confirm(`Möchtest du die Bestellung #${orderName} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`)) {
-            return;
-        }
+        showConfirmDialog(`Möchtest du die Bestellung #${orderName} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`, () => {
+            performDeleteOrder(orderId);
+        });
+    }
 
+    async function performDeleteOrder(orderId) {
         try {
             const response = await fetch(`/admin/delete-order/${orderId}`, {
                 method: 'POST',
@@ -663,19 +665,18 @@
             const data = await response.json();
 
             if (response.ok) {
-                alert('Bestellung erfolgreich gelöscht');
-                // Redirect back to orders page
-                setTimeout(() => {
+                showDialog('Bestellung erfolgreich gelöscht', 'success', () => {
                     window.location.href = '/orders';
-                }, 500);
+                });
             } else {
-                alert(`Fehler: ${data.error || 'Bestellung konnte nicht gelöscht werden'}`);
+                showDialog('Fehler beim Löschen: ' + (data.error || 'Unbekannt'), 'error');
             }
         } catch (error) {
             console.error('Fehler:', error);
-            alert('Fehler beim Löschen der Bestellung');
+            showDialog('Fehler beim Löschen der Bestellung', 'error');
         }
     }
+
     function updateStatusDisplay(orderId, newStatus) {
         // Refresh the page or update the status badge
         location.reload();

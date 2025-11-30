@@ -1,7 +1,2 @@
 id,name,category,price,description,images,stock
-1,Product A,Elektronik,19.99,Description for Product A,"[""PersoVorderseite_0.jpeg""]",500
-3,Product C,,39.99,Description for Product C,[],
-4,Product D,,49.99,Description for Product D,[],
-5,Product E,kek,59.99,Description for Product E,[],0
-6,Test,Elektronik,12.99,test,[],500
-7,TestBilder,Bild,100.0,das ist ein test fuer die bilder,"['Audi_0.jpg', 'wolf_rescaling_4096px_15fps_0.gif']",40
+1,Tizian,Elektronik,12.0,asdf,[],123

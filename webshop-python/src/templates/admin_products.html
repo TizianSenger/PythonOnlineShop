@@ -101,10 +101,8 @@
                                 endif %}</small></td>
                         <td>
                             <a class="btn" href="/admin/edit-product/{{ product.id }}">Bearbeiten</a>
-                            <form method="POST" action="/admin/delete-product/{{ product.id }}" style="display:inline;">
-                                <button type="submit" class="btn btn-danger"
-                                    onclick="return confirm('Wirklich löschen?')">Löschen</button>
-                            </form>
+                            <button type="button" class="btn btn-danger"
+                                onclick="deleteProductConfirm('{{ product.id }}')">Löschen</button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -120,6 +118,14 @@
 
 {% block extra_js %}
 <script>
-    // Admin products scripts if needed
+    function deleteProductConfirm(productId) {
+        showConfirmDialog('Produkt wirklich löschen?', () => {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/delete-product/${productId}`;
+            document.body.appendChild(form);
+            form.submit();
+        });
+    }
 </script>
 {% endblock %}

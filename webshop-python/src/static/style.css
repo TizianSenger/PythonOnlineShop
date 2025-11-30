@@ -493,3 +493,128 @@ footer {
 .btn-flash {
     animation: buttonPulse 0.6s ease-out;
 }
+
+/* Custom Modal Dialog */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-dialog {
+    background: var(--bg-light);
+    border-radius: 0.75rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    min-width: 300px;
+    max-width: 500px;
+    padding: 2rem;
+    animation: slideIn 0.3s ease forwards;
+    color: var(--text-dark);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-dialog.closing {
+    animation: slideOut 0.3s ease forwards;
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+}
+
+.modal-header {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    word-break: break-word;
+}
+
+.modal-header.error {
+    color: var(--danger);
+}
+
+.modal-header.success {
+    color: var(--success);
+}
+
+.modal-header.warning {
+    color: var(--warning);
+}
+
+.modal-header.info {
+    color: var(--primary);
+}
+
+.modal-body {
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    word-break: break-word;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+.modal-btn {
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.modal-btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.modal-btn-secondary {
+    background: var(--bg-secondary);
+    color: var(--text-dark);
+    border: 1px solid var(--border);
+}
+
+.modal-btn-secondary:hover {
+    background: var(--border);
+}

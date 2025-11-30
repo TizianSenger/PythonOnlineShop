@@ -319,7 +319,7 @@
         if (e.currentTarget.disabled) return;
         // final validation
         if (!checkValidity()) {
-            alert('Bitte fülle alle Pflichtfelder korrekt aus.');
+            showDialog('Bitte fülle alle Pflichtfelder korrekt aus.', 'warning');
             return;
         }
         hiddenMethod.value = method;

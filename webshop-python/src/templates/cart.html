@@ -119,12 +119,12 @@
                 if (data && data.success) {
                     location.reload();
                 } else {
-                    alert('Aktualisieren fehlgeschlagen');
+                    showDialog('Aktualisieren fehlgeschlagen', 'error');
                 }
             })
             .catch(err => {
                 console.error(err);
-                alert('Netzwerkfehler');
+                showDialog('Netzwerkfehler', 'error');
             });
     }
 </script>

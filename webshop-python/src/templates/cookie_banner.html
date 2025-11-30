@@ -233,7 +233,7 @@
             this.enableAnalytics();
             this.enableMarketing();
             this.hideBanner();
-            alert('✓ Alle Cookies akzeptiert');
+            showToast('✓ Alle Cookies akzeptiert', 'success');
         }
 
         rejectAll() {
@@ -245,7 +245,7 @@
             };
             this.setConsent(consent);
             this.hideBanner();
-            alert('✓ Nur essenzielle Cookies aktiviert');
+            showToast('✓ Nur essenzielle Cookies aktiviert', 'success');
         }
 
         saveSettings() {
@@ -263,7 +263,7 @@
             const modal = bootstrap.Modal.getInstance(document.getElementById('cookieSettingsModal'));
             modal.hide();
             this.hideBanner();
-            alert('✓ Cookie-Einstellungen gespeichert');
+            showToast('✓ Cookie-Einstellungen gespeichert', 'success');
         }
 
         enableAnalytics() {

@@ -113,21 +113,24 @@
 {% block extra_js %}
 <script>
     function removeImage(productId, imageName, index) {
-        if (!confirm('Bild wirklich löschen?')) return;
-
-        fetch(`/admin/remove-product-image/${productId}/${imageName}`, {
-            method: 'POST'
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById(`img-${index}`).remove();
-                    location.reload(); // Refresh to update counter
-                } else {
-                    alert('Fehler beim Löschen: ' + (data.error || 'Unbekannt'));
-                }
+        showConfirmDialog('Bild wirklich löschen?', () => {
+            fetch(`/admin/remove-product-image/${productId}/${imageName}`, {
+                method: 'POST'
             })
-            .catch(err => console.error(err));
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById(`img-${index}`).remove();
+                        location.reload(); // Refresh to update counter
+                    } else {
+                        showDialog('Fehler beim Löschen: ' + (data.error || 'Unbekannt'), 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showDialog('Fehler beim Löschen des Bildes', 'error');
+                });
+        });
     }
 </script>
 {% endblock %}

@@ -9,3 +9,13 @@ timestamp,event_type,user_id,user_email,action,resource_type,resource_id,details
 2025-11-30T18:55:07.206080,admin_action,2,tiziansengerps4@gmail.com,delete_order,order,4,,127.0.0.1,success
 2025-11-30T18:55:14.282334,admin_action,2,tiziansengerps4@gmail.com,delete_order,order,1,,127.0.0.1,success
 2025-11-30T18:55:21.190493,admin_action,2,tiziansengerps4@gmail.com,delete_order,order,2,,127.0.0.1,success
+2025-11-30T19:43:56.487099,cookie_consent,2,tiziansengerps4@gmail.com,Cookie consent provided,,,"{""essential"": true, ""analytics"": true, ""marketing"": true, ""timestamp"": ""2025-11-30T19:43:56.484Z""}",127.0.0.1,success
+2025-11-30T19:45:26.377557,cookie_consent,2,tiziansengerps4@gmail.com,Cookie consent provided,,,"{""essential"": true, ""analytics"": true, ""marketing"": true, ""timestamp"": ""2025-11-30T19:45:26.375Z""}",127.0.0.1,success
+2025-11-30T19:52:42.330333,admin_action,2,tiziansengerps4@gmail.com,delete_order,order,4,,127.0.0.1,success
+2025-11-30T19:52:49.987236,admin_action,2,tiziansengerps4@gmail.com,delete_order,order,4,,127.0.0.1,success
+2025-11-30T19:53:04.187866,admin_action,2,tiziansengerps4@gmail.com,delete_order,order,3,,127.0.0.1,success
+2025-11-30T19:53:08.068452,admin_action,2,tiziansengerps4@gmail.com,delete_order,order,3,,127.0.0.1,success
+2025-11-30T19:53:17.420887,admin_action,2,tiziansengerps4@gmail.com,delete_order,order,3,,127.0.0.1,success
+2025-11-30T19:56:10.941425,cookie_consent,,anonymous,Cookie consent provided,,,"{""essential"": true, ""analytics"": true, ""marketing"": true, ""timestamp"": ""2025-11-30T19:56:10.939Z""}",127.0.0.1,success
+2025-11-30T19:56:28.837254,admin_action,2,tiziansengerps4@gmail.com,delete_order,order,1,,127.0.0.1,success
+2025-11-30T19:57:38.559689,admin_action,2,tiziansengerps4@gmail.com,delete_order,order,1,,127.0.0.1,success

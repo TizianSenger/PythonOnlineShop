@@ -40,6 +40,15 @@
         </p>
     </footer>
 
+    <!-- Custom Modal Dialog -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-dialog" id="modal-dialog">
+            <div class="modal-header" id="modal-header"></div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer" id="modal-footer"></div>
+        </div>
+    </div>
+
     <script>
         function toggleTheme() {
             const html = document.documentElement;
@@ -60,6 +69,124 @@
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
             updateThemeButton();
+        });
+
+        // Custom Dialog/Modal Functions
+        function showDialog(message, type = 'info', onConfirm = null, onCancel = null) {
+            const overlay = document.getElementById('modal-overlay');
+            const dialog = document.getElementById('modal-dialog');
+            const header = document.getElementById('modal-header');
+            const body = document.getElementById('modal-body');
+            const footer = document.getElementById('modal-footer');
+
+            // Set header with type icon
+            const icons = {
+                'error': '❌',
+                'success': '✓',
+                'warning': '⚠️',
+                'info': 'ℹ️'
+            };
+
+            header.className = `modal-header ${type}`;
+            header.textContent = `${icons[type] || icons['info']} ${type === 'error' ? 'Fehler' :
+                type === 'success' ? 'Erfolg' :
+                    type === 'warning' ? 'Warnung' :
+                        'Benachrichtigung'
+                }`;
+
+            body.textContent = message;
+
+            // Create buttons
+            footer.innerHTML = '';
+
+            if (onConfirm) {
+                const confirmBtn = document.createElement('button');
+                confirmBtn.className = 'modal-btn modal-btn-primary';
+                confirmBtn.textContent = 'OK';
+                confirmBtn.onclick = () => {
+                    closeDialog();
+                    if (onConfirm) onConfirm();
+                };
+                footer.appendChild(confirmBtn);
+            } else {
+                const okBtn = document.createElement('button');
+                okBtn.className = 'modal-btn modal-btn-primary';
+                okBtn.textContent = 'OK';
+                okBtn.onclick = closeDialog;
+                footer.appendChild(okBtn);
+            }
+
+            if (onCancel) {
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'modal-btn modal-btn-secondary';
+                cancelBtn.textContent = 'Abbrechen';
+                cancelBtn.onclick = () => {
+                    closeDialog();
+                    onCancel();
+                };
+                footer.appendChild(cancelBtn);
+            }
+
+            overlay.classList.add('active');
+        }
+
+        function closeDialog() {
+            const overlay = document.getElementById('modal-overlay');
+            const dialog = document.getElementById('modal-dialog');
+            dialog.classList.add('closing');
+
+            setTimeout(() => {
+                overlay.classList.remove('active');
+                dialog.classList.remove('closing');
+            }, 300);
+        }
+
+        // Confirmation Dialog Function
+        function showConfirmDialog(message, onConfirm, onCancel = null) {
+            const overlay = document.getElementById('modal-overlay');
+            const dialog = document.getElementById('modal-dialog');
+            const header = document.getElementById('modal-header');
+            const body = document.getElementById('modal-body');
+            const footer = document.getElementById('modal-footer');
+
+            header.className = 'modal-header warning';
+            header.textContent = '⚠️ Bestätigung erforderlich';
+            body.textContent = message;
+
+            footer.innerHTML = '';
+
+            const confirmBtn = document.createElement('button');
+            confirmBtn.className = 'modal-btn modal-btn-primary';
+            confirmBtn.textContent = 'Ja, löschen';
+            confirmBtn.style.background = 'var(--danger)';
+            confirmBtn.onclick = () => {
+                closeDialog();
+                if (onConfirm) onConfirm();
+            };
+            footer.appendChild(confirmBtn);
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'modal-btn modal-btn-secondary';
+            cancelBtn.textContent = 'Abbrechen';
+            cancelBtn.onclick = () => {
+                closeDialog();
+                if (onCancel) onCancel();
+            };
+            footer.appendChild(cancelBtn);
+
+            overlay.classList.add('active');
+        }
+
+        // Close modal when clicking on overlay
+        document.addEventListener('DOMContentLoaded', () => {
+            const overlay = document.getElementById('modal-overlay');
+            if (overlay) {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        closeDialog();
+                    }
+                });
+            }
         });
     </script>
 

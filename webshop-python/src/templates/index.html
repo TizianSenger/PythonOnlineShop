@@ -83,8 +83,9 @@
                     showToast(`${quantity} Artikel hinzugefügt! 🛒`, 'success');
                 } else if (data && data.error) {
                     // Benutzer muss sich einloggen
-                    alert(data.error);
-                    window.location.href = '/login';
+                    showDialog(data.error, 'error', () => {
+                        window.location.href = '/login';
+                    });
                 }
             })
             .catch(err => console.error(err));
