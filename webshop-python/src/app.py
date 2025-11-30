@@ -13,7 +13,6 @@ from werkzeug.utils import secure_filename
 from storage.csv_backend import CSVBackend
 from storage.sqlite_backend import SQLiteBackend
 from storage.hybrid_backend import HybridBackend
-from api.routes import api_bp
 from api.checkout_routes import checkout_bp
 from config import SECRET_KEY, SMTP_USER, SMTP_PASS, ADMIN_PIN, CSV_FOLDER_PATH, USE_DATABASE, DB_PATH
 from utils.logging_service import audit_logger, AuditLogType
@@ -24,9 +23,8 @@ app = Flask(__name__,
             static_folder=os.path.join(os.path.dirname(__file__), "static"))
 app.secret_key = SECRET_KEY
 
-# API unter /api bereitstellen
-app.register_blueprint(api_bp, url_prefix="/api")
-app.register_blueprint(checkout_bp)  # Checkout-Routen
+# Checkout-Routen registrieren
+app.register_blueprint(checkout_bp)
 
 # Backend initialisieren: Hybrid (SQLite + CSV)
 csv_backend = CSVBackend(str(CSV_FOLDER_PATH))
