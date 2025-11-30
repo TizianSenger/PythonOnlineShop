@@ -21,10 +21,20 @@
                 class="badge {% if user.role == 'admin' %}badge-success{% else %}badge-primary{% endif %}">{{
                 user.role }}</span></p>
         <hr class="my-3">
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
-            <a href="{{ url_for('privacy_policy') }}" class="btn btn-sm" style="font-size: 0.9rem;">📋 Datenschutz</a>
-            <a href="{{ url_for('impressum') }}" class="btn btn-sm" style="font-size: 0.9rem;">ℹ️ Impressum</a>
-            <a href="{{ url_for('gdpr_rights') }}" class="btn btn-sm" style="font-size: 0.9rem;">✋ Betroffenenrechte</a>
+        <div
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-top: 1rem;">
+            <a href="{{ url_for('privacy_policy') }}" class="btn btn-primary"
+                style="text-align: center; padding: 0.75rem 1rem; text-decoration: none; border-radius: 8px; font-weight: 500; transition: all 0.3s ease;">
+                📋 Datenschutz
+            </a>
+            <a href="{{ url_for('impressum') }}" class="btn btn-primary"
+                style="text-align: center; padding: 0.75rem 1rem; text-decoration: none; border-radius: 8px; font-weight: 500; transition: all 0.3s ease;">
+                ℹ️ Impressum
+            </a>
+            <a href="{{ url_for('gdpr_rights') }}" class="btn btn-primary"
+                style="text-align: center; padding: 0.75rem 1rem; text-decoration: none; border-radius: 8px; font-weight: 500; transition: all 0.3s ease;">
+                ✋ Betroffenenrechte
+            </a>
         </div>
     </div>
     <div class="card mb-4">
