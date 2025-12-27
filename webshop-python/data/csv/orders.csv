@@ -1,1 +1,2 @@
-id,user_id,product_id,quantity,total
+id,user_id,items,total,customer,status,payment_provider,provider_id,created_at
+1,2,"[{""product_id"": ""1"", ""name"": ""Tizian"", ""price"": 12.0, ""quantity"": 1}]",12.0,"{""name"": ""Tizian"", ""email"": ""tiziansengerps4@gmail.com"", ""address"": ""Georg-Krammel-Str.3"", ""city"": ""Geisenfeld"", ""zip"": ""85290"", ""country"": ""DE""}",vorbereitung_transport,paypal,9JF89217YL5916324,2025-12-27T13:33:15.022778

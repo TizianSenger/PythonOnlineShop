@@ -1,0 +1,178 @@
+PROJEKTBERICHT
+Prüfungsleitfaden zur Erstellung eines Projektberichts
+INHALTSVERZEICHNIS
+1. Definition und Zielsetzung eines Projektberichts........................................................................... 2
+2. Gliederung und Aufbau................................................................................................................ 2
+2.1. Einleitung: Projektziele und -vorbereitungen............................................................................................ 3
+2.2. Hauptteil: Durchführung, Evaluation und Reflexion ................................................................................. 3
+2.3. Abschluss: Fazit........................................................................................................................................... 4
+3. Formale Richtlinien und Vorgaben ............................................................................................... 4
+3.1. Bestandteile des Projektberichts ............................................................................................................... 4
+3.2. Formalia ...................................................................................................................................................... 5
+3.3. Bewertung des Projektberichts.................................................................................................................. 6
+Seite 2 von 6
+PRÜFUNGSAMT
+IU.DE
+1. DEFINITION UND ZIELSETZUNG EINES PROJEKTBERICHTS
+Bei der Prüfungsleistung „Projektbericht“ handelt es sich um eine wissenschaftliche Arbeit, in der Studierende die
+selbstständige Bearbeitung eines eigenen Projekts/einer Praxisaufgabe darstellen und anhand von theoretischen
+Ansätzen und Modellen reflektieren – und zwar von der Zielsetzung und Planung über das genaue Vorgehen bis
+hin zum erarbeiteten Ergebnis („Produkt“).
+Der Unterschied zu einer klassischen Seminar- oder Hausarbeit besteht in dem praktischen Aspekt, also im
+Projekt- bzw. Praxisteil, der dem Projektbericht zwingend vorausgeht. Durch einen Projektbericht können und
+sollen Studierende ihre Fähigkeit zeigen, theoretische Ansätze zur Lösung praktischer Probleme anzuwenden
+sowie ihre praktischen Erfahrungen anhand theoretischer Konzepte zu analysieren, zu reflektieren und zu
+bewerten und daraus Schlussfolgerungen für ihre eigene spätere Berufstätigkeit zu ziehen.
+Der Projektbericht als Prüfungsform vereinigt damit einerseits Fachwissen und andererseits dessen Transfer in
+die Praxis anhand der Bearbeitung einer konkreten Problemstellung in einem Praxisfeld. Je nach Kurs und
+Studiengang oder persönlicher Situation kann es sich hierbei um ein berufliches, gesellschaftliches oder auch
+privates Umfeld handeln.
+Das Ergebnis eines Projektberichts ist immer ein „Produkt“ im eigentlichen oder übertragenen Sinne. Dieses kann
+physischer Natur sein (z. B. ein ingenieurtechnisches Modell) oder aber auch aus einem Konzept, einer SoftwareLösung, einer Installation, einer Intervention, einem Prozess o. Ä. bestehen.
+Der Projektbericht soll möglichst lückenlos, präzise und nachvollziehbar über die einzelnen Arbeits- oder
+Entwicklungsschritte und die eingeschlagene Vorgehensweise informieren. Der Projektbericht ist somit das
+Protokoll des gesamten Projektbearbeitungsprozesses mit seinen Zwischenschritten und -produkten
+einschließlich einer Reflexion der Vorgehensweise und Methodik und der Betrachtung der notwendigen und zur
+Verfügung stehenden Ressourcen. Teil des Projektberichts ist es demnach auch, die für die Umsetzung
+erforderlichen Ressourcen zu beschaffen. Diese können aus Daten, Umfragen, Anwendungen, der technischen
+Ausstattung, Software, verschiedenen Tools usw. bestehen. Auch das Endprodukt ist in geeigneter und
+angemessener Weise zu dokumentieren. Gegebenenfalls ist die Nutzung in einer typischen Anwendungssituation
+zu simulieren und zu exemplifizieren.
+2. GLIEDERUNG UND AUFBAU
+Um ein „Produkt“ im Sinne des Projektberichts zu entwickeln, ist ein mehrschrittiges Verfahren notwendig. Im
+Projektbericht spiegeln sich diese Schritte in verschiedenen Kapiteln und Unterkapiteln wider, die sich an der im
+Folgenden dargestellten Gliederung orientieren können. Je nach Fokus und Rahmen des Projekts bzw. der
+Praxisaufgabe sind aber auch Abweichungen von dieser Struktur möglich. Zentral ist also nicht deren strikte
+Einhaltung, sondern vielmehr eine adäquate Anpassung an das konkrete Vorgehen im Einzelfall. Als Hilfestellung
+für eine geeignete Gliederung des Projektberichts kann auch die Orientierung an zentralen Leitfragen dienen, die
+als Gerüst während des Projekts fungiert haben. Der Projektbericht entsteht dann weitestgehend durch die
+Beantwortung dieser Leitfragen als Fließtext mit (Teil-)Überschriften. Die Festlegung der Gliederung in sinnvolle
+Kapitel, Unterkapitel, Einheiten und Abschnitte kann sich projektabhängig unterscheiden und ist Teil der zu
+bearbeitenden Aufgabe in diesem Modul.
+Seite 3 von 6
+PRÜFUNGSAMT
+IU.DE
+2.1. Einleitung: Projektziele und -vorbereitungen
+Zunächst müssen die Problemstellung abgegrenzt, die Ausgangsbedingungen analysiert und die Zielsetzung
+definiert werden. Im Einleitungsteil soll die Projektidee kurz vorgestellt werden, indem die Problemstellung und
+das Ziel/die Ziele beschrieben und ggf. in den zugrunde liegenden Kontext, das Projektumfeld und die
+Ausgangsmotivation eingebettet werden. Dieser Teil sollte in etwa 10 bis 15 % des Berichts umfassen.
+Teil der Einleitung ist zudem eine kurze Erläuterung der Vorgehensweise zur Problemlösung, indem z. B. ein kurzer
+Überblick über die einzelnen Kapitel gegeben wird. Ferner sind die Vorplanungen und das Vorgehen zu
+beschreiben. Folgende Leitfragen können als Orientierung für den Einleitungsteil dienen:
+− Was und wie ist bzw. war das Umfeld? Was ist bzw. war die Situation? Was ist die Aufgabe bzw. Problematik?
+− Was war die Zielsetzung?
+− Welches Vorgehen wurde geplant – und warum/wozu? Welche Methodik / welche Tools wurden gewählt – auf
+Basis welcher theoretischen Ansätze/Modelle?
+− Welche Vorarbeiten waren ggf. notwendig (ggf. Datenerhebung, Datenanalyse, Materialauswertung…)
+− Wie ist der Aufbau des Projektberichts?
+2.2.Hauptteil: Durchführung, Evaluation und Reflexion
+Im Hauptteil des Berichts sollte die eigentliche Durchführung beschrieben werden. Hier sind besondere
+Meilensteine zu nennen sowie Schwierigkeiten, die im Verlauf möglicherweise aufgetaucht sind. Alle
+durchlaufenen (Entwicklungs-)Schritte müssen im Projektbericht protokolliert und Zwischenergebnisse
+festgehalten werden. Eine weitere Anforderung besteht darin, das Projekt bzw. die Praxisaufgabe effizient und
+mit den zur Verfügung gestellten und ggf. beschränkten Mitteln zu bearbeiten. Das Ergebnis muss auf Wirksamkeit
+und Nutzen (überprüft werden. Darüber hinaus sollten auch die Möglichkeiten der nachhaltigen Verankerung in
+den Alltag untersucht bzw. reflektiert werden. Der Hauptteil sollte erfahrungsgemäß in etwa 70 bis 80 % des
+Berichts umfassen.
+Stichwörter für die Beschreibung der Durchführung können sein:
+− Beteiligte Personen/Rollen, ggf. weitere Stakeholder
+− ggf. Risikoanalyse
+− Hauptaufgaben: Phasenplanung/Projektphasen inkl. Aufgaben/Funktionen etc. Ablauf- und Terminplanung
+− Ressourcen: Einsatzmittel-/Kostenplanung
+− Fortschritt
+− Zielerreichung: Welches Ergebnis habe ich erreicht? Entspricht das Ergebnis dem Ziel der Arbeit? Falls nein,
+warum nicht?
+− Welche Effekte und Veränderungen konnten durch die Einführung/Umsetzung erzielt und tatsächlich
+gemessen werden?
+− Welche Schlüsse kann man aus dem Verlauf ziehen? Was kann ggf. verbessert werden?
+− Welche Veränderungen und kontinuierlichen Verbesserungen müssen umgesetzt werden?
+− Wie lassen sich nachhaltige Strukturen zur Verankerung des der Erkenntnisse/Ergebnisse schaffen?
+− ggf. Reflexion der Leistungen/Termine
+− ggf. Reflexion Ressourcen/Kosten
+− ggf. Reflexion der beteiligten Personen und Fachleute
+− Wie sind die eigenen praktischen Erfahrungen vor dem Hintergrund theoretischer Ansätze/Modelle zu
+beurteilen?
+Seite 4 von 6
+PRÜFUNGSAMT
+IU.DE
+2.3. Abschluss: Fazit
+Das Fazit soll einen abschließenden Gesamteindruck ermöglichen und insbesondere aus den Reflexionsaspekten
+auch Schlussfolgerungen aufzeigen. Es sollte in etwa 10 bis 15 % des Berichts umfassen. Abschließende Fragen
+könnten möglicherweise sein:
+− Welche Schlüsse lassen sich aus dem Ergebnis und Erkenntnissen der Reflexionen des Hauptteils ableiten?
+− Was folgt daraus für das weitere Studium bzw. die weitere persönliche und berufliche Entwicklung?
+− …
+3. FORMALE RICHTLINIEN UND VORGABEN
+Beim Schreiben des Projektberichts sollte unbedingt ein sachlicher und präziser Stil mit genauen Formulierungen
+und unter Nutzung wissenschaftlicher Termini gewählt werden. Die Ich-Perspektive ist zu vermeiden, vielmehr
+spricht die verfassende Person des Projektberichtes in der dritten Person; d.h. zum Beispiel: „Die Projektgruppe
+betrachtete folgende Erkenntnisse als besonders wertvoll ...“. Wird zusätzlich auf Literatur zurückgegriffen, muss
+diese unseren Richtlinien entsprechend zitiert werden. Erlebnisstil, Umgangssprache, Ausschmückungen und
+lange, verschachtelte Sätze sind dringend zu vermeiden.
+3.1.Bestandteile des Projektberichts
+Der Projektbericht besteht i. d. R. aus den folgenden Teilen, die im Inhaltsverzeichnis/in der Gliederung erfasst
+werden:
+− Titelblatt
+− Inhaltsverzeichnis (Gliederung der Arbeit)
+− Abbildungs- und/oder Tabellenverzeichnis
+− Abkürzungsverzeichnis
+− Textteil mit Einleitung, Hauptteil, Schluss
+− Literaturverzeichnis
+− Verzeichnis der Anhänge
+− Anhänge und Materialien
+Seite 5 von 6
+PRÜFUNGSAMT
+IU.DE
+3.2. Formalia
+Formalia Erläuterung
+Umfang BACHELOR 7-10 Seiten Textteil
+Umfang MASTER 12-15 Seiten Textteil
+Papierformat DIN A4
+Seitenränder Oben und unten 2 cm; links 2 cm; rechts 2 cm
+Seitenzahlen Zentriert am Seitenende
+Außer dem Titelblatt sind alle Seiten zu nummerieren. Die Seiten vor dem Textteil (falls
+vorhanden, z. B. Titelblatt, Inhaltsverzeichnis, Tabellen- und Abkürzungsverzeichnis) sollten
+mit römischen Großbuchstaben nummeriert werden (I, II, III, IV etc.), wobei die Seitenzählung
+auf der Seite I (Titelblatt) nicht erscheint. Die Seiten des Textteils werden mit arabischen
+Zahlen (1, 2, 3 etc.) nummeriert. Diese Seitenzahlen werden bis zum Schluss, also auch durch
+den Anhang hindurch (falls vorhanden), weitergeführt.
+Schrifttyp Allgemeiner Text – Arial 11 Pkt.; Überschriften – 12 Pkt, Blocksatz
+Zeilenabstand 1,5
+Satz Blocksatz und Silbentrennung
+Fußnoten Arial 10 Pkt., Blocksatz
+Absätze Nach gedanklicher Gliederung – 6 Pkt. Abstand nach Zeilenumbruch
+Titelblatt Das Titelblatt soll mindestens folgende Bestandteile enthalten: Titel der Arbeit, Art der
+Arbeit, Kursbezeichnung, Studiengang, Datum, Name Verfasser:in, Matrikelnummer, Name
+Tutor:in
+Kursspezifische Anpassungen der Angaben sind möglich.
+Kapitelstufen Maximal 3 Stufen (1. Hauptüberschrift, 1.1 Abschnitt, 1.1.1 Unterkapitel)
+Nur die einzelnen Kapitel im Text der Arbeit werden durchnummeriert, die sonstigen
+Bestandteile der Arbeit wie Abbildungsverzeichnis oder Literaturverzeichnis werden ohne
+Nummerierung angegeben.
+Keine Unterstreichungen verwenden, zum sparsamen Hervorheben von Passagen „Kursiv“
+verwenden
+Zitierstandard Bitte beachte hierzu den Zitationsleitfaden auf myCampus.
+Eidesstattliche Erklärung Die Abgabe der Eidesstattlichen Erklärung erfolgt in elektronischer Form über myCampus.
+Davor ist keine Einreichung der schriftlichen Ausarbeitung möglich.
+Abgabe Bitte beachte hierzu die „Anleitung für das Einreichen einer Arbeit in myCampus – Turnitin“.
+Seite 6 von 6
+PRÜFUNGSAMT
+IU.DE
+3.3.Bewertung des Projektberichts
+In die Bewertung des Projektberichts fließen die nachfolgenden Aspekte mit dem jeweils angegebenen
+Prozentsatz ein. Die untenstehenden Erläuterungen zu den Bewertungskriterien können in der
+Aufgabenstellung unter Kapitel 2 erläutert oder anders spezifiziert werden.
+Bewertungskriterium Erläuterung Gewichtung
+Transfer Angemessener Transfer von Theorien/Modellen, Schlussfolgerungen im Fazit 15 %
+Dokumentation Sauberkeit der schriftlichen Ausarbeitung, Einhaltung formaler Kriterien, richtige
+Rechtschreibung, Interpunktion, gute sprachliche Ausdrucksweise
+10 %
+Ressourcen Auswahl und Einsatz passender Hilfsmittel, effizienter Umgang mit Ressourcen 10 %
+Prozess Schlüssigkeit und Eignung des Vorgehens, 25 %
+Kreativität Kreativität des Lösungsansatzes, der Vorgehensweise, der aus den
+Erfahrungen/Ergebnissen abgeleiteten Schlussfolgerungen
+15 %
+Qualität Tiefe, Gründlichkeit und Nachvollziehbarkeit der Reflexion des Vorgehens und der
+Ergebnisse, Nachvollziehbarkeit und Schlüssigkeit der Argumentation/der
+Erkenntnisse; geeignete Anwendung von theoretischen Ansätzen/Konzepten
