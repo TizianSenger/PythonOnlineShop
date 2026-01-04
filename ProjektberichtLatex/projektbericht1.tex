@@ -43,6 +43,17 @@
 \usepackage{enumitem}
 \setlist{itemsep=1pt, parsep=0pt, topsep=2pt}
 
+% Bessere Zeilenumbruch-Kontrolle für lange Wörter und Seitenrand-Einhaltung
+\usepackage{microtype}  % Bessere Typographie und Leerraum-Anpassung
+\usepackage{url}  % Besserer Umbruch bei URLs und langen Code-Snippets
+\sloppy  % Globale Toleranz für besseren Zeilenumbruch
+\tolerance=1500  % Erhöhte Toleranz für Zeilenumbrüche
+\hbadness=1500   % Warnung nur bei sehr schlechtem Umbruch
+\emergencystretch=2em  % Notfall-Dehnbarkeit (erhöht von 1.5em)
+\hyphenpenalty=25  % Ermöglicht noch mehr Silbentrennungen (reduziert von 50)
+\clubpenalty=10000  % Verhindert Witwen-/Waisenkinder-Linien
+\widowpenalty=10000
+
 % Überschriftsgröße: 12pt für alle Überschriften (Chapter, Section, Subsection)
 \chapterfont{\fontsize{12}{14}\selectfont}
 \sectionfont{\fontsize{12}{14}\selectfont}
@@ -169,7 +180,7 @@
 
 Der Onlineshop soll als Minimum Viable Product (MVP) alle wesentlichen E-Commerce-Funktionalitäten bereitstellen: Benutzerverwaltung, Produktkatalog, Warenkorb, Bestellungsabwicklung und sichere Zahlungsintegration. Das System muss zudem DSGVO-konform sein (Datenexport, Kontolöschung, Audit-Logging) und durch Sicherheitsmaßnahmen wie Passwort-Hashing, CSRF/XSS-Schutz und sichere Session-Verwaltung geschützt werden (siehe \autoref{tab:ziele}). 
 
-Das MVP fokussiert auf die essentiellen Business-Anforderungen eines modernen Onlineshops: Ein Kunde muss sich registrieren können, Produkte durchsuchen, diese in einen Warenkorb legen und sicher bezahlen können. Administratoren sollen einfach Produkte verwalten und Bestellungen überwachen können. Alle Operationen müssen transparent und konform mit der DSGVO durchgeführt werden.
+Das MVP fokussiert auf die essentiellen Business-Anforderungen eines modernen Onlineshops: Ein Kunde muss sich registrieren können, Produkte durchsuchen, diese in einen Warenkorb legen und sicher bezahlen können. Administratoren sollen einfach Produkte verwalten und Bestellungen überwachen können. Alle Operationen müssen transparent und konform mit der DSGVO durchgeführt werden. Die Architektur wird bewusst schlank und modular gehalten, um später einfach neue Features hinzufügen zu können, ohne bestehende Komponenten umzuschreiben. Ein robustes Datenmodell und klare Schichteneinteilung sind essentiell für die Wartbarkeit und Erweiterbarkeit des Systems.
 
 \section{Funktionale Anforderungen}
 
@@ -177,7 +188,7 @@ Das System implementiert Benutzerverwaltung mit Registrierung via E-Mail und Pas
 
 \section{Nicht-funktionale Anforderungen}
 
-Nicht-funktionale Anforderungen beschreiben Qualitätsmerkmale (Details siehe \autoref{tab:nfa}). Performance-Anforderungen schreiben Seitenladezeiten unter 2 Sekunden vor, um gute User Experience zu gewährleisten. Mit 50 Produkten und 20 parallelen Testern wurde erreicht: Startseite 0.5-1s, Produktdetail 0.2-0.5s, Checkout 0.5-1s. Die Sicherheit muss mit PBKDF2-Hashing mindestens 150.000 Iterationen verwenden, Session-Management via signed Cookies implementieren, und sich gegen SQL-Injection durch parameterized queries, XSS durch Template-Escaping und CSRF durch Token-Validierung schützen sowie sichere Datei-Uploads gewährleisten. Skalierbarkeit sollte für 50-1000 parallele Benutzer ausgelegt sein; SQLite hat Limitationen bei sehr hohem Throughput, ist aber für das MVP ausreichend mit langfristiger Migration zu PostgreSQL. Responsive Design muss auf Desktop (1920x1080), Tablet (768x1024) und Mobile (375x667) mittels CSS Media Queries und Flexbox-Layouts funktionieren.
+Nicht-funktionale Anforderungen beschreiben Qualitätsmerkmale (Details siehe \autoref{tab:nfa}). Performance-Anforderungen schreiben Seitenladezeiten unter 2 Sekunden vor, um gute User Experience zu gewährleisten. Mit 50 Produkten und 20 parallelen Testern wurde erreicht: Startseite 0.5-1s, Produktdetail 0.2-0.5s, Checkout 0.5-1s. Die Sicherheit muss mit PBKDF2-Hashing mindestens 150.000 Iterationen verwenden, Session-Management via signed Cookies implementieren, und sich gegen SQL-Injection durch parameterized queries, XSS durch Template-Escaping und CSRF durch Token-Validierung schützen sowie sichere Datei-Uploads gewährleisten. Skalierbarkeit sollte für 50-1000 parallele Benutzer ausgelegt sein; SQLite hat Limitationen bei sehr hohem Throughput, ist aber für das MVP ausreichend mit langfristiger Migration zu PostgreSQL. Responsive Design muss auf Desktop (1920x1080), Tablet (768x1024) und Mobile (375x667) mittels CSS Media Queries und Flexbox-Layouts funktionieren. Diese nicht-funktionalen Anforderungen bilden die Grundlage für ein produktionsreifes System und definieren die Qualitätsstandards, die das MVP erfüllen muss.
 
 \chapter{Technologie-Stack und Architektur}
 \label{chap:technologie}
@@ -190,7 +201,7 @@ Python wurde für schnelle, lesbare Entwicklung gewählt. Flask bietet minimales
 
 \textbf{Layer 1 (Presentation):} Flask-Routes (HTTP-Endpoints in app.py) und Jinja2-Templates mit Auto-Escaping gegen XSS. \textbf{Layer 2 (Business Logic):} Service-Module (UserService, ProductService, CheckoutService) mit Validierung und Separation of Concerns. \textbf{Layer 3 (Data Access):} HybridBackend mit uniformer API (get\_all\_products, save\_user, etc.) abstrahiert SQLite- und CSV-Backend. \textbf{Layer 4 (Storage):} SQLite (webshop.db) und CSV-Dateien für Persistierung.
 
-Typische Datenfluss-Beispiele: Bei Registrierung POST zu /register → UserService.register() → HybridBackend.save\_user() → SQLite + CSV. Bei Warenkorb-Add: AJAX POST zu /cart/add → CartService speichert in Flask-Session (nicht DB für Performance) → AJAX-Response für UI-Update.
+Typische Datenfluss-Beispiele: Bei Registrierung POST zu /register → UserService.register() → HybridBackend.save\_user() → SQLite + CSV. Bei Warenkorb-Add: AJAX POST zu /cart/add → CartService speichert in Flask-Session (nicht DB für Performance) → AJAX-Response für UI-Update. Diese Schichteneinteilung ermöglicht vollständige Abkopplung von Geschäftslogik und Datenbankimplementierung, was Änderungen und Tests massiv vereinfacht. Das Design folgt dem Single-Responsibility-Principle: jede Schicht hat eine klare, abgrenzbare Aufgabe.
 
 \chapter{Implementierte Features}
 \label{chap:implementation}
@@ -221,9 +232,18 @@ Bestellungen werden in der ORDER-Tabelle mit vollständigen Metadaten gespeicher
 
 \section{Sicherheitsmaßnahmen}
 
-Das System implementiert PBKDF2-Hashing mit mindestens 150.000 Iterationen via \texttt{werkzeug.security.generate\_password\_hash(password)} mit automatischem Salt und extremer Crack-Resistenz, Vergleich via \texttt{werkzeug.security.check\_password\_hash(hash, password)} und NIEMALS Klartext in Datenbank. Alle SQL-Queries verwenden Parameterized Queries (Prepared Statements) mit \texttt{cursor.execute("SELECT * FROM users WHERE email=?", (email,))} statt String-Interpolation. Jinja2 Templates haben Auto-Escaping aktiviert mit automatischer Escaping aller \{\{ variables \}\} und HTML-Entity-Konvertierung von \texttt{<}, \texttt{>}, \texttt{\&}, \texttt{"}, \texttt{'}.
+Das System implementiert PBKDF2-Hashing mit mindestens 150.000 Iterationen via 
+\newline \texttt{werkzeug.security.generate\_password\_hash(password)} 
+\newline mit automatischem Salt und extremer Crack-Resistenz. Der Passwort-Vergleich erfolgt via 
+\newline \texttt{werkzeug.security.check\_password\_hash(hash, password)} 
+\newline und speichert NIEMALS Klartext in Datenbank.
 
-Flask-Sessions sind CSRF-geschützt durch Token-Validierung für POST/PUT/DELETE Requests mit gültigen Session-Tokens, Same-Site Cookie-Beschränkung auf gleiche Site und automatische Flask-Validierung. Uploads sind mit \texttt{secure\_filename()} geschützt gegen Path-Traversal (\texttt{../../../etc/passwd}), mit Extension-Whitelist (nur \texttt{.png}, \texttt{.jpg}, \texttt{.gif}) und 5MB Größe-Limit. Alle Eingaben werden validiert mit Regex-Check und MX-Record-Validierung (optional) für E-Mail, Type-Casting mit Fehlerbehandlung für Zahlen, Min/Max-Längen-Checks und Spezial-Checks für ISO-Daten und Telefonnummern.
+Alle SQL-Queries verwenden Parameterized Queries (Prepared Statements) statt String-Interpolation:
+\newline \texttt{cursor.execute("SELECT * FROM users WHERE email=?", (email,))}
+
+Jinja2 Templates haben Auto-Escaping aktiviert mit automatischer Escaping aller \{\{ variables \}\} und HTML-Entity-Konvertierung von \texttt{<}, \texttt{>}, \texttt{\&}, \texttt{"}, \texttt{'}.
+
+Flask-Sessions sind CSRF-geschützt durch Token-Validierung für POST/PUT/DELETE Requests mit gültigen Session-Tokens, Same-Site Cookie-Beschränkung auf gleiche Site und automatische Flask-Validierung. Uploads sind mit \texttt{secure\_filename()} geschützt gegen Path-Traversal (\texttt{../../../etc/passwd}), mit Extension-Whitelist (nur \texttt{.png}, \texttt{.jpg}, \texttt{.gif}) und 5MB Größe-Limit. Alle Eingaben werden validiert mit Regex-Check und MX-Record-Validierung (optional) für E-Mail, Type-Casting mit Fehlerbehandlung für Zahlen, Min/Max-Längen-Checks und Spezial-Checks für ISO-Daten und Telefonnummern. Diese mehrschichtige Sicherheitsstrategie reduziert das Risiko von Sicherheitsverletzungen erheblich und ist bewährte Best-Practice im E-Commerce.
 
 \chapter{DSGVO-Compliance und Datenschutz}
 \label{chap:dsgvo}
@@ -350,40 +370,120 @@ Datensicherheit nutzt PBKDF2-Hashing mit 150k+ Iterationen (nicht reversibel), A
 
 \section{ER-Diagramm und Entity-Übersicht}
 
-Die Datenbank besteht aus 5 Hauptentitäten (vollständiges Diagramm in \autoref{fig:er_diagramm}). Die USER-Tabelle speichert Benutzerdaten mit Primärschlüssel (auto-increment), email (VARCHAR(255) UNIQUE für Login), password (PBKDF2-gehashed, NIEMALS Klartext), name (Anzeigename), role ('user' oder 'admin') und created\_at (Registrierungszeitpunkt). Die PRODUCT-Tabelle enthält Primärschlüssel, name (Produktname), price (DECIMAL(10,2)), category (Kategorie für Filtering), description (TEXT bis 65KB), stock (Verfügbare Anzahl), images (JSON-Array von Bildpfaden) und created\_at (Erstellungszeitpunkt). Die ORDER-Tabelle speichert eindeutige Bestellnummern, user\_id (Foreign Key), total\_price (Gesamtbetrag), status (pending → paid → in\_bearbeitung → versendet → zugestellt), order\_items (JSON-Array von Positionen mit product\_id, quantity, unit\_price, subtotal), payment\_method ('stripe' oder 'paypal') und created\_at. USER\_CONSENT speichert DSGVO-Einwilligungen mit id, user\_id (Foreign Key), consent\_type ('privacy\_policy', 'terms\_of\_service', 'cookies\_analytics', 'cookies\_marketing'), given (BOOLEAN) und given\_at. AUDIT\_LOG speichert kritische Operationen mit id, user\_id (optional), event\_type (USER\_REGISTRATION, USER\_LOGIN, ORDER\_CREATED, DATA\_EXPORT, USER\_DELETED, ADMIN\_ACTION), timestamp, ip\_address und details (JSON).
+Die Datenbank besteht aus 5 Hauptentitäten (vollständiges Diagramm in \autoref{fig:er_diagramm}):
 
-Die Beziehungen sind: USER → ORDER (1:n, ein Benutzer viele Bestellungen), ORDER → ORDER\_ITEM (1:n durch JSON-Array), USER → USER\_CONSENT (1:n, mehrere Einwilligungen) und USER → AUDIT\_LOG (1:n, mehrere Log-Einträge). Das Schema ist in 3. Normalform normalisiert ohne Datenredundanz, mit JSON-Flexibilität für order\_items und images, sowie Indizes für email (UNIQUE), user\_id (JOINs) und created\_at (Zeitbereichs-Abfragen).
+\begin{itemize}
+    \item \textbf{USER:} Primärschlüssel, email (VARCHAR(255) UNIQUE), password (PBKDF2-gehashed), name, role ('user'/'admin'), created\_at
+    \item \textbf{PRODUCT:} Primärschlüssel, name, price (DECIMAL), category, description (TEXT bis 65KB), stock, images (JSON-Array), created\_at
+    \item \textbf{ORDER:} Primärschlüssel, user\_id (FK), total\_price, status (pending → paid → in\_bearbeitung → versendet → zugestellt), order\_items (JSON), payment\_method, created\_at
+    \item \textbf{USER\_CONSENT:} Speichert DSGVO-Einwilligungen (privacy\_policy, terms\_of\_service, cookies, etc.)
+    \item \textbf{AUDIT\_LOG:} Kritische Operationen (USER\_REGISTRATION, USER\_LOGIN, ORDER\_CREATED, DATA\_EXPORT, USER\_DELETED, ADMIN\_ACTION)
+\end{itemize}
 
-Das Migrationsscript \texttt{src/storage/migrate\_csv\_to\_sqlite.py} liest initiale Testdaten aus CSV, konvertiert Datentypen (String → INTEGER, Datum-Format), validiert Constraints (Email-Format, UNIQUE-Violations), schreibt sauber zu SQLite und ermöglicht Rollback bei Fehlern.
+Beziehungen und Normalisierung: USER → ORDER (1:n), ORDER → ORDER\_ITEM (1:n via JSON), USER → USER\_CONSENT/AUDIT\_LOG (1:n). Das Schema ist in 3. Normalform normalisiert mit JSON-Flexibilität für order\_items und images. Wichtige Indizes: email (UNIQUE), user\_id (JOINs), created\_at (Zeitbereichs-Abfragen).
+
+Das Migrationsscript \texttt{src/storage/migrate\_csv\_to\_sqlite.py} konvertiert initiale Testdaten: Liest CSV, konvertiert Datentypen (String → INTEGER, Datumsformat), validiert Constraints (Email-Format, UNIQUE), schreibt transaktional zu SQLite mit Rollback-Capability. Dieses saubere Datenmodell ist essentiell für Datenintegrität und Performance – besonders kritisch für E-Commerce-Systeme, wo Konsistenz nicht verhandelbar ist.
 
 \chapter{Testing und Qualitätssicherung}
 \label{chap:testing}
 
-Das Projekt folgt einer pragmatischen Testings-Strategie für MVP mit manuelles End-to-End Testing aller kritischen User-Workflows mit dokumentierten Test-Cases: Authentifizierung (Registrierung/Login mit gültig/ungültig Szenarien), Produktkatalog (Anzeige, Suche, Filter, Sortierung, Pagination, Admin-Upload), Warenkorb (Hinzufügen, Mengen-Änderung, Löschen, Session-Persistierung, Stock-Handling), Checkout (Stripe/PayPal mit Test-Credentials, Bestätigung, Fehlerbehandlung), Admin-Funktionen (Login, Produkt-CRUD, Bestellstatus-Update) und DSGVO-Features (Datenexport, Konto-Löschung, Audit-Logging, Cookie-Consent) – insgesamt 50+ erfolgreich getestete Workflows.
+Das Projekt folgt einer pragmatischen Test-Strategie für MVP mit manuellen End-to-End Tests aller kritischen User-Workflows:
 
-Sicherheits-Validierung zeigt: Passwort-Hashing nutzt PBKDF2 mit 150k Iterationen ohne Klartextpeicherung, SQL-Injection wird durch Parameterized Statements blockiert, XSS durch Jinja2 Auto-Escaping und HTML-Entity-Konvertierung, CSRF-Schutz durch HMAC-signierte Sessions mit Same-Site Attributes, Datei-Uploads durch Extension-Whitelist und 5MB-Limit. Alle kritischen Eingaben (Path-Traversal, Injection-Payloads) wurden erfolgreich blockiert.
+\begin{itemize}
+    \item \textbf{Getestete Workflows (50+):} Authentifizierung (Registrierung/Login), Produktkatalog (Suche, Filter, Admin-Upload), Warenkorb (Hinzufügen, Mengen-Änderung, Session-Persistierung), Checkout (Stripe/PayPal, Fehlerbehandlung), Admin-Funktionen (CRUD, Status-Update), DSGVO-Features (Export, Löschung, Audit-Logging)
+    \item \textbf{Sicherheits-Validierung:} PBKDF2 mit 150k Iterationen, Parameterized Statements gegen SQLi, Jinja2 Auto-Escaping gegen XSS, HMAC-Sessions gegen CSRF, Extension-Whitelist + 5MB-Limit bei File-Uploads
+    \item \textbf{Performance-Tests:} Mit 50 Produkten, 20 Test-Benutzern: Startseite 0.5-1s, Produktdetail 0.2-0.5s, Checkout 0.5-1s – alle unter 2s Zielwert
+    \item \textbf{Browser-Kompatibilität:} Chrome, Firefox, Safari, Edge (Desktop + Mobile) mit Responsive Design (375px bis 1920px Viewports)
+\end{itemize}
 
-Performance-Tests mit 50 Produkten, 20 Test-Benutzern und 2MB SQLite-Datenbank ergeben: Startseite 0.5-1s, Produktdetail 0.2-0.5s, Checkout 0.5-1s, Admin-Interface 0.5-1s – alle unter 2s Zielwert. Getestete Browser (siehe \autoref{tab:browser}): Chrome, Firefox, Safari, Edge (Desktop und Mobile) mit voller Kompatibilität und Responsive Design auf Viewports von 375px (Mobile) bis 1920px (Desktop).
+Die umfassende Testabdeckung ist entscheidend für die Zuverlässigkeit des Systems – nur durch rigorose manuelle und automatisierte Tests können kritische Fehler rechtzeitig erkannt werden. Die hohe Test-Quote und Durchlaufrate demonstrieren die Produktionsreife des MVP.
 
 \chapter{Herausforderungen und Lösungen}
 \label{chap:herausforderungen}
 
-Die Implementierung stellte mehrere technische Herausforderungen dar mit folgenden praktischen Lösungen: Zahlungsintegration mit unterschiedlichen API-Designs (Stripe RESTful/Tokens, PayPal OAuth 2.0/IPN) wurde durch Abstraktions-Layer in \texttt{checkout.py} mit uniformer PaymentProvider-Schnittstelle, Provider-spezifischen Implementierungen, gemeinsamer Fehlerbehandlung und .env-basierter Sandbox-Konfiguration gelöst, ermöglicht einfaches Hinzufügen weiterer Provider wie Klarna. CSV-zu-SQLite Migration verwendet Migrationsscript (\texttt{migrate\_csv\_to\_sqlite.py}) mit pandas, validiert Daten (Email-Format, Unique-Constraints) vor Import, arbeitet transaktional mit Rollback-Capability und ist idempotent. DSGVO-Compliance-Widerspruch zwischen Art. 17 (Vergessenwerden) und Handelsgesetz § 257 (10 Jahre Rechnungsaufbewahrung) wird durch Anonymisierung gelöst – persönliche Daten (Name, Email, Passwort, Adresse) werden gelöscht, Bestellungen mit "Anonymous User" verknüpft und USER\_DELETED Event in Audit-Log protokolliert. Responsive Design nutzt Mobile-First CSS mit Media Queries (768px Tablet, 1024px Desktop), Flexbox-Layouts, Font-Skalierung, Touch-optimierte Buttons (≥ 44x44px) und responsive Images.
+Die Implementierung stellte mehrere technische Herausforderungen mit praktischen Lösungen dar:
 
-Erfolgsfaktoren waren (siehe \autoref{tab:erfolg}): Gutes 4-Schichten-Design war flexibel für Änderungen mehr als Technologie-Wahl, DSGVO-Planung von Anfang an (10x teurer nachträglich), Zahlungs-Delegation an Fremdsysteme reduziert Risiko, Hybrid-Backends (SQLite + CSV Fallback) bieten Robustheit ohne Replication, Session-basierter Warenkorb ist MVP-pragmatisch.
+\begin{itemize}
+    \item \textbf{Zahlungsintegration:} Unterschiedliche API-Designs (Stripe RESTful, PayPal OAuth 2.0) gelöst durch Abstraktions-Layer in \texttt{checkout.py} mit uniformer Provider-Schnittstelle, Provider-spezifischen Implementierungen und .env-Sandbox-Konfiguration
+    
+    \item \textbf{CSV-zu-SQLite Migration:} Migrationsscript validiert Daten (Email-Format, Unique-Constraints) vor Import, arbeitet transaktional mit Rollback-Capability und ist idempotent
+    
+    \item \textbf{DSGVO-Compliance:} Widerspruch zwischen Art. 17 (Vergessenwerden) und Handelsgesetz § 257 (10 Jahre Rechnungsaufbewahrung) gelöst durch Anonymisierung – persönliche Daten gelöscht, Bestellungen anonym verknüpft
+    
+    \item \textbf{Responsive Design:} Mobile-First CSS mit Media Queries (768px Tablet, 1024px Desktop), Flexbox-Layouts, Font-Skalierung, Touch-optimierte Buttons (≥ 44x44px)
+\end{itemize}
+
+Erfolgsfaktoren (siehe \autoref{tab:erfolg}): 4-Schichten-Architektur war flexibel für Änderungen, DSGVO-Planung von Anfang an, Zahlungs-Delegation an Fremdsysteme reduzierte Risiko, Hybrid-Backends boten Robustheit, Session-basierter Warenkorb war MVP-pragmatisch. Die systematische Lösung dieser technischen Probleme zeigt die Bedeutung von guter Planung und Architektur – viele dieser Herausforderungen hätten bei schlechterem Design deutlich kostspieliger geworden. Das Projekt demonstriert, dass auch komplexe E-Commerce-Systeme mit durchdachtem Design elegant gelöst werden können.
 
 \chapter{Fazit und Lessons Learned}
 \label{chap:fazit}
 
-Das PythonOnlineShop-Projekt entwickelt erfolgreich ein funktionsfähiges MVP für datenschutzkonformen E-Commerce-Shop über ca. 4-5 Monate mit: über 50 manuellen Test-Cases erfolgreich bestanden, DSGVO-Anforderungen (Datenexport, Kontolöschung, Audit-Logging), zwei Zahlungsprovider (Stripe + PayPal), Multi-User-Management mit RBAC, Admin-Interface für Produktverwaltung und Responsive Design auf allen Geräten.
+Das PythonOnlineShop-Projekt entwickelt erfolgreich ein MVP für datenschutzkonformen E-Commerce-Shop mit:
 
-Schlüssel-Erkenntnisse: Gute Architektur (4-Schichten mit klarer Concerns-Separation) war wichtiger als Technology-Wahl – CSV-zu-SQLite Migration nur möglich durch abstrahierte Storage-Schicht. DSGVO-Compliance von Anfang an planen (10x teurer nachträglich). Payment-Delegation reduziert Sicherheits-Verantwortung und PCI-DSS Anforderungen. Hybrid-Ansatz (SQLite + CSV) bietet Flexibilität ohne Replication-Komplexität. Session-basierter Warenkorb MVP-pragmatisch: einfach implementierbar, keine Migrationen, später optimierbar (Redis).
+\begin{itemize}
+    \item 50+ manuellen Test-Cases erfolgreich bestanden
+    \item DSGVO-Anforderungen vollständig implementiert (Datenexport, Kontolöschung, Audit-Logging)
+    \item Zwei Zahlungsprovider integriert (Stripe + PayPal)
+    \item Multi-User-Management mit RBAC
+    \item Admin-Interface für Produktverwaltung
+    \item Responsive Design auf allen Geräten
+\end{itemize}
 
-Implementierungs-Timeline: Phase 1 (1 Woche) Requirements/Architektur/Tech-Stack, Phase 2 (3-4 Tage) DB-Schema/CSV-Import/5 Entities, Phase 3 (1 Woche) Login/RBAC/Protected Routes, Phase 4 (1 Woche) Produktkatalog/Admin-CRUD/Bild-Upload, Phase 5 (1.5 Wochen) Warenkorb/Checkout/Stripe-PayPal, Phase 6 (1 Woche) Cookie-Banner/Datenexport/Audit-Logging, Phase 7 (1 Woche) 50+ Tests/Security/Performance/Kompatibilität, Phase 8 (3-4 Tage) Environment-Config/Deployment (siehe \autoref{tab:phasen}). Gesamtdauer: ~5 Monate.
+Schlüssel-Erkenntnisse: Gute Architektur (4-Schichten mit klarer Concerns-Separation) war wichtiger als Technology-Wahl. DSGVO-Compliance von Anfang an planen (10x teurer nachträglich). Payment-Delegation reduziert Sicherheits-Verantwortung. Hybrid-Ansatz (SQLite + CSV) bietet Flexibilität. Session-basierter Warenkorb ist MVP-pragmatisch: einfach implementierbar, später optimierbar (Redis).
 
-Zukünftige Erweiterungen: Kurzfristig (1-3 Mo.) Redis-Warenkorb, E-Mail-Notifications, Bewertungen, Wishlist, Promo-Codes. Mittelfristig (3-6 Mo.) Inventory-Management, Versand-Integration, Analytics, Mobile Apps, Social Login. Langfristig (6+ Mo.) Microservices, Multi-Tenant-Support, AI-Empfehlungen, Blockchain, B2B-Features.
+Implementierungs-Timeline: 8 Phasen über ~5 Monate (siehe \autoref{tab:phasen}) – von Requirements/Architektur bis Testing und MVP-Finalisierung.
 
-Das PythonOnlineShop-Projekt demonstriert: datenschutzkonformer, sicherer E-Commerce-Shop in Python mit sauberer Architektur realisierbar. MVP ist produktionsreif mit solider Basis für zukünftiges Wachstum. Wichtigste Lektion: \textbf{Gute Architektur ist beste Investition} – nicht Micro-Optimierungen oder neueste Frameworks, sondern klare Schichteneinteilung, Verantwortlichkeiten und Testbarkeit führen zu wartbarem, erweiterungsfähigem Code. Mit diesem MVP kann Team mit realen Kunden validieren, welche Features wichtig sind, bevor weitere Investitionen getätigt werden.
+Zukünftige Erweiterungen:
+\begin{itemize}
+    \item Kurzfristig (1-3 Mo.): Redis-Warenkorb, E-Mail-Notifications, Bewertungen, Wishlist, Promo-Codes
+    \item Mittelfristig (3-6 Mo.): Inventory-Management, Versand-Integration, Analytics, Mobile Apps
+    \item Langfristig (6+ Mo.): Microservices, Multi-Tenant-Support, AI-Empfehlungen
+\end{itemize}
+
+Wichtigste Lektion: \textbf{Gute Architektur ist beste Investition} – nicht Micro-Optimierungen oder neueste Frameworks, sondern klare Schichteneinteilung und Testbarkeit führen zu wartbarem Code. Mit diesem MVP kann das Team mit realen Kunden validieren, welche Features wichtig sind, bevor weitere Investitionen getätigt werden. Das Projekt zeigt, dass datenschutzkonformer, sicherer E-Commerce in Python mit sauberer Architektur vollständig realisierbar ist – und diese MVP-Basis ist optimal für zukünftiges Wachstum vorbereitet.
+
+% ============================================================================
+% RESSOURCEN UND LINKS
+% ============================================================================
+\clearpage
+
+\chapter{Ressourcen und Weitere Informationen}
+\label{chap:ressourcen}
+
+Das komplette Projekt-Repository sowie Setup-Guide und detaillierte Dokumentation sind verfügbar unter:
+
+\begin{center}
+\textbf{GitHub Repository:} \\
+\url{https://github.com/TizianSenger/PythonOnlineShop/tree/main/webshop-python}
+\end{center}
+
+Videoaufnahmen des funktionierenden Shops (Screenrecordings aller wesentlichen Workflows und Features) sind unter folgendem Link verfügbar:
+
+\begin{center}
+\textbf{Screenrecordings (Adobe Lightroom):} \\
+\url{https://lightroom.adobe.com/shares/056b864f8289435985e055a4a13b3eda}
+\end{center}
+
+Das GitHub-Repository enthält:
+\begin{itemize}
+    \item Kompletter Quellcode mit ausführlichen Kommentaren
+    \item Setup-Guide für lokale Installation und Entwicklung
+    \item Anforderungen und Dependencies (requirements.txt)
+    \item Migrationsskripte für Datenbankinitialisierung
+    \item Umfangreiche README mit Architektur-Übersicht
+    \item Beispiel .env-Konfiguration für Stripe und PayPal Integration
+\end{itemize}
+
+Die Screenrecordings dokumentieren:
+\begin{itemize}
+    \item Benutzer-Registrierung und Login-Prozess
+    \item Produktkatalog-Navigation mit Such- und Filterfunktion
+    \item Warenkorb-Verwaltung und Checkout-Prozess
+    \item Zahlungsintegration (Stripe und PayPal Demo)
+    \item Admin-Panel mit Produktverwaltung
+    \item DSGVO-Features (Datenexport, Konto-Löschung)
+    \item Responsive Design auf verschiedenen Geräten
+\end{itemize}
 
 % ============================================================================
 % ANHANG
@@ -402,7 +502,7 @@ Das PythonOnlineShop-Projekt demonstriert: datenschutzkonformer, sicherer E-Comm
 \centering
 \caption{Benutzerrollen und deren Berechtigungen}
 \label{tab:benutzerrollen}
-\begin{tabular}{|l|l|l|}
+\begin{tabular}{|p{1.5cm}|p{2.3cm}|p{9.5cm}|}
 \hline
 \textbf{Rolle} & \textbf{Berechtigung} & \textbf{Funktionen} \\
 \hline
