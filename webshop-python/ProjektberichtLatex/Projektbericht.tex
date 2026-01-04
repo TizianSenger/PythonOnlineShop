@@ -23,6 +23,8 @@
 \usepackage{tocloft}
 \usepackage{caption}
 \usepackage{subcaption}
+\captionsetup{skip=3pt}
+\setlength{\belowcaptionskip}{3pt}
 \usepackage{verbatim}
 \usepackage[ngerman]{babel}  % Aktiviert deutsche Silbentrennung
 \usepackage{ragged2e}  % Für präzisen Blocksatz
@@ -33,15 +35,31 @@
 \RaggedRightParindent=1em
 \onehalfspacing
 
-% Absatzabstände gemäß Prüfungsleitfaden: 6 Pt. nach Zeilenumbruch
-\setlength{\parskip}{6pt}
+% Absatzabstände gemäß Prüfungsleitfaden: 6 Pt. nach Zeilenumbruch (komprimiert auf 3pt für MVP)
+\setlength{\parskip}{3pt}
 \setlength{\parindent}{0em}
+
+% Listenabstände komprimieren
+\usepackage{enumitem}
+\setlist{itemsep=1pt, parsep=0pt, topsep=2pt}
 
 % Überschriftsgröße: 12pt für alle Überschriften (Chapter, Section, Subsection)
 \chapterfont{\fontsize{12}{14}\selectfont}
 \sectionfont{\fontsize{12}{14}\selectfont}
 \subsectionfont{\fontsize{12}{14}\selectfont}
 \subsubsectionfont{\fontsize{12}{14}\selectfont}
+
+% Abstände vor/nach Überschriften reduzieren
+\usepackage{titlesec}
+\titlespacing*{\chapter}{0pt}{1.2\baselineskip}{0.3\baselineskip}
+\titlespacing*{\section}{0pt}{0.6\baselineskip}{0.2\baselineskip}
+\titlespacing*{\subsection}{0pt}{0.4\baselineskip}{0.15\baselineskip}
+\titlespacing*{\paragraph}{0pt}{0.2\baselineskip}{0.15cm}
+
+% Kapitel nicht auf neue Seite erzwingen
+\titleformat{\chapter}[block]{\normalfont\Large\bfseries}{}{0pt}{}
+\titleclass{\chapter}{straight}
+\newcommand{\sectionbreak}{\vspace{0.2cm}}
 
 % Schriftarten - Arial
 \usepackage[scaled]{helvet}
@@ -79,47 +97,47 @@
 % ============================================================================
 \begin{titlepage}
     \begin{center}
-        \vspace*{2cm}
+        \vspace*{0.8cm}
         
         {\LARGE \textbf{Projektbericht}}
         
-        \vspace{1.5cm}
+        \vspace{0.6cm}
         
         {\Large Konzeption und Umsetzung eines einfachen Onlineshops}
         
-        \vspace{2cm}
+        \vspace{0.8cm}
         
         {\large Aufgabenstellung 2}
         
-        \vspace{3cm}
+        \vspace{1cm}
         
         \vfill
         
         {\large \textbf{Verfasser:}} \\
-        {\large [Name]} \\
-        Matrikelnummer: [XXXXXXXXXXXX] \\
+        {\large [Tizian Senger]} \\
+        Matrikelnummer: [IU14143428] \\
         
-        \vspace{1cm}
+        \vspace{0.4cm}
         
         {\large \textbf{Kursbezeichnung:}} \\
-        {\large [Kurs-Code]} \\
+        {\large [DLBITPEWP01-01]} \\
         
-        \vspace{1cm}
+        \vspace{0.4cm}
         
         {\large \textbf{Studiengang:}} \\
-        {\large [Studiengang]} \\
+        {\large [Informatik]} \\
         
-        \vspace{1cm}
+        \vspace{0.4cm}
         
         {\large \textbf{Tutor:}} \\
-        {\large [Tutor Name]} \\
+        {\large [Valentin Bodendörfer]} \\
         
-        \vspace{1cm}
+        \vspace{0.4cm}
         
         {\large \textbf{Abgabedatum:}} \\
         {\large \today}
         
-        \vspace{2cm}
+        \vspace{0.8cm}
         
         IU Internationale Hochschule GmbH
         
@@ -135,29 +153,7 @@
 % INHALTSVERZEICHNIS
 % ============================================================================
 \tableofcontents
-\newpage
-
-% ============================================================================
-% ABBILDUNGSVERZEICHNIS
-% ============================================================================
-\listoffigures
-\newpage
-
-% ============================================================================
-% TABELLENVERZEICHNIS
-% ============================================================================
-\listoftables
-\newpage
-
-% ============================================================================
-% ABKÜRZUNGSVERZEICHNIS
-% ============================================================================
-\chapter*{Abkürzungsverzeichnis}
-\addcontentsline{toc}{chapter}{Abkürzungsverzeichnis}
-
-\textit{(Tabelle 1 - siehe Anhang)}\newline
-
-\newpage
+\clearpage
 
 % ============================================================================
 % TEXTTEIL
@@ -170,7 +166,6 @@
 % ============================================================================
 
 % Wechsel zu arabischen Seitenzahlen und Mainmatter
-\cleardoublepage
 \pagenumbering{arabic}
 \setcounter{page}{1}
 \pagestyle{mainmatter}
@@ -264,7 +259,7 @@ Die funktionalen Anforderungen definieren die konkreten Funktionalitäten, die d
 \subsection{Nicht-funktionale Anforderungen}
 \label{subsec:nichtfunktional}
 
-Nicht-funktionale Anforderungen beschreiben Qualitätsmerkmale und Betriebscharakteristiken:
+Nicht-funktionale Anforderungen beschreiben Qualitätsmerkmale und Betriebscharakteristiken (detailliert in \autoref{tab:nfa}):
 
 \paragraph{Sicherheit}
 \begin{itemize}
@@ -327,7 +322,6 @@ Der vorliegende Projektbericht ist wie folgt aufgebaut:
 % KAPITEL 2: ZAHLUNGSABWICKLUNG UND COMPLIANCE
 % ============================================================================
 \chapter{Zahlungsabwicklung und Compliance}
-\label{chap:zahlungsabwicklung}
 
 \section{Zahlungsabwicklung}
 \label{sec:zahlungssysteme}
@@ -399,9 +393,11 @@ Die Datenschutz-Grundverordnung (DSGVO) ist die rechtliche Grundlage für den Da
 
 \paragraph{Betroffenenrechte (Art. 12-22 DSGVO):}
 
-Der Shop implementiert die folgenden Rechte (Details siehe \autoref{tab:dsgvo} im Anhang):
+Der Shop implementiert die folgenden Rechte (Details siehe \autoref{tab:dsgvo}):
 
 \paragraph{Datenschutzrichtlinien im Shop:}
+
+Die Authentifizierungsmechanismen sind detailliert in \autoref{tab:auth} dokumentiert.
 
 \begin{itemize}
     \item \textbf{Privacy Policy:} Eine umfassende Datenschutzerklärung ist verfügbar und informiert über Datenerfassung, Verarbeitung und Rechte
@@ -513,7 +509,7 @@ Die Benutzeroberfläche des Onlineshops wurde mit dem Ziel einer intuitiven, ben
 \subsection{Wireframes und Mockups}
 \label{subsec:wireframes}
 
-Der Shop wurde mit HTML, CSS und JavaScript implementiert. Die Template-Engine Jinja2 ermöglicht dynamische Inhalte. Im Folgenden sind die Hauptseiten des Shops beschrieben:
+Der Shop wurde mit HTML, CSS und JavaScript implementiert. Die Template-Engine Jinja2 ermöglicht dynamische Inhalte. Im Folgenden sind die Hauptseiten des Shops beschrieben (siehe auch \autoref{fig:startseite} bis \autoref{fig:admin_products}):
 
 \paragraph{Startseite (Index):}
 
@@ -527,21 +523,11 @@ Die Startseite ist das Herzstück des Shops und präsentiert den Produktkatalog 
     \item \textbf{Warenkorb-Counter:} Zeigt aktuelle Anzahl der Artikel im Warenkorb
 \end{itemize}
 
-\begin{figure}[H]
-\centering
-\framebox{
-\begin{minipage}{0.9\textwidth}
-\includegraphics[width=1\textwidth]{Images/mainPage.png}\\
-\small Abbildung: Hauptseite des Onlineshops mit Produktgrid, Suchfeld und Filtermöglichkeiten
-\end{minipage}
-}
-\caption{Startseite des Webshops}
-\label{fig:startseite}
-\end{figure}
+Die Startseite ist in \autoref{fig:startseite} visualisiert.
 
 \paragraph{Login und Registrierung:}
 
-Benutzer müssen sich registrieren oder anmelden, um zu bestellen:
+Benutzer müssen sich registrieren oder anmelden, um zu bestellen. Das Login-Interface ist in \autoref{fig:login} dargestellt:
 
 \begin{itemize}
     \item \textbf{Registrierungsformular:} E-Mail, Name, Passwort, Rolle (User/Admin), optional Admin-PIN
@@ -550,21 +536,9 @@ Benutzer müssen sich registrieren oder anmelden, um zu bestellen:
     \item \textbf{Session-Management:} Nach erfolgreicher Anmeldung wird eine Session erstellt
 \end{itemize}
 
-\begin{figure}[H]
-\centering
-\framebox{
-\begin{minipage}{0.9\textwidth}
-\includegraphics[width=1\textwidth]{Images/loginPage.png}\\
-\small Abbildung: Login-Formular mit E-Mail und Passwort
-\end{minipage}
-}
-\caption{Login-Seite}
-\label{fig:login}
-\end{figure}
-
 \paragraph{Produktdetail-Seite:}
 
-Wenn ein Benutzer auf ein Produkt klickt, wird die Detailseite angezeigt:
+Wenn ein Benutzer auf ein Produkt klickt, wird die Detailseite angezeigt (siehe \autoref{fig:produktdetail}):
 
 \begin{itemize}
     \item \textbf{Produktbild:} Hochauflösendes Bild des Produkts
@@ -574,21 +548,9 @@ Wenn ein Benutzer auf ein Produkt klickt, wird die Detailseite angezeigt:
     \item \textbf{In den Warenkorb Button:} AJAX-basierter Button (keine Seite wird neu geladen)
 \end{itemize}
 
-\begin{figure}[H]
-\centering
-\framebox{
-\begin{minipage}{0.9\textwidth}
-\includegraphics[width=1\textwidth]{Images/productDetailPage.png}\\
-\small Abbildung: Produktdetail-Seite mit Bild, Beschreibung und Warenkorb-Button
-\end{minipage}
-}
-\caption{Produktdetail-Seite}
-\label{fig:produktdetail}
-\end{figure}
-
 \paragraph{Warenkorb:}
 
-Der Warenkorb-View zeigt alle hinzugefügten Artikel:
+Der Warenkorb-View zeigt alle hinzugefügten Artikel (siehe \autoref{fig:warenkorb}):
 
 \begin{itemize}
     \item \textbf{Artikel-Liste:} Tabellarische Ansicht mit Produktname, Preis, Menge, Gesamtbetrag
@@ -597,21 +559,9 @@ Der Warenkorb-View zeigt alle hinzugefügten Artikel:
     \item \textbf{Checkout-Button:} Leads zu Checkout-Seite
 \end{itemize}
 
-\begin{figure}[H]
-\centering
-\framebox{
-\begin{minipage}{0.9\textwidth}
-\includegraphics[width=1\textwidth]{Images/warenkorbPage.png}\\
-\small Abbildung: Warenkorb mit Artikelübersicht und Checkout-Button
-\end{minipage}
-}
-\caption{Warenkorb-Seite}
-\label{fig:warenkorb}
-\end{figure}
-
 \paragraph{Checkout:}
 
-Das Checkout-Formular ist das Herzstück der Bestellabwicklung:
+Das Checkout-Formular ist das Herzstück der Bestellabwicklung (siehe \autoref{fig:checkout}):
 
 \begin{itemize}
     \item \textbf{Bestelldetails:} Zusammenfassung der Artikel und Gesamtpreis
@@ -620,21 +570,9 @@ Das Checkout-Formular ist das Herzstück der Bestellabwicklung:
     \item \textbf{Zahlungs-Integration:} Bei Klick auf \textit{Bezahlen} wird zur externen Zahlungsplattform weitergeleitet
 \end{itemize}
 
-\begin{figure}[H]
-\centering
-\framebox{
-\begin{minipage}{0.9\textwidth}
-\includegraphics[width=1\textwidth]{Images/checkoutPage.png}\\
-\small Abbildung: Checkout-Formular mit Kundendaten und Zahlungsoptionen
-\end{minipage}
-}
-\caption{Checkout-Seite}
-\label{fig:checkout}
-\end{figure}
-
 \paragraph{Bestellbestätigung:}
 
-Nach erfolgreicher Zahlung wird eine Bestätigungsseite angezeigt:
+Nach erfolgreicher Zahlung wird eine Bestätigungsseite angezeigt (siehe \autoref{fig:bestaetigung}):
 
 \begin{itemize}
     \item \textbf{Erfolgs-Nachricht:} Danksagung und Bestätigung der Bestellung
@@ -643,21 +581,9 @@ Nach erfolgreicher Zahlung wird eine Bestätigungsseite angezeigt:
     \item \textbf{Nächste Schritte:} Link zu Bestellungshistorie
 \end{itemize}
 
-\begin{figure}[H]
-\centering
-\framebox{
-\begin{minipage}{0.9\textwidth}
-\includegraphics[width=1\textwidth]{Images/orderConfirmPage.png}\\
-\small Abbildung: Bestellbestätigungsseite mit Bestellnummer
-\end{minipage}
-}
-\caption{Bestellbestätigungsseite}
-\label{fig:bestaetigung}
-\end{figure}
-
 \paragraph{Dashboard und Bestellungshistorie:}
 
-Angemeldete Benutzer können ihre Bestellungshistorie einsehen:
+Angemeldete Benutzer können ihre Bestellungshistorie einsehen (siehe \autoref{fig:bestellungen}):
 
 \begin{itemize}
     \item \textbf{Bestellliste:} Tabelle mit allen bisherigen Bestellungen
@@ -666,21 +592,9 @@ Angemeldete Benutzer können ihre Bestellungshistorie einsehen:
     \item \textbf{Admin-Features:} Administratoren können Bestellstatus ändern
 \end{itemize}
 
-\begin{figure}[H]
-\centering
-\framebox{
-\begin{minipage}{0.9\textwidth}
-\includegraphics[width=1\textwidth]{Images/orderHistoryPage.png}\\
-\small Abbildung: Dashboard mit Bestellungshistorie und Status
-\end{minipage}
-}
-\caption{Bestellungshistorie}
-\label{fig:bestellungen}
-\end{figure}
-
 \paragraph{Admin-Interface:}
 
-Administratoren haben Zugriff auf ein spezielles Interface:
+Administratoren haben Zugriff auf ein spezielles Interface (siehe \autoref{fig:admin_products}):
 
 \begin{itemize}
     \item \textbf{Produktverwaltung:} Tabelle mit allen Produkten
@@ -689,18 +603,6 @@ Administratoren haben Zugriff auf ein spezielles Interface:
     \item \textbf{Produkt löschen:} Bestätigtes Löschen von Produkten
     \item \textbf{Bestellungsverwaltung:} Übersicht aller Bestellungen mit Status-Updates
 \end{itemize}
-
-\begin{figure}[H]
-\centering
-\framebox{
-\begin{minipage}{0.9\textwidth}
-\includegraphics[width=1\textwidth]{Images/productAdminPage.png}\\
-\small Abbildung: Admin-Interface mit Produktverwaltung
-\end{minipage}
-}
-\caption{Admin-Produktverwaltung}
-\label{fig:admin_products}
-\end{figure}
 
 \subsection{Navigationskonzept}
 \label{subsec:navigation}
@@ -760,64 +662,32 @@ Das Datenmodell des Onlineshops ist relational und besteht aus fünf Hauptentit�
 \subsection{ER-Diagramm}
 \label{subsec:er_diagramm}
 
-Das folgende ER-Diagramm visualisiert das Datenbankschema:
-
-\begin{figure}[H]
-\centering
-\framebox{
-\begin{minipage}{0.9\textwidth}
-\textit{[ER-Diagramm einfügen]}\\
-\small Abbildung: Entity-Relationship-Diagramm mit Entitäten, Attributen und Beziehungen
-
-Die Abbildung sollte folgende Elemente zeigen:
-\begin{itemize}
-    \item USER-Tabelle (id, name, email, password, role)
-    \item PRODUCT-Tabelle (id, name, price, category, description, stock, images)
-    \item ORDER-Tabelle (id, user\_id, total, status, created\_at, payment\_provider)
-    \item ORDER\_ITEM-Tabelle (id, order\_id, product\_id, quantity, price)
-    \item CONSENT-Tabelle (id, user\_id, consent\_type, value, created\_at)
-    \item AUDIT\_LOG-Tabelle (id, user\_id, event\_type, action, ip\_address, created\_at)
-\end{itemize}
-\end{minipage}
-}
-\caption{Entity-Relationship-Diagramm des Onlineshops}
-\label{fig:er_diagramm}
-\end{figure}
+Das folgende ER-Diagramm visualisiert das Datenbankschema (siehe \autoref{fig:er_diagramm}):
 
 \subsection{Datenbeschreibung}
 \label{subsec:datenbeschreibung}
 
-Folgende Tabellen werden im System verwendet:
+Folgende Tabellen werden im System verwendet (siehe \autoref{tab:user}, \autoref{tab:product}, \autoref{tab:order}, \autoref{tab:consent}, \autoref{tab:audit} im Anhang):
 
 \paragraph{USER-Tabelle:}
 
-Speichert Benutzerinformationen für Authentifizierung und Profilverwaltung.
-
-\textit{(Tabelle 2 - siehe Anhang)}\newline
+Speichert Benutzerinformationen für Authentifizierung und Profilverwaltung (siehe \autoref{tab:user}).
 
 \paragraph{PRODUCT-Tabelle:}
 
-Speichert Produktinformationen für den Katalog.
-
-\textit{(Tabelle 3 - siehe Anhang)}\newline
+Speichert Produktinformationen für den Katalog (siehe \autoref{tab:product}).
 
 \paragraph{ORDER-Tabelle:}
 
-Speichert Bestellungen mit Metadaten.
-
-\textit{(Tabelle 4 - siehe Anhang)}\newline
+Speichert Bestellungen mit Metadaten (siehe \autoref{tab:order}).
 
 \paragraph{CONSENT-Tabelle:}
 
-Speichert Einwilligungen des Benutzers (DSGVO).
-
-\textit{(Tabelle 5 - siehe Anhang)}\newline
+Speichert Einwilligungen des Benutzers (DSGVO) (siehe \autoref{tab:consent}).
 
 \paragraph{AUDIT\_LOG-Tabelle:}
 
-Speichert kritische Operationen für Compliance und Sicherheit.
-
-\textit{(Tabelle 6 - siehe Anhang)}\newline
+Speichert kritische Operationen für Compliance und Sicherheit (siehe \autoref{tab:audit}).
 
 % ============================================================================
 % KAPITEL 4: TECHNOLOGIEENTSCHEIDUNGEN
@@ -973,20 +843,7 @@ Der Onlineshop implementiert ein innovatives \textbf{Hybrid-Backend}, das SQLite
 
 \paragraph{Architektur-Übersicht:}
 
-Das Hybrid Backend folgt diesem Datenfluss:
-
-\begin{figure}[H]
-\centering
-\framebox{
-\begin{minipage}{0.85\textwidth}
-\textit{[Architektur-Diagramm: Hybrid Backend einfügen]}
-
-\small Abbildung zeigt: Flask App → Hybrid Backend → SQLite (Primary) mit Fallback zu CSV (Backup)
-\end{minipage}
-}
-\caption{Hybrid-Backend Datenfluss}
-\label{fig:hybrid_backend}
-\end{figure}
+Das Hybrid Backend folgt diesem Datenfluss (siehe \autoref{tab:hybrid}):
 
 \paragraph{Funktionsweise:}
 
@@ -1073,9 +930,7 @@ Die App läuft im Development Mode mit folgenden Features:
 \subsection{Dependencies und Packages}
 \label{subsec:dependencies}
 
-Das Projekt nutzt folgende externe Python-Packages (siehe \texttt{requirements.txt}):
-
-\textit{(Tabelle 8 - siehe Anhang)}\newline
+Das Projekt nutzt folgende externe Python-Packages (siehe \texttt{requirements.txt} und \autoref{tab:dependencies}):
 
 \paragraph{Optional für Erweiterungen:}
 
@@ -1100,26 +955,7 @@ Diese Packages sind alle Open-Source und gut dokumentiert, ohne lizenzrechtliche
 \subsection{Architekturübersicht}
 \label{subsec:arch_overview}
 
-Der Onlineshop folgt einer klaren, modularen Architektur mit Separation of Concerns. Die Architektur besteht aus vier Schichten:
-
-\begin{figure}[H]
-\centering
-\framebox{
-\begin{minipage}{0.9\textwidth}
-\textit{[Architektur-Schichtenmodell einfügen]}
-
-\small Abbildung zeigt die vier Schichten (von oben nach unten):
-\begin{itemize}
-    \item Presentation Layer (Flask Routes, Jinja2 Templates)
-    \item Business Logic Layer (Services, Checkout)
-    \item Data Access Layer (Hybrid Backend, Storage)
-    \item Data Storage Layer (SQLite, CSV)
-\end{itemize}
-\end{minipage}
-}
-\caption{Architektur-Schichtenmodell des Onlineshops}
-\label{fig:schichten}
-\end{figure}
+Der Onlineshop folgt einer klaren, modularen Architektur mit Separation of Concerns. Die Architektur besteht aus vier Schichten (siehe \autoref{fig:schichten}):
 
 \subsection{Schichtenmodell}
 \label{subsec:schichten}
@@ -1422,9 +1258,7 @@ Schutz vor SQL-Injection durch Datenbankabfragen:
 
 \paragraph{Seiten-Ladezeiten:}
 
-Zielwerte für Produktionsumgebung:
-
-\textit{(Tabelle 9 - siehe Anhang)}\newline
+Zielwerte für Produktionsumgebung sind Teil der nicht-funktionalen Anforderungen (siehe \autoref{tab:nfa}):
 
 \paragraph{Optimierungsmaßnahmen:}
 
@@ -1822,9 +1656,7 @@ Aufgrund des Solo-Entwicklungs-Ansatzes liegt der Fokus auf manuellem Testing au
 \subsection{Funktionalitäts-Validierung}
 \label{subsec:funktionalitaet}
 
-Alle beschriebenen Anforderungen aus Kapitel 1 wurden validiert:
-
-\textit{(Tabelle 10 - siehe Anhang)}\newline
+Alle beschriebenen Anforderungen aus Kapitel 1 wurden validiert (siehe \autoref{tab:ziele}):
 
 \subsection{Sicherheits-Validierung}
 \label{subsec:sicherheitstests}
@@ -1942,9 +1774,7 @@ Als Solo-Projekt lag die QA vollständig beim Entwickler mit folgenden Validieru
 \subsection{Browser-Testing Ergebnisse}
 \label{subsec:browser_testing}
 
-Manuelle Tests in verschiedenen Browsern zeigten folgende Ergebnisse:
-
-\textit{(Tabelle 11 - siehe Anhang)}\newline
+Manuelle Tests in verschiedenen Browsern zeigten folgende Ergebnisse (siehe \autoref{tab:browser}):
 
 % ============================================================================
 % KAPITEL 8: KRITISCHE REFLEXION
@@ -1957,12 +1787,12 @@ Diese Projektarbeit war eine umfassende Lernreise mit wertvoollen Erkenntnissen.
 \section{Erfolgreiche Aspekte}
 \label{sec:erfolg}
 
-Mehrere Aspekte des Projekts können als besonders erfolgreich bewertet werden:
+Mehrere Aspekte des Projekts können als besonders erfolgreich bewertet werden (siehe auch \autoref{tab:erfolg}):
 
 \subsection{Hybrid-Backend-Architektur}
 \label{subsec:erfolg_hybrid}
 
-Die Implementierung des Hybrid-Backends (SQLite mit CSV-Fallback) war eine gelungene Design-Entscheidung:
+Die Implementierung des Hybrid-Backends (SQLite mit CSV-Fallback, siehe \autoref{tab:hybrid}) war eine gelungene Design-Entscheidung:
 
 \begin{itemize}
     \item \textbf{Redundanz:} Dual-Speicherung bietet robustes Fallback bei Datenbankfehlern
@@ -2114,11 +1944,7 @@ Usability-Tests zeigten, dass Nutzer den Shop ohne Anleitung verstehen.
 
 \textbf{Alternative:} SQLAlchemy ORM
 
-\textbf{Vergleich:}
-
-\textit{(Tabelle 12 - siehe Anhang)}\newline
-
-\textbf{Fazit:} Für MVP war raw SQL pragmatisch. Für Production würde SQLAlchemy + Alembic empfohlen.
+\textbf{Vergleich:} Für MVP war raw SQL pragmatisch. Für Production würde SQLAlchemy + Alembic empfohlen.
 
 \subsection{Frontend-Framework}
 \label{subsec:alt_frontend}
@@ -2255,9 +2081,7 @@ Die modulare Architektur ermöglicht diese Erweiterungen ohne Major Refactoring.
 \subsection{Zeitaufwand}
 \label{subsec:zeitaufwand}
 
-Das Projekt erforderte folgende Ressourcen:
-
-\textit{(Tabelle 13 - siehe Anhang)}\newline
+Das Projekt erforderte systematische Planung in mehreren Phasen (siehe \autoref{tab:phasen}) mit insgesamt ca. 8 Wochen Entwicklungszeit für ein funktionsfähiges MVP mit Qualitätssicherung.
 
 Dies ist ein realistischer Aufwand für einen funktionsfähigen MVP mit guter Qualität.
 
@@ -2327,9 +2151,7 @@ Die Implementierung demonstriert tiefgehendes Verständnis für Anforderungsanal
 \section{Erreichte Ziele}
 \label{sec:ziele_erreicht}
 
-Alle in der Aufgabenstellung definierten Ziele wurden erreicht:
-
-\textit{(Tabelle 14 - siehe Anhang)}\newline
+Alle in der Aufgabenstellung definierten Ziele wurden erreicht (siehe \autoref{tab:ziele}):
 
 Zusätzlich wurden Qualitätsaspekte wie umfassendes Testing, Sicherheitsvalidierung und Usability-Evaluation durchgeführt.
 
@@ -2490,11 +2312,7 @@ Das Projekt war eine bereichernde Erfahrung, die theoretisches Wissen in praktis
 \end{itemize}
 
 bildet die Basis für professionelle Softwareentwicklung. Dieses Projekt ist ein starker Anfang für eine Karriere im Web-Engineering.
-
-\section{Reflexion des Lernprozesses}
-\label{sec:lernprozess}
-
-% Platzhalter für Inhalt
+\newpage
 
 % ============================================================================
 % LITERATURVERZEICHNIS
@@ -2532,12 +2350,11 @@ OWASP Foundation (2024). \textit{OWASP Top 10 -- Web Application Security Risks}
 Ronacher, A. (2024). \textit{Werkzeug -- The Utility Library Behind Flask}. Verfügbar unter: https://werkzeug.palletsprojects.com/ [Zugegriffen: 04. Januar 2026].
 
 \end{thebibliography}
-
+\newpage
 % ============================================================================
 % ANHANG
 % ============================================================================
 \appendix
-
 \chapter{Tabellen}
 \label{chap:tabellen}
 
@@ -2933,32 +2750,183 @@ Testing & $\checkmark$ & 50+ E2E Test Cases, Unit Tests \\
 \end{tabular}
 \end{table}
 
-\chapter{Anhang: Projektdateien und Dokumentation}
-\label{chap:anhang}
 
-\section{Projektstruktur}
-\label{sec:projektstruktur}
 
-% Platzhalter für Inhalt
+\newpage
+\chapter{Bilder}
+\label{chap:bilder}
 
-\section{Konfigurationsdateien}
-\label{sec:konfiguration}
+\section{UI-Mockups und Screenshots}
+\label{sec:ui_screenshots}
 
-% Platzhalter für Inhalt
+\subsection{Startseite des Webshops}
+\label{subsec:img_startseite}
 
-\section{Screenshots und Visualisierungen}
-\label{sec:screenshots}
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=1\textwidth]{Images/mainPage.png}\\
+\small Abbildung: Hauptseite des Onlineshops mit Produktgrid, Suchfeld und Filtermöglichkeiten
+\end{minipage}
+}
+\caption{Startseite des Webshops}
+\label{fig:startseite}
+\end{figure}
 
-% Platzhalter für Inhalt
+\subsection{Login-Seite}
+\label{subsec:img_login}
 
-\section{Testdaten und Beispiele}
-\label{sec:testdaten}
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=1\textwidth]{Images/loginPage.png}\\
+\small Abbildung: Login-Formular mit E-Mail und Passwort
+\end{minipage}
+}
+\caption{Login-Seite}
+\label{fig:login}
+\end{figure}
 
-% Platzhalter für Inhalt
+\subsection{Produktdetail-Seite}
+\label{subsec:img_produktdetail}
 
-\section{Setup- und Installationsanleitung}
-\label{sec:setup}
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=1\textwidth]{Images/productDetailPage.png}\\
+\small Abbildung: Produktdetail-Seite mit Bild, Beschreibung und Warenkorb-Button
+\end{minipage}
+}
+\caption{Produktdetail-Seite}
+\label{fig:produktdetail}
+\end{figure}
 
-% Platzhalter für Inhalt
+\subsection{Warenkorb-Seite}
+\label{subsec:img_warenkorb}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=1\textwidth]{Images/warenkorbPage.png}\\
+\small Abbildung: Warenkorb mit Artikelübersicht und Checkout-Button
+\end{minipage}
+}
+\caption{Warenkorb-Seite}
+\label{fig:warenkorb}
+\end{figure}
+
+\subsection{Checkout-Seite}
+\label{subsec:img_checkout}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=1\textwidth]{Images/checkoutPage.png}\\
+\small Abbildung: Checkout-Formular mit Kundendaten und Zahlungsoptionen
+\end{minipage}
+}
+\caption{Checkout-Seite}
+\label{fig:checkout}
+\end{figure}
+
+\subsection{Bestellbestätigungsseite}
+\label{subsec:img_bestaetigung}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=1\textwidth]{Images/orderConfirmPage.png}\\
+\small Abbildung: Bestellbestätigungsseite mit Bestellnummer
+\end{minipage}
+}
+\caption{Bestellbestätigungsseite}
+\label{fig:bestaetigung}
+\end{figure}
+
+\subsection{Bestellungshistorie}
+\label{subsec:img_bestellungen}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=1\textwidth]{Images/orderHistoryPage.png}\\
+\small Abbildung: Dashboard mit Bestellungshistorie und Status
+\end{minipage}
+}
+\caption{Bestellungshistorie}
+\label{fig:bestellungen}
+\end{figure}
+
+\subsection{Admin-Produktverwaltung}
+\label{subsec:img_admin_products}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=1\textwidth]{Images/productAdminPage.png}\\
+\small Abbildung: Admin-Interface mit Produktverwaltung
+\end{minipage}
+}
+\caption{Admin-Produktverwaltung}
+\label{fig:admin_products}
+\end{figure}
+
+\section{Architektur-Diagramme}
+\label{sec:architektur_diagramme}
+
+\subsection{Schichtenmodell}
+\label{subsec:img_schichten}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\textit{[Architektur-Schichtenmodell einfügen]}
+
+\small Abbildung zeigt die vier Schichten (von oben nach unten):
+\begin{itemize}
+    \item Presentation Layer (Flask Routes, Jinja2 Templates)
+    \item Business Logic Layer (Services, Checkout)
+    \item Data Access Layer (Hybrid Backend, Storage)
+    \item Data Storage Layer (SQLite, CSV)
+\end{itemize}
+\end{minipage}
+}
+\caption{Architektur-Schichtenmodell des Onlineshops}
+\label{fig:schichten}
+\end{figure}
+
+\subsection{Entity-Relationship-Diagramm}
+\label{subsec:img_er_diagramm}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\textit{[ER-Diagramm einfügen]}\\
+\small Abbildung: Entity-Relationship-Diagramm mit Entitäten, Attributen und Beziehungen
+
+Die Abbildung sollte folgende Elemente zeigen:
+\begin{itemize}
+    \item USER-Tabelle (id, name, email, password, role)
+    \item PRODUCT-Tabelle (id, name, price, category, description, stock, images)
+    \item ORDER-Tabelle (id, user\_id, total, status, created\_at, payment\_provider)
+    \item ORDER\_ITEM-Tabelle (id, order\_id, product\_id, quantity, price)
+    \item CONSENT-Tabelle (id, user\_id, consent\_type, value, created\_at)
+    \item AUDIT\_LOG-Tabelle (id, user\_id, event\_type, action, ip\_address, created\_at)
+\end{itemize}
+\end{minipage}
+}
+\caption{Entity-Relationship-Diagramm des Onlineshops}
+\label{fig:er_diagramm}
+\end{figure}
 
 \end{document}
