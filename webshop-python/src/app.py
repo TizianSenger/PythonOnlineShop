@@ -84,6 +84,9 @@ def index():
         # Hole das erste Bild oder nutze leeren String
         images = p.get('images', [])
         p['main_image'] = images[0] if images and len(images) > 0 else ''
+        # Kürze Beschreibung für Übersicht (20 Zeichen + "...")
+        description = p.get('description', '')
+        p['description_short'] = (description[:20] + '...') if len(description) > 20 else description
 
     categories = sorted({(p.get('category') or '').strip() for p in products if p.get('category')})
 
@@ -365,7 +368,18 @@ def admin_products():
     products = backend.get_all_products()
     cart = session.get("cart", [])
     cart_count = get_cart_item_count(cart)
-    return render_template("admin_products.html", user=user, products=products, cart_count=cart_count)
+    
+    # Berechne Gesamtwert des Inventars (Preis * Stückzahl für jedes Produkt)
+    total_inventory_value = 0
+    for product in products:
+        try:
+            price = float(product.get('price', 0))
+            stock = int(product.get('stock', 0))
+            total_inventory_value += price * stock
+        except (ValueError, TypeError):
+            pass
+    
+    return render_template("admin_products.html", user=user, products=products, cart_count=cart_count, total_inventory_value=total_inventory_value)
 
 @app.route("/admin/edit-product/<product_id>", methods=["GET", "POST"])
 def edit_product(product_id):
@@ -419,7 +433,7 @@ def edit_product(product_id):
             "images": images_list,
             "stock": str(int(stock) if stock.isdigit() else 0)
         }
-        backend.update_product(product_id, updates)
+        backend.update_product(product_id, **updates)
         flash("Produkt aktualisiert.", "success")
         return redirect(url_for("admin_products"))
 
@@ -450,7 +464,7 @@ def remove_product_image(product_id, image_name):
     images = product.get('images', [])
     if image_name in images:
         images.remove(image_name)
-        backend.update_product(product_id, {"images": images})
+        backend.update_product(product_id, images=images)
         # Optional: Delete file from uploads
         try:
             file_path = os.path.join(UPLOAD_FOLDER, image_name)
@@ -464,7 +478,7 @@ def remove_product_image(product_id, image_name):
 
 # Bestellungs-Verwaltung
 # Status-Abfolge für Bestellungen
-ORDER_STATUSES = ["paid", "in_bearbeitung", "vorbereitung_transport", "abgeschickt", "zugestellt"]
+ORDER_STATUSES = ["pending", "paid", "in_bearbeitung", "vorbereitung_transport", "abgeschickt", "zugestellt"]
 
 @app.route("/orders")
 def orders():

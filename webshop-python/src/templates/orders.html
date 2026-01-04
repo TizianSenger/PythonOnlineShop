@@ -474,11 +474,11 @@
 
         <!-- Status Timeline -->
         <div class="status-timeline">
-            {% set status_order = ['paid', 'in_bearbeitung', 'vorbereitung_transport', 'abgeschickt',
+            {% set status_order = ['pending', 'paid', 'in_bearbeitung', 'vorbereitung_transport', 'abgeschickt',
             'zugestellt'] %}
-            {% set status_icons = {'paid': '✓', 'in_bearbeitung': '⚙️', 'vorbereitung_transport': '📦',
+            {% set status_icons = {'pending': '⏳', 'paid': '✓', 'in_bearbeitung': '⚙️', 'vorbereitung_transport': '📦',
             'abgeschickt': '📮', 'zugestellt': '✓'} %}
-            {% set status_labels = {'paid': 'Bezahlt', 'in_bearbeitung': 'In Bearbeitung',
+            {% set status_labels = {'pending': 'Ausstehend', 'paid': 'Bezahlt', 'in_bearbeitung': 'In Bearbeitung',
             'vorbereitung_transport': 'Vorbereitung', 'abgeschickt': 'Abgeschickt', 'zugestellt': 'Zugestellt'}
             %}
 

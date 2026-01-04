@@ -254,6 +254,7 @@
 
         <h2>Zahlungsart</h2>
         <div class="pay-grid" role="tablist" aria-label="Zahlungsoptionen">
+            {% if 'stripe' in available_payment_methods %}
             <button type="button" class="pay-btn stripe" id="pay-stripe" data-method="stripe" disabled
                 aria-pressed="false">
                 <span class="cards" aria-hidden="true">
@@ -262,12 +263,19 @@
                 </span>
                 <span>Mit Kreditkarte bezahlen</span>
             </button>
+            {% endif %}
 
+            {% if 'paypal' in available_payment_methods %}
             <button type="button" class="pay-btn paypal" id="pay-paypal" data-method="paypal" disabled
                 aria-pressed="false">
                 <span class="paypal-logo" aria-hidden="true"></span>
                 <span>Mit PayPal bezahlen</span>
             </button>
+            {% else %}
+            <div style="padding: 0.75rem; background: var(--bg-input); border-radius: 6px; color: var(--text-muted);">
+                <strong>ℹ️ PayPal nicht verfügbar</strong> - Bitte kontaktiere den Support oder nutze Kreditkarte.
+            </div>
+            {% endif %}
         </div>
         <div class="actions">
             <a class="btn" href="{{ url_for('cart') }}">Zurück zum Warenkorb</a>

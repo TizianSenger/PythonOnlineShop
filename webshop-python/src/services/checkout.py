@@ -87,12 +87,22 @@ def create_stripe_session(csv_backend, cart_items, customer, success_url, cancel
     return session.url, order_id
 
 def create_paypal_order(csv_backend, cart_items, customer, return_url, cancel_url, user_id):
+    # Validate PayPal credentials
+    if not PAYPAL_CLIENT_ID or not PAYPAL_CLIENT_SECRET:
+        raise ValueError("PayPal Client ID und Secret nicht konfiguriert. Bitte überprüfen Sie die .env Datei.")
+    
     # Get access token
-    token_resp = requests.post(f"{paypal_base()}/v1/oauth2/token",
-                               auth=(PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET),
-                               headers={"Accept": "application/json"},
-                               data={"grant_type": "client_credentials"})
-    token_resp.raise_for_status()
+    try:
+        token_resp = requests.post(f"{paypal_base()}/v1/oauth2/token",
+                                   auth=(PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET),
+                                   headers={"Accept": "application/json"},
+                                   data={"grant_type": "client_credentials"})
+        token_resp.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 401:
+            raise ValueError("PayPal Authentifizierung fehlgeschlagen. Überprüfen Sie die Client ID und Secret in der .env Datei.")
+        raise ValueError(f"PayPal API Fehler: {e.response.status_code}")
+    
     access_token = token_resp.json()['access_token']
 
     total = 0.0

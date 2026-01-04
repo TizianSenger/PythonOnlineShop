@@ -19,3 +19,13 @@ timestamp,event_type,user_id,user_email,action,resource_type,resource_id,details
 2025-11-30T19:56:10.941425,cookie_consent,,anonymous,Cookie consent provided,,,"{""essential"": true, ""analytics"": true, ""marketing"": true, ""timestamp"": ""2025-11-30T19:56:10.939Z""}",127.0.0.1,success
 2025-11-30T19:56:28.837254,admin_action,2,tiziansengerps4@gmail.com,delete_order,order,1,,127.0.0.1,success
 2025-11-30T19:57:38.559689,admin_action,2,tiziansengerps4@gmail.com,delete_order,order,1,,127.0.0.1,success
+2026-01-04T19:53:34.917466,user_data_export,2,tiziansengerps4@gmail.com,User requested data export,,,,127.0.0.1,success
+2026-01-04T19:53:51.729513,user_data_deleted,2,tiziansengerps4@gmail.com,User account deletion request,,,,127.0.0.1,pending
+2026-01-04T19:53:51.731511,user_data_deleted,2,tiziansengerps4@gmail.com,User account and data deleted,,,,127.0.0.1,success
+2026-01-04T19:54:15.560518,user_registration,4,tiziansengerps4@gmail.com,User registered,,,"{""role"": ""admin""}",127.0.0.1,success
+2026-01-04T20:07:17.304778,admin_action,4,tiziansengerps4@gmail.com,delete_order,order,1,,127.0.0.1,success
+2026-01-04T20:07:20.473416,admin_action,4,tiziansengerps4@gmail.com,delete_order,order,2,,127.0.0.1,success
+2026-01-04T20:08:15.285059,admin_action,4,tiziansengerps4@gmail.com,delete_order,order,1,,127.0.0.1,success
+2026-01-04T20:10:42.380906,user_data_deleted,3,tiziansengerbw@gmail.com,User account deletion request,,,,127.0.0.1,pending
+2026-01-04T20:10:42.387913,user_data_deleted,3,tiziansengerbw@gmail.com,User account and data deleted,,,,127.0.0.1,success
+2026-01-04T20:43:05.688688,user_registration,5,tiziansengerbw@gmail.com,User registered,,,"{""role"": ""user""}",127.0.0.1,success

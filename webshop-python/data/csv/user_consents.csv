@@ -1,1 +1,7 @@
 id,user_id,consent_type,value,timestamp
+1,4,privacy_policy,True,2026-01-04T20:54:15.561550
+2,4,marketing,True,2026-01-04T20:54:15.578642
+3,4,analytics,True,2026-01-04T20:54:15.595183
+4,5,privacy_policy,True,2026-01-04T21:43:05.707422
+5,5,marketing,True,2026-01-04T21:43:05.721972
+6,5,analytics,True,2026-01-04T21:43:05.736968

@@ -41,7 +41,7 @@
                     {% if not product.main_image %}📦{% endif %}
                 </div>
                 <h3 class="product-name">{{ product.name }}</h3>
-                <p class="product-description">{{ product.description or 'Keine Beschreibung verfügbar' }}</p>
+                <p class="product-description">{{ product.description_short or 'Keine Beschreibung verfügbar' }}</p>
                 {% if product.category %}
                 <p class="text-muted mb-2"><small>Kategorie: {{ product.category }}</small></p>
                 {% endif %}

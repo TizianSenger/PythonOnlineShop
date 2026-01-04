@@ -2,11 +2,19 @@ import json
 from flask import Blueprint, render_template, request, session, redirect, url_for, current_app, flash
 from services.checkout import create_stripe_session, create_paypal_order, capture_paypal_order, save_order
 from storage.csv_backend import CSVBackend
-from config import STRIPE_PUBLISHABLE_KEY, APP_BASE_URL, CSV_FOLDER_PATH
+from config import STRIPE_PUBLISHABLE_KEY, PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, APP_BASE_URL, CSV_FOLDER_PATH
 
 checkout_bp = Blueprint("checkout_bp", __name__, template_folder="../templates")
 
 csv_backend = CSVBackend(str(CSV_FOLDER_PATH))
+
+# Prüfe verfügbare Zahlungsmethoden
+AVAILABLE_PAYMENT_METHODS = ["stripe"]
+if STRIPE_PUBLISHABLE_KEY:
+    AVAILABLE_PAYMENT_METHODS = ["stripe"] if "stripe" not in AVAILABLE_PAYMENT_METHODS else AVAILABLE_PAYMENT_METHODS
+
+if PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET:
+    AVAILABLE_PAYMENT_METHODS.append("paypal")
 
 @checkout_bp.route("/checkout", methods=["GET"])
 def checkout_page():
@@ -35,7 +43,8 @@ def checkout_page():
         cart=cart,
         total=total,
         stripe_key=STRIPE_PUBLISHABLE_KEY,
-        user=user
+        user=user,
+        available_payment_methods=AVAILABLE_PAYMENT_METHODS
     )
 
 @checkout_bp.route("/checkout/create", methods=["POST"])
@@ -48,6 +57,11 @@ def create_checkout():
     
     data = request.form.to_dict()
     payment_method = data.get("payment_method", "stripe")
+    
+    # Prüfe ob Zahlungsmethode verfügbar ist
+    if payment_method not in AVAILABLE_PAYMENT_METHODS:
+        flash(f"Zahlungsmethode '{payment_method}' ist nicht verfügbar.", "danger")
+        return redirect(url_for("checkout_bp.checkout_page"))
     # Collect customer info
     customer = {
         "name": data.get("name", ""),

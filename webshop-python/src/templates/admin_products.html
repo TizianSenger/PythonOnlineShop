@@ -63,8 +63,7 @@
             <div>
                 <p class="text-muted">Gesamtwert Inventar</p>
                 <h3 style="font-size: 2rem; color: var(--success);">
-                    € {{ "%.2f"|format(products | map(attribute='price') | map('float') | sum) if products else
-                    0 }}
+                    € {{ "%.2f"|format(total_inventory_value) if total_inventory_value else 0 }}
                 </h3>
             </div>
         </div>
