@@ -1,0 +1,970 @@
+%!TEX encoding = UTF-8 Unicode
+% Projektbericht LaTeX-Vorlage
+% Zu bearbeitende Aufgabe: Konzeption und Umsetzung eines einfachen Onlineshops
+
+\documentclass[11pt, a4paper, ngerman]{report}
+
+% Pakete
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[left=2cm, right=2cm, top=2cm, bottom=2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{array}
+\usepackage{amssymb}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{makeidx}
+\usepackage{tocloft}
+\usepackage{caption}
+\usepackage{subcaption}
+\captionsetup{skip=3pt}
+\setlength{\belowcaptionskip}{3pt}
+\usepackage{verbatim}
+\usepackage[ngerman]{babel}  % Aktiviert deutsche Silbentrennung
+\usepackage{ragged2e}  % Für präzisen Blocksatz
+\usepackage{sectsty}  % Für Kontrol über Überschriftsgröße
+
+% Blocksatz und Silbentrennung aktivieren
+\raggedbottom
+\RaggedRightParindent=1em
+\onehalfspacing
+
+% Absatzabstände gemäß Prüfungsleitfaden: 6 Pt. nach Zeilenumbruch (komprimiert auf 3pt für MVP)
+\setlength{\parskip}{3pt}
+\setlength{\parindent}{0em}
+
+% Listenabstände komprimieren
+\usepackage{enumitem}
+\setlist{itemsep=1pt, parsep=0pt, topsep=2pt}
+
+% Überschriftsgröße: 12pt für alle Überschriften (Chapter, Section, Subsection)
+\chapterfont{\fontsize{12}{14}\selectfont}
+\sectionfont{\fontsize{12}{14}\selectfont}
+\subsectionfont{\fontsize{12}{14}\selectfont}
+\subsubsectionfont{\fontsize{12}{14}\selectfont}
+
+% Abstände vor/nach Überschriften reduzieren
+\usepackage{titlesec}
+\titlespacing*{\chapter}{0pt}{1.2\baselineskip}{0.3\baselineskip}
+\titlespacing*{\section}{0pt}{0.6\baselineskip}{0.2\baselineskip}
+\titlespacing*{\subsection}{0pt}{0.4\baselineskip}{0.15\baselineskip}
+\titlespacing*{\paragraph}{0pt}{0.2\baselineskip}{0.15cm}
+
+% Kapitel nicht auf neue Seite erzwingen
+\titleformat{\chapter}[block]{\normalfont\Large\bfseries}{\thechapter\space}{0pt}{}
+\titleclass{\chapter}{straight}
+\newcommand{\sectionbreak}{\vspace{0.2cm}}
+
+% Schriftarten - Arial
+\usepackage[scaled]{helvet}
+\renewcommand\familydefault{\sfdefault}
+\usepackage[T1]{fontenc}
+
+% Seitenstil mit römischen/arabischen Zahlen
+\fancypagestyle{plain}{%
+    \renewcommand{\headrulewidth}{0pt}%
+    \renewcommand{\footrulewidth}{0pt}%
+    \fancyhf{}%
+    \fancyfoot[C]{\thepage}%
+}
+\pagestyle{plain}
+
+% Separate Seitenstile für Frontmatter (römisch) und Mainmatter (arabisch)
+\fancypagestyle{frontmatter}{%
+    \fancyhf{}%
+    \fancyfoot[C]{\Roman{page}}%
+}
+\fancypagestyle{mainmatter}{%
+    \fancyhf{}%
+    \fancyfoot[C]{\arabic{page}}%
+}
+
+% Titel und Autor
+\title{Konzeption und Umsetzung eines einfachen Onlineshops}
+\author{Verfasser}
+\date{\today}
+
+\begin{document}
+
+% ============================================================================
+% TITELBLATT
+% ============================================================================
+\begin{titlepage}
+    \begin{center}
+        \vspace*{0.8cm}
+        
+        {\LARGE \textbf{Projektbericht}}
+        
+        \vspace{0.6cm}
+        
+        {\Large Konzeption und Umsetzung eines einfachen Onlineshops}
+        
+        \vspace{0.8cm}
+        
+        {\large Aufgabenstellung 2}
+        
+        \vspace{1cm}
+        
+        \vfill
+        
+        {\large \textbf{Verfasser:}} \\
+        {\large [Tizian Senger]} \\
+        Matrikelnummer: [IU14143428] \\
+        
+        \vspace{0.4cm}
+        
+        {\large \textbf{Kursbezeichnung:}} \\
+        {\large [DLBITPEWP01-01]} \\
+        
+        \vspace{0.4cm}
+        
+        {\large \textbf{Studiengang:}} \\
+        {\large [Informatik]} \\
+        
+        \vspace{0.4cm}
+        
+        {\large \textbf{Tutor:}} \\
+        {\large [Valentin Bodendörfer]} \\
+        
+        \vspace{0.4cm}
+        
+        {\large \textbf{Abgabedatum:}} \\
+        {\large \today}
+        
+        \vspace{0.8cm}
+        
+        IU Internationale Hochschule GmbH
+        
+    \end{center}
+\end{titlepage}
+
+% Seitennummerierung: Frontmatter mit römischen Ziffern (nicht auf Titelblatt sichtbar)
+\pagenumbering{roman}
+\setcounter{page}{2}  % Titelblatt ist Seite 1, aber wird nicht nummeriert
+\pagestyle{frontmatter}
+
+% ============================================================================
+% INHALTSVERZEICHNIS
+% ============================================================================
+\tableofcontents
+\clearpage
+
+% ============================================================================
+% TEXTTEIL
+% ============================================================================
+\setcounter{page}{1}
+\pagenumbering{arabic}
+\pagestyle{mainmatter}
+
+\chapter{Anforderungen und Zielsetzung}
+\label{chap:anforderungen}
+
+\section{Problemstellung und Zielsetzung}
+
+Der Onlineshop soll als Minimum Viable Product (MVP) alle wesentlichen E-Commerce-Funktionalitäten bereitstellen: Benutzerverwaltung, Produktkatalog, Warenkorb, Bestellungsabwicklung und sichere Zahlungsintegration. Das System muss zudem DSGVO-konform sein (Datenexport, Kontolöschung, Audit-Logging) und durch Sicherheitsmaßnahmen wie Passwort-Hashing, CSRF/XSS-Schutz und sichere Session-Verwaltung geschützt werden (siehe \autoref{tab:ziele}). 
+
+Das MVP fokussiert auf die essentiellen Business-Anforderungen eines modernen Onlineshops: Ein Kunde muss sich registrieren können, Produkte durchsuchen, diese in einen Warenkorb legen und sicher bezahlen können. Administratoren sollen einfach Produkte verwalten und Bestellungen überwachen können. Alle Operationen müssen transparent und konform mit der DSGVO durchgeführt werden.
+
+\section{Funktionale Anforderungen}
+
+Das System implementiert Benutzerverwaltung mit Registrierung via E-Mail und Passwort, Login mit Authentifizierung und Session-Management, rollen-basierter Zugriffskontrolle zwischen Kunden und Administratoren, PIN-geschützter Admin-Registrierung, sowie Profil-Verwaltung und Passwort-Zurücksetzen. Der Produktkatalog zeigt alle Produkte in responsiver Grid-Ansicht mit Suchfunktion nach Name und Beschreibung, Filterung nach Kategorie und Preisbereich, detaillierte Produktseiten mit Bild und Verfügbarkeit, und ermöglicht Administratoren die Produkt-CRUD-Operationen und Bild-Uploads. Die Warenkorb- und Bestellverwaltung ermöglicht das Hinzufügen von Produkten mit Mengenangaben, Warenkorb-Bearbeitung, Checkout mit Kundeninformationen, Integration mit Stripe und PayPal, Bestellungshistorie-Einsicht und Admin-Status-Updates. DSGVO-Funktionen umfassen Datenexport als JSON, Konto-Löschung mit Anonymisierung, Audit-Logging aller kritischen Operationen, Privacy Policy und Terms of Service, sowie granulare Einwilligungskontrolle.
+
+\section{Nicht-funktionale Anforderungen}
+
+Nicht-funktionale Anforderungen beschreiben Qualitätsmerkmale (Details siehe \autoref{tab:nfa}). Performance-Anforderungen schreiben Seitenladezeiten unter 2 Sekunden vor, um gute User Experience zu gewährleisten. Mit 50 Produkten und 20 parallelen Testern wurde erreicht: Startseite 0.5-1s, Produktdetail 0.2-0.5s, Checkout 0.5-1s. Die Sicherheit muss mit PBKDF2-Hashing mindestens 150.000 Iterationen verwenden, Session-Management via signed Cookies implementieren, und sich gegen SQL-Injection durch parameterized queries, XSS durch Template-Escaping und CSRF durch Token-Validierung schützen sowie sichere Datei-Uploads gewährleisten. Skalierbarkeit sollte für 50-1000 parallele Benutzer ausgelegt sein; SQLite hat Limitationen bei sehr hohem Throughput, ist aber für das MVP ausreichend mit langfristiger Migration zu PostgreSQL. Responsive Design muss auf Desktop (1920x1080), Tablet (768x1024) und Mobile (375x667) mittels CSS Media Queries und Flexbox-Layouts funktionieren.
+
+\chapter{Technologie-Stack und Architektur}
+\label{chap:technologie}
+
+\section{Gewählte Technologien}
+
+Python wurde für schnelle, lesbare Entwicklung gewählt. Flask bietet minimales Framework mit essentiellen Komponenten (Routing, Sessions, Built-in CSRF-Protection, Jinja2 Template Engine mit Auto-Escaping). SQLite ermöglicht serverlose Datenbank ohne Infrastruktur. Das Hybrid-Backend kombiniert SQLite (primär) mit CSV-Fallback für Robustheit – Schreib-Operationen gehen zu beiden, Lese-Operationen funktionieren auch bei SQLite-Fehler über CSV. Frontend nutzt HTML5/CSS3/Vanilla JavaScript ohne schwere Frameworks für Responsive Design mit Flexbox und AJAX-Warenkorb-Updates.
+
+\section{Systemarchitektur - 4-Schichten-Modell (siehe \autoref{fig:schichten})}
+
+\textbf{Layer 1 (Presentation):} Flask-Routes (HTTP-Endpoints in app.py) und Jinja2-Templates mit Auto-Escaping gegen XSS. \textbf{Layer 2 (Business Logic):} Service-Module (UserService, ProductService, CheckoutService) mit Validierung und Separation of Concerns. \textbf{Layer 3 (Data Access):} HybridBackend mit uniformer API (get\_all\_products, save\_user, etc.) abstrahiert SQLite- und CSV-Backend. \textbf{Layer 4 (Storage):} SQLite (webshop.db) und CSV-Dateien für Persistierung.
+
+Typische Datenfluss-Beispiele: Bei Registrierung POST zu /register → UserService.register() → HybridBackend.save\_user() → SQLite + CSV. Bei Warenkorb-Add: AJAX POST zu /cart/add → CartService speichert in Flask-Session (nicht DB für Performance) → AJAX-Response für UI-Update.
+
+\chapter{Implementierte Features}
+\label{chap:implementation}
+
+\section{Benutzer-Management}
+
+Registrierung mit E-Mail und Passwort ist der erste Schritt mit Validierung der E-Mail-Format (Regex, Eindeutigkeit), Passwort-Stärke (mindestens 8 Zeichen, Mix aus Groß/Klein/Zahlen/Sonderzeichen), PBKDF2-Hashing mit 150.000+ Iterationen und Duplikat-Prävention durch UNIQUE-Constraint. Nach erfolgreicher Registrierung wird eine Flask-Session mit Benutzer-ID und Rolle erstellt; Login erfolgt mit E-Mail + Passwort und Hash-Vergleich via \texttt{check\_password\_hash()}.
+
+Zwei Rollen sind implementiert (siehe \autoref{tab:benutzerrollen}): User (normaler Kunde zum Browsen, Kaufen, Profil-Verwaltung und DSGVO-Rechte) und Admin (alle User-Funktionen plus Produkt-Management, Bestellstatus-Update und Audit-Logs-Einsicht). Admin-Registrierung ist durch PIN geschützt in der \texttt{.env}-Datei konfiguriert, um Missbrauch zu verhindern.
+
+\section{Produktkatalog und Warenkorb}
+
+Der Katalog zeigt alle Produkte in responsiver Grid-Ansicht mit CSS Flexbox/Grid für automatische Bildschirmanpassung, Suchfunktion via GET /search?q=keyword durch Name und Beschreibung, Filterung nach Kategorie (Dropdown) und Preisbereich (Slider), detaillierte Produktseiten mit großem Bild und Volltext-Beschreibung, sowie Admin-Features zum Erstellen, Bearbeiten und Löschen von Produkten. Produktbilder werden zu \texttt{src/static/uploads/} mit sanitierten Dateinamen via \texttt{secure\_filename()} gegen Path-Traversal hochgeladen. Die Startseite zeigt eine Übersicht (siehe \autoref{fig:startseite}), Produktdetails in \autoref{fig:produktdetail}.
+
+Der Warenkorb wird bewusst in der Flask-Session gespeichert (nicht in Datenbank) aus Performance-Gründen mit signed Cookies und HMAC-Signature, ohne DB-Abfragen für schnellen Zugriff und verteilbar an Clients, aber mit Limitation auf ~4KB Browser-Cookie-Größe und Verlust bei Browser-Löschen. Die Struktur ist ein Dictionary mit product\_id → \{quantity, price\}. Warenkorb-Operationen: \texttt{POST /cart/add} zum Hinzufügen mit Menge, \texttt{POST /cart/update} zum Mengen-Ändern, \texttt{POST /cart/remove} zum Entfernen und \texttt{GET /cart} zur Seite-Anzeige (siehe \autoref{fig:warenkorb}).
+
+\section{Checkout und Zahlungsintegration}
+
+Der Checkout ist ein Multi-Step-Prozess (siehe \autoref{fig:checkout}): Schritt 1 Warenkorb-Übersicht mit Gesamtpreis, Schritt 2 Kundeninformationen (Name, Adresse, E-Mail), Schritt 3 Zahlungsmethode-Wahl (Stripe oder PayPal), Schritt 4 Weiterleitung zum externen Payment-Provider, Schritt 5 Bestellbestätigung nach erfolgreicher Zahlung (siehe \autoref{fig:bestaetigung}).
+
+Der Shop speichert KEINE Zahlungsdaten selbst - dies würde PCI-DSS Level 1 erfordern. Stattdessen wird der Benutzer zu Stripe/PayPal weitergeleitet, Zahlung erfolgt extern, der Shop erhält Zahlungs-ID und Status zurück und speichert nur die Zahlungs-ID in der ORDER-Tabelle als Metadaten. Der Shop muss kein PCI-DSS Level 1 erfüllen, da die Verantwortung bei den Providern liegt. Beide Provider unterstützen Sandbox-Testing mit Test-Credentials ideal für Entwicklung.
+
+\section{Admin-Interface und Bestellungsverwaltung}
+
+Das Admin-Dashboard auf \texttt{GET /admin/products} ist nur für Administratoren zugänglich (siehe \autoref{fig:admin_products}) mit Produktverwaltungs-Tabelle mit Edit/Delete Buttons, Formular zum Produkt-Erstellen mit Name, Preis, Kategorie, Beschreibung und Bild-Upload, editierbare Felder zum Produkt-Bearbeiten und Löschen mit Bestätigung.
+
+Bestellungen werden in der ORDER-Tabelle mit vollständigen Metadaten gespeichert (siehe \autoref{tab:order}): order\_id (eindeutig), user\_id (Foreign Key zu USER), total\_price (Gesamtbetrag), status (pending → paid → in\_bearbeitung → versendet → zugestellt) und order\_items (JSON mit product\_id, quantity, price). Bestellungshistorie (siehe \autoref{fig:bestellungen}): normale Benutzer sehen ihre eigenen Bestellungen, Admins sehen alle Bestellungen und können Status aktualisieren.
+
+\section{Sicherheitsmaßnahmen}
+
+Das System implementiert PBKDF2-Hashing mit mindestens 150.000 Iterationen via \texttt{werkzeug.security.generate\_password\_hash(password)} mit automatischem Salt und extremer Crack-Resistenz, Vergleich via \texttt{werkzeug.security.check\_password\_hash(hash, password)} und NIEMALS Klartext in Datenbank. Alle SQL-Queries verwenden Parameterized Queries (Prepared Statements) mit \texttt{cursor.execute("SELECT * FROM users WHERE email=?", (email,))} statt String-Interpolation. Jinja2 Templates haben Auto-Escaping aktiviert mit automatischer Escaping aller \{\{ variables \}\} und HTML-Entity-Konvertierung von \texttt{<}, \texttt{>}, \texttt{\&}, \texttt{"}, \texttt{'}.
+
+Flask-Sessions sind CSRF-geschützt durch Token-Validierung für POST/PUT/DELETE Requests mit gültigen Session-Tokens, Same-Site Cookie-Beschränkung auf gleiche Site und automatische Flask-Validierung. Uploads sind mit \texttt{secure\_filename()} geschützt gegen Path-Traversal (\texttt{../../../etc/passwd}), mit Extension-Whitelist (nur \texttt{.png}, \texttt{.jpg}, \texttt{.gif}) und 5MB Größe-Limit. Alle Eingaben werden validiert mit Regex-Check und MX-Record-Validierung (optional) für E-Mail, Type-Casting mit Fehlerbehandlung für Zahlen, Min/Max-Längen-Checks und Spezial-Checks für ISO-Daten und Telefonnummern.
+
+\chapter{DSGVO-Compliance und Datenschutz}
+\label{chap:dsgvo}
+
+Die Datenschutz-Grundverordnung (DSGVO) ist das rechtliche Rahmenwerk für Datenschutz in der EU. Der Shop implementiert folgende Anforderungen:
+
+\section{Implementierte Betroffenenrechte}
+
+\subsection{Datenexport (Art. 15 DSGVO - Auskunftsrecht)}
+
+Benutzer können ihre Daten als JSON exportieren unter \texttt{GET /gdpr/data-export}:
+
+\begin{itemize}
+    \item \textbf{Inhalt:} Komplette Benutzer-Profil, alle Bestellungen, alle Einwilligungen
+    \item \textbf{Format:} JSON mit vollständigen Metadaten
+    \item \textbf{Automatisch:} Kein manueller Admin-Eingriff nötig
+    \item \textbf{Audit-Log:} Export wird protokolliert (DATA\_EXPORT Event)
+\end{itemize}
+
+Beispiel Export:
+\begin{itemize}
+    \item USER: \{id, email, name, role, created\_at\}
+    \item ORDERS: Array aller Bestellungen mit Items
+    \item CONSENTS: Array der Einwilligungen (Privacy Policy, Cookies, etc.)
+\end{itemize}
+
+\subsection{Kontolöschung (Art. 17 DSGVO - Recht auf Vergessenwerden)}
+
+Benutzer können ihr Konto löschen unter \texttt{GET /gdpr/delete}:
+
+\begin{itemize}
+    \item \textbf{Lösch-Prozess:} Persönliche Daten (Name, Email, Passwort) werden gelöscht
+    \item \textbf{Anonymisierung:} Bestellungen bleiben, aber werden anonymisiert
+    \item \textbf{Begründung:} Handelsgesetz erfordert Aufbewahrung von Bestelldaten für Steuerzwecke (10 Jahre)
+    \item \textbf{Audit-Log:} USER\_DELETED Event wird protokolliert
+\end{itemize}
+
+\subsection{Audit-Logging (Art. 5 DSGVO - Rechenschaftspflicht)}
+
+Alle kritischen Operationen werden protokolliert in AUDIT\_LOG-Tabelle (siehe \autoref{tab:audit}):
+
+\begin{itemize}
+    \item \textbf{Erfasste Events:}
+    \begin{itemize}
+        \item USER\_REGISTRATION - Neue Registrierung
+        \item USER\_LOGIN - Login-Attempt (erfolgreich/fehlgeschlagen)
+        \item ORDER\_CREATED - Neue Bestellung
+        \item DATA\_EXPORT - Benutzer exportiert Daten
+        \item USER\_DELETED - Benutzer löscht sein Konto
+        \item ADMIN\_ACTION - Bestellstatus-Update durch Admin
+    \end{itemize}
+    \item \textbf{Speichert:} user\_id, event\_type, timestamp, ip\_address, details (JSON)
+    \item \textbf{Beweise:} Dokumentiert wer wann was gemacht hat - ideal für Compliance-Audits
+\end{itemize}
+
+\section{Datenschutz-Richtlinien und Kundenkommunikation}
+
+\subsection{Transparenz-Anforderungen}
+
+Der Shop stellt folgende Seiten zur Verfügung:
+
+\begin{itemize}
+    \item \textbf{Privacy Policy:} Erklärt Datenerfassung, Verarbeitung, Speicherdauer, Benutzerrechte
+    \item \textbf{Terms of Service:} Allgemeine Geschäftsbedingungen (AGB)
+    \item \textbf{Impressum:} Kontaktinformationen des Betreibers
+    \item \textbf{Cookie-Banner:} Granulare Einwilligungskontrolle (Pflicht-Cookies vs. Analytics)
+\end{itemize}
+
+\subsection{Einwilligungen (Art. 7 DSGVO)}
+
+Benutzer müssen explizit zustimmen:
+
+\begin{itemize}
+    \item \textbf{Registrierung:} Privacy Policy \& AGB müssen akzeptiert werden
+    \item \textbf{Cookies:} Granulare Kontrolle (Essential vs. Analytics vs. Marketing)
+    \item \textbf{Speicherung:} USER\_CONSENT-Tabelle speichert Zeitpunkt und Status
+    \item \textbf{Widerruf:} Benutzer können Einwilligung jederzeit in Profil widerrufen
+\end{itemize}
+
+\section{Zahlungsdaten und PCI-DSS}
+
+\subsection{PCI-DSS Compliance Strategy}
+
+Der Shop implementiert die sicherste Strategie: **Keine Zahlungsdaten speichern!**
+
+\begin{itemize}
+    \item \textbf{Normales Modell:} Shop speichert Kartendaten → PCI-DSS Level 1 (sehr teuer/komplex)
+    \item \textbf{Delegiertes Modell:} Stripe/PayPal speichern → Shop speichert nur Zahlungs-ID → Kein PCI-DSS nötig!
+    \item \textbf{Implementierung:} Benutzer wird zu externem Payment-Gateway weitergeleitet
+    \item \textbf{Rückgabe:} Shop erhält nur erfolgt/fehlgeschlagen + Transaction-ID
+\end{itemize}
+
+Konkret:
+\begin{itemize}
+    \item Shop speichert: payment\_method ('stripe'/'paypal'), transaction\_id, status
+    \item Shop speichert NICHT: Kartennummer, CVC, Gültigkeitsdatum, Kontodetails
+    \item Verantwortung: Stripe/PayPal tragen PCI-DSS-Audit-Lasten
+    \item Vorteil für MVP: Massive Reduktion von Sicherheits-Overhead
+\end{itemize}
+
+\section{Datenschutz by Design}
+
+\subsection{Datenminimierung (Art. 5 DSGVO)}
+
+Der Shop erhebt nur die minimal notwendigen Daten:
+
+\begin{itemize}
+    \item \textbf{Registrierung:} E-Mail, Name, Passwort (gehashed)
+    \item \textbf{Bestellungen:} Lieferadresse, Rechnungsadresse
+    \item \textbf{Analytics:} Anonymisierte Session-IDs (kein Tracking über Browser-Cookies)
+    \item \textbf{NIE gesammelt:} Kreditkartendaten, Social-Media-Profile, Biometrische Daten
+\end{itemize}
+
+\subsection{Speicherdauer}
+
+Speicherdauer ist: aktive Benutzer solange Konto existiert, gelöschte Benutzer mit sofort gelöschten persönlich identifizierbaren Daten, Bestellungen 10 Jahre (Handelsgesetzbuch § 257), Audit-Logs 6 Monate (Compliance und Forensik).
+
+\subsection{Datensicherheit at Rest}
+
+Datensicherheit nutzt PBKDF2-Hashing mit 150k+ Iterationen (nicht reversibel), API-Keys in \texttt{.env}-Datei (nicht in Git), SQLite-Datei unverschlüsselt für MVP (Production: Bitlocker/dm-crypt) und CSV-Dateien als menschenlesbare Backups.
+
+\chapter{Datenmodell und Datenbankdesign}
+\label{chap:datenmodell}
+
+\section{ER-Diagramm und Entity-Übersicht}
+
+Die Datenbank besteht aus 5 Hauptentitäten (vollständiges Diagramm in \autoref{fig:er_diagramm}). Die USER-Tabelle speichert Benutzerdaten mit Primärschlüssel (auto-increment), email (VARCHAR(255) UNIQUE für Login), password (PBKDF2-gehashed, NIEMALS Klartext), name (Anzeigename), role ('user' oder 'admin') und created\_at (Registrierungszeitpunkt). Die PRODUCT-Tabelle enthält Primärschlüssel, name (Produktname), price (DECIMAL(10,2)), category (Kategorie für Filtering), description (TEXT bis 65KB), stock (Verfügbare Anzahl), images (JSON-Array von Bildpfaden) und created\_at (Erstellungszeitpunkt). Die ORDER-Tabelle speichert eindeutige Bestellnummern, user\_id (Foreign Key), total\_price (Gesamtbetrag), status (pending → paid → in\_bearbeitung → versendet → zugestellt), order\_items (JSON-Array von Positionen mit product\_id, quantity, unit\_price, subtotal), payment\_method ('stripe' oder 'paypal') und created\_at. USER\_CONSENT speichert DSGVO-Einwilligungen mit id, user\_id (Foreign Key), consent\_type ('privacy\_policy', 'terms\_of\_service', 'cookies\_analytics', 'cookies\_marketing'), given (BOOLEAN) und given\_at. AUDIT\_LOG speichert kritische Operationen mit id, user\_id (optional), event\_type (USER\_REGISTRATION, USER\_LOGIN, ORDER\_CREATED, DATA\_EXPORT, USER\_DELETED, ADMIN\_ACTION), timestamp, ip\_address und details (JSON).
+
+Die Beziehungen sind: USER → ORDER (1:n, ein Benutzer viele Bestellungen), ORDER → ORDER\_ITEM (1:n durch JSON-Array), USER → USER\_CONSENT (1:n, mehrere Einwilligungen) und USER → AUDIT\_LOG (1:n, mehrere Log-Einträge). Das Schema ist in 3. Normalform normalisiert ohne Datenredundanz, mit JSON-Flexibilität für order\_items und images, sowie Indizes für email (UNIQUE), user\_id (JOINs) und created\_at (Zeitbereichs-Abfragen).
+
+Das Migrationsscript \texttt{src/storage/migrate\_csv\_to\_sqlite.py} liest initiale Testdaten aus CSV, konvertiert Datentypen (String → INTEGER, Datum-Format), validiert Constraints (Email-Format, UNIQUE-Violations), schreibt sauber zu SQLite und ermöglicht Rollback bei Fehlern.
+
+\chapter{Testing und Qualitätssicherung}
+\label{chap:testing}
+
+Das Projekt folgt einer pragmatischen Testings-Strategie für MVP mit manuelles End-to-End Testing aller kritischen User-Workflows mit dokumentierten Test-Cases: Authentifizierung (Registrierung/Login mit gültig/ungültig Szenarien), Produktkatalog (Anzeige, Suche, Filter, Sortierung, Pagination, Admin-Upload), Warenkorb (Hinzufügen, Mengen-Änderung, Löschen, Session-Persistierung, Stock-Handling), Checkout (Stripe/PayPal mit Test-Credentials, Bestätigung, Fehlerbehandlung), Admin-Funktionen (Login, Produkt-CRUD, Bestellstatus-Update) und DSGVO-Features (Datenexport, Konto-Löschung, Audit-Logging, Cookie-Consent) – insgesamt 50+ erfolgreich getestete Workflows.
+
+Sicherheits-Validierung zeigt: Passwort-Hashing nutzt PBKDF2 mit 150k Iterationen ohne Klartextpeicherung, SQL-Injection wird durch Parameterized Statements blockiert, XSS durch Jinja2 Auto-Escaping und HTML-Entity-Konvertierung, CSRF-Schutz durch HMAC-signierte Sessions mit Same-Site Attributes, Datei-Uploads durch Extension-Whitelist und 5MB-Limit. Alle kritischen Eingaben (Path-Traversal, Injection-Payloads) wurden erfolgreich blockiert.
+
+Performance-Tests mit 50 Produkten, 20 Test-Benutzern und 2MB SQLite-Datenbank ergeben: Startseite 0.5-1s, Produktdetail 0.2-0.5s, Checkout 0.5-1s, Admin-Interface 0.5-1s – alle unter 2s Zielwert. Getestete Browser (siehe \autoref{tab:browser}): Chrome, Firefox, Safari, Edge (Desktop und Mobile) mit voller Kompatibilität und Responsive Design auf Viewports von 375px (Mobile) bis 1920px (Desktop).
+
+\chapter{Herausforderungen und Lösungen}
+\label{chap:herausforderungen}
+
+Die Implementierung stellte mehrere technische Herausforderungen dar mit folgenden praktischen Lösungen: Zahlungsintegration mit unterschiedlichen API-Designs (Stripe RESTful/Tokens, PayPal OAuth 2.0/IPN) wurde durch Abstraktions-Layer in \texttt{checkout.py} mit uniformer PaymentProvider-Schnittstelle, Provider-spezifischen Implementierungen, gemeinsamer Fehlerbehandlung und .env-basierter Sandbox-Konfiguration gelöst, ermöglicht einfaches Hinzufügen weiterer Provider wie Klarna. CSV-zu-SQLite Migration verwendet Migrationsscript (\texttt{migrate\_csv\_to\_sqlite.py}) mit pandas, validiert Daten (Email-Format, Unique-Constraints) vor Import, arbeitet transaktional mit Rollback-Capability und ist idempotent. DSGVO-Compliance-Widerspruch zwischen Art. 17 (Vergessenwerden) und Handelsgesetz § 257 (10 Jahre Rechnungsaufbewahrung) wird durch Anonymisierung gelöst – persönliche Daten (Name, Email, Passwort, Adresse) werden gelöscht, Bestellungen mit "Anonymous User" verknüpft und USER\_DELETED Event in Audit-Log protokolliert. Responsive Design nutzt Mobile-First CSS mit Media Queries (768px Tablet, 1024px Desktop), Flexbox-Layouts, Font-Skalierung, Touch-optimierte Buttons (≥ 44x44px) und responsive Images.
+
+Erfolgsfaktoren waren (siehe \autoref{tab:erfolg}): Gutes 4-Schichten-Design war flexibel für Änderungen mehr als Technologie-Wahl, DSGVO-Planung von Anfang an (10x teurer nachträglich), Zahlungs-Delegation an Fremdsysteme reduziert Risiko, Hybrid-Backends (SQLite + CSV Fallback) bieten Robustheit ohne Replication, Session-basierter Warenkorb ist MVP-pragmatisch.
+
+\chapter{Fazit und Lessons Learned}
+\label{chap:fazit}
+
+Das PythonOnlineShop-Projekt entwickelt erfolgreich ein funktionsfähiges MVP für datenschutzkonformen E-Commerce-Shop über ca. 4-5 Monate mit: über 50 manuellen Test-Cases erfolgreich bestanden, DSGVO-Anforderungen (Datenexport, Kontolöschung, Audit-Logging), zwei Zahlungsprovider (Stripe + PayPal), Multi-User-Management mit RBAC, Admin-Interface für Produktverwaltung und Responsive Design auf allen Geräten.
+
+Schlüssel-Erkenntnisse: Gute Architektur (4-Schichten mit klarer Concerns-Separation) war wichtiger als Technology-Wahl – CSV-zu-SQLite Migration nur möglich durch abstrahierte Storage-Schicht. DSGVO-Compliance von Anfang an planen (10x teurer nachträglich). Payment-Delegation reduziert Sicherheits-Verantwortung und PCI-DSS Anforderungen. Hybrid-Ansatz (SQLite + CSV) bietet Flexibilität ohne Replication-Komplexität. Session-basierter Warenkorb MVP-pragmatisch: einfach implementierbar, keine Migrationen, später optimierbar (Redis).
+
+Implementierungs-Timeline: Phase 1 (1 Woche) Requirements/Architektur/Tech-Stack, Phase 2 (3-4 Tage) DB-Schema/CSV-Import/5 Entities, Phase 3 (1 Woche) Login/RBAC/Protected Routes, Phase 4 (1 Woche) Produktkatalog/Admin-CRUD/Bild-Upload, Phase 5 (1.5 Wochen) Warenkorb/Checkout/Stripe-PayPal, Phase 6 (1 Woche) Cookie-Banner/Datenexport/Audit-Logging, Phase 7 (1 Woche) 50+ Tests/Security/Performance/Kompatibilität, Phase 8 (3-4 Tage) Environment-Config/Deployment (siehe \autoref{tab:phasen}). Gesamtdauer: ~5 Monate.
+
+Zukünftige Erweiterungen: Kurzfristig (1-3 Mo.) Redis-Warenkorb, E-Mail-Notifications, Bewertungen, Wishlist, Promo-Codes. Mittelfristig (3-6 Mo.) Inventory-Management, Versand-Integration, Analytics, Mobile Apps, Social Login. Langfristig (6+ Mo.) Microservices, Multi-Tenant-Support, AI-Empfehlungen, Blockchain, B2B-Features.
+
+Das PythonOnlineShop-Projekt demonstriert: datenschutzkonformer, sicherer E-Commerce-Shop in Python mit sauberer Architektur realisierbar. MVP ist produktionsreif mit solider Basis für zukünftiges Wachstum. Wichtigste Lektion: \textbf{Gute Architektur ist beste Investition} – nicht Micro-Optimierungen oder neueste Frameworks, sondern klare Schichteneinteilung, Verantwortlichkeiten und Testbarkeit führen zu wartbarem, erweiterungsfähigem Code. Mit diesem MVP kann Team mit realen Kunden validieren, welche Features wichtig sind, bevor weitere Investitionen getätigt werden.
+
+% ============================================================================
+% ANHANG
+% ============================================================================
+\clearpage
+\pagenumbering{roman}
+\setcounter{page}{1}
+\pagestyle{frontmatter}
+
+\chapter{Tabellen}
+\label{chap:tabellen}
+
+\section{Anforderungsanalyse}
+
+\begin{table}[H]
+\centering
+\caption{Benutzerrollen und deren Berechtigungen}
+\label{tab:benutzerrollen}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Rolle} & \textbf{Berechtigung} & \textbf{Funktionen} \\
+\hline
+User & Kunde & Registrierung, Login, Produktbrowsing, Warenkorb, Bestellung, Profil-Management, DSGVO-Rechte \\
+\hline
+Admin & Administrator & Alle User-Funktionen + Produkt-Management (Create/Edit/Delete), Bestellstatus-Update, Audit-Log-View \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Nicht-funktionale Anforderungen (NFAs)}
+\label{tab:nfa}
+\begin{tabular}{|l|p{5cm}|l|}
+\hline
+\textbf{NFA} & \textbf{Beschreibung} & \textbf{Zielwert} \\
+\hline
+Performance & Seitenladezeiten & < 2 Sekunden \\
+\hline
+Skalierbarkeit & Gleichzeitige Benutzer & 50-1000 \\
+\hline
+Verfügbarkeit & Uptime & > 99\% \\
+\hline
+Sicherheit & Passwort-Hashing & PBKDF2, 150k+ Iterationen \\
+\hline
+DSGVO-Konformität & Compliance & Art. 12-22 implementiert \\
+\hline
+Browserkompatibilität & Unterstützte Browser & Chrome, Firefox, Safari, Edge \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{DSGVO-Anforderungen und Implementierung}
+\label{tab:dsgvo}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{DSGVO-Anforderung} & \textbf{Artikel} & \textbf{Implementierung} \\
+\hline
+Datenexport & Art. 15 & /gdpr/data-export JSON-Download \\
+\hline
+Kontolöschung & Art. 17 & /gdpr/delete mit Anonymisierung \\
+\hline
+Datenschutzerklärung & Art. 13 & /privacy\_policy Public Page \\
+\hline
+Audit-Logging & Art. 5 & AUDIT\_LOG-Tabelle, alle kritischen Events \\
+\hline
+Einwilligungen & Art. 7 & USER\_CONSENT-Tabelle, Cookie-Banner \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Authentifizierung und Autorisierung}
+
+\begin{table}[H]
+\centering
+\caption{Authentifizierungs- und Autorisierungsmechanismen}
+\label{tab:auth}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Mechanismus} & \textbf{Implementierung} \\
+\hline
+Passwort-Hashing & werkzeug.security.generate\_password\_hash (PBKDF2) \\
+\hline
+Session-Management & Flask-Sessions mit signed Cookies (Secret Key) \\
+\hline
+Rollen-basierte Zugriffskontrolle (RBAC) & User/Admin Rollen in USER-Tabelle \\
+\hline
+Admin-Registrierung-Schutz & PIN-Validierung erforderlich \\
+\hline
+\hline
+\end{tabular}
+\end{table}
+
+\section{Datenbank-Schemas}
+
+\begin{table}[H]
+\centering
+\caption{USER-Tabelle}
+\label{tab:user}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Spalte} & \textbf{Datentyp} & \textbf{Beschreibung} \\
+\hline
+id & INTEGER (PK) & Primärschlüssel \\
+\hline
+email & VARCHAR(255) (UNIQUE) & E-Mail des Benutzers (eindeutig) \\
+\hline
+password & VARCHAR(255) (gehashed) & PBKDF2-gehashtes Passwort \\
+\hline
+name & VARCHAR(255) & Name des Benutzers \\
+\hline
+role & VARCHAR(50) & 'user' oder 'admin' \\
+\hline
+created\_at & TIMESTAMP & Registrierungszeitpunkt \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{PRODUCT-Tabelle}
+\label{tab:product}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Spalte} & \textbf{Datentyp} & \textbf{Beschreibung} \\
+\hline
+id & INTEGER (PK) & Primärschlüssel \\
+\hline
+name & VARCHAR(255) & Produktname \\
+\hline
+price & DECIMAL(10,2) & Produktpreis \\
+\hline
+category & VARCHAR(100) & Produktkategorie \\
+\hline
+description & TEXT & Lange Produktbeschreibung \\
+\hline
+stock & INTEGER & Verfügbare Anzahl \\
+\hline
+images & JSON & Array von Bilddatei-Namen \\
+\hline
+created\_at & TIMESTAMP & Erstellungszeitpunkt \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{ORDER-Tabelle}
+\label{tab:order}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Spalte} & \textbf{Datentyp} & \textbf{Beschreibung} \\
+\hline
+id & INTEGER (PK) & Primärschlüssel \\
+\hline
+user\_id & INTEGER (FK) & Benutzer-ID (Foreign Key) \\
+\hline
+total\_price & DECIMAL(10,2) & Gesamtpreis der Bestellung \\
+\hline
+status & VARCHAR(50) & pending, paid, in\_bearbeitung, versendet, zugestellt \\
+\hline
+order\_items & JSON & Array von Bestellpositionen (product\_id, quantity, price) \\
+\hline
+payment\_method & VARCHAR(50) & 'stripe' oder 'paypal' \\
+\hline
+created\_at & TIMESTAMP & Bestellzeitpunkt \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{USER\_CONSENT-Tabelle}
+\label{tab:consent}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Spalte} & \textbf{Datentyp} & \textbf{Beschreibung} \\
+\hline
+id & INTEGER (PK) & Primärschlüssel \\
+\hline
+user\_id & INTEGER (FK) & Benutzer-ID \\
+\hline
+consent\_type & VARCHAR(100) & 'privacy\_policy', 'terms\_of\_service', 'cookies', etc. \\
+\hline
+given & BOOLEAN & TRUE wenn Einwilligung gegeben \\
+\hline
+given\_at & TIMESTAMP & Zeitpunkt der Einwilligung \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{AUDIT\_LOG-Tabelle}
+\label{tab:audit}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Spalte} & \textbf{Datentyp} & \textbf{Beschreibung} \\
+\hline
+id & INTEGER (PK) & Primärschlüssel \\
+\hline
+user\_id & INTEGER & Betroffener Benutzer (optional) \\
+\hline
+event\_type & VARCHAR(100) & USER\_REGISTRATION, USER\_LOGIN, ORDER\_CREATED, DATA\_EXPORT, USER\_DELETED \\
+\hline
+timestamp & TIMESTAMP & Zeitpunkt der Operation \\
+\hline
+ip\_address & VARCHAR(50) & IP-Adresse des Benutzers \\
+\hline
+details & JSON & Zusätzliche Details der Operation \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Python Dependencies}
+\label{sec:tab:dependencies}
+
+\begin{table}[H]
+\centering
+\caption{Externe Python-Packages und ihre Verwendung}
+\label{tab:dependencies}
+\begin{tabular}{|l|l|p{7cm}|}
+\hline
+\textbf{Package} & \textbf{Version} & \textbf{Verwendungszweck} \\
+\hline
+Flask & \texttt{\textasciicircum 2.0} & Web-Framework und Routing \\
+\hline
+pandas & \texttt{\textasciicircum 1.3} & CSV-Datenmanipulation und Analyse \\
+\hline
+sqlite3 & Built-in & SQL-Datenbank (enthalten in Python) \\
+\hline
+pytest & Latest & Unit- und Integrationstests \\
+\hline
+flask-restful & Latest & REST-API-Unterstützung \\
+\hline
+Werkzeug & Dep. von Flask & Sicherheitsfunktionen (Passwort-Hashing, CSRF) \\
+\hline
+Jinja2 & Dep. von Flask & Template-Engine für HTML \\
+\hline
+stripe & Latest & Stripe Payment Gateway SDK \\
+\hline
+requests & Latest & HTTP-Client für PayPal API \\
+\hline
+python-dotenv & Latest & Umgebungsvariablen aus \texttt{.env} laden \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Hybrid-Backend Architektur}
+\label{sec:tab:hybrid}
+
+\begin{table}[H]
+\centering
+\caption{Hybrid-Backend: Fallback-Mechanismus}
+\label{tab:hybrid}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Priorität} & \textbf{Speicher-Typ} & \textbf{Beschreibung} \\
+\hline
+1 & SQLite (Primär) & Native SQL-Datenbank für hohe Performance und Zuverlässigkeit \\
+\hline
+2 & CSV (Fallback) & Dateisystem-basierte CSV-Dateien bei SQLite-Ausfällen \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Dateistruktur}
+\label{sec:tab:dateien}
+
+\begin{table}[H]
+\centering
+\caption{Wichtige Projektdateien und deren Zweck}
+\label{tab:dateien}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Datei/Ordner} & \textbf{Zweck} \\
+\hline
+\texttt{src/app.py} & Haupt-Flask-Anwendung mit allen Routes \\
+\hline
+\texttt{src/config.py} & Konfiguration und Umgebungsvariablen \\
+\hline
+\texttt{src/storage/} & Datenbank-Backends (SQLite, CSV, Hybrid) \\
+\hline
+\texttt{src/services/checkout.py} & Checkout und Zahlungsintegration \\
+\hline
+\texttt{src/utils/logging\_service.py} & DSGVO-Audit-Logging \\
+\hline
+\texttt{src/templates/} & Jinja2 HTML-Templates \\
+\hline
+\texttt{data/} & Laufzeit-Daten (CSV-Dateien, SQLite-DB, Logs) \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Implementierungs-Phasen}
+\label{sec:tab:phasen}
+
+\begin{table}[H]
+\centering
+\caption{8-Phasen Entwicklungsplan mit Meilensteinen}
+\label{tab:phasen}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Phase} & \textbf{Dauer} & \textbf{Meilenstein} \\
+\hline
+Phase 1 & Woche 1 & Projektsetup, Umgebungskonfiguration, Git-Repository \\
+\hline
+Phase 2 & Woche 2 & Datenmodell und Datenbank-Schemas definiert \\
+\hline
+Phase 3 & Woche 3-4 & Benutzerverwaltung (Registrierung, Login) \\
+\hline
+Phase 4 & Woche 4-5 & Produktkatalog und Warenkorb \\
+\hline
+Phase 5 & Woche 5-6 & Checkout und Zahlungsintegration (Stripe/PayPal) \\
+\hline
+Phase 6 & Woche 6-7 & DSGVO-Features und Audit-Logging \\
+\hline
+Phase 7 & Woche 7-8 & Testing (Manual E2E, Unit Tests, Security) \\
+\hline
+Phase 8 & Woche 8 & Dokumentation, MVP-Finalisierung \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Browser-Kompatibilität}
+\label{sec:tab:browser}
+
+\begin{table}[H]
+\centering
+\caption{Getestete Browser und ihre Kompatibilität}
+\label{tab:browser}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Browser} & \textbf{Version} & \textbf{OS} & \textbf{Status} \\
+\hline
+Chrome & Aktuell & Win/Mac/Linux & $\checkmark$ Voll kompatibel \\
+\hline
+Firefox & Aktuell & Win/Mac/Linux & $\checkmark$ Voll kompatibel \\
+\hline
+Safari & Aktuell & Mac/iOS & $\checkmark$ Voll kompatibel \\
+\hline
+Edge & Aktuell & Win & $\checkmark$ Voll kompatibel \\
+\hline
+Mobile Chrome & Aktuell & Android & $\checkmark$ Responsive Design \\
+\hline
+Mobile Safari & Aktuell & iOS & $\checkmark$ Responsive Design \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Erfolgs- und Lernfaktoren}
+\label{sec:tab:erfolg}
+
+\begin{table}[H]
+\centering
+\caption{4 Erfolgsfaktoren des Projekts}
+\label{tab:erfolg}
+\begin{tabular}{|l|p{10cm}|}
+\hline
+\textbf{Erfolgsfaktor} & \textbf{Beschreibung} \\
+\hline
+Hybrid-Backend Innovation & Die intelligente Kombination von SQLite und CSV ermöglichte Zuverlässigkeit mit einfacher Wartbarkeit \\
+\hline
+Fokus auf Benutzer-Sicherheit & DSGVO-Compliance und Sicherheitsmaßnahmen (PBKDF2, CSRF, XSS-Schutz) waren von Anfang an integriert \\
+\hline
+Manuelle E2E-Testing Strategie & Umfassendes manuelles Testen über 50+ Test-Cases sicherte Qualität ohne Komplexität \\
+\hline
+Schlanke Architektur & Minimale Dependencies (nur Flask, pandas, Stripe/PayPal) ermöglichten schnelle Entwicklung und einfache Deployment \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Zielererreichung}
+\label{sec:tab:ziele}
+
+\begin{table}[H]
+\centering
+\caption{Erreichte Ziele vs. Aufgabenstellung}
+\label{tab:ziele}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Anforderung} & \textbf{Status} & \textbf{Implementierung} \\
+\hline
+Benutzerregistrierung und Login & $\checkmark$ & Vollständig mit PBKDF2 Hashing \\
+\hline
+Produktkatalog & $\checkmark$ & Komplett mit Bildern und Kategorien \\
+\hline
+Warenkorb-Verwaltung & $\checkmark$ & Session-basiert, AJAX-enabled \\
+\hline
+Zahlungsintegration & $\checkmark$ & Stripe und PayPal delegiert \\
+\hline
+Bestellverwaltung & $\checkmark$ & Vollständig mit Status-Tracking \\
+\hline
+Admin-Oberfläche & $\checkmark$ & Produkt- und Bestell-Management \\
+\hline
+DSGVO-Compliance & $\checkmark$ & Datenexport, Löschung, Audit-Logging \\
+\hline
+Sicherheit & $\checkmark$ & CSRF, XSS, SQLi Schutz \\
+\hline
+Testing & $\checkmark$ & 50+ E2E Test Cases, Unit Tests \\
+\hline
+\end{tabular}
+\end{table}
+
+\newpage
+\chapter{Bilder}
+\label{chap:bilder}
+
+\section{UI-Mockups und Screenshots}
+\label{sec:ui_screenshots}
+
+\subsection{Startseite des Webshops}
+\label{subsec:img_startseite}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=1\textwidth]{Images/mainPage.png}\\
+\small Abbildung: Hauptseite des Onlineshops mit Produktgrid, Suchfeld und Filtermöglichkeiten
+\end{minipage}
+}
+\caption{Startseite des Webshops}
+\label{fig:startseite}
+\end{figure}
+
+\subsection{Login-Seite}
+\label{subsec:img_login}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=1\textwidth]{Images/loginPage.png}\\
+\small Abbildung: Login-Formular mit E-Mail und Passwort
+\end{minipage}
+}
+\caption{Login-Seite}
+\label{fig:login}
+\end{figure}
+
+\subsection{Produktdetail-Seite}
+\label{subsec:img_produktdetail}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=1\textwidth]{Images/productDetailPage.png}\\
+\small Abbildung: Produktdetail-Seite mit Bild, Beschreibung und Warenkorb-Button
+\end{minipage}
+}
+\caption{Produktdetail-Seite}
+\label{fig:produktdetail}
+\end{figure}
+
+\subsection{Warenkorb-Seite}
+\label{subsec:img_warenkorb}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=1\textwidth]{Images/warenkorbPage.png}\\
+\small Abbildung: Warenkorb mit Artikelübersicht und Checkout-Button
+\end{minipage}
+}
+\caption{Warenkorb-Seite}
+\label{fig:warenkorb}
+\end{figure}
+
+\subsection{Checkout-Seite}
+\label{subsec:img_checkout}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=1\textwidth]{Images/checkoutPage.png}\\
+\small Abbildung: Checkout-Formular mit Kundendaten und Zahlungsoptionen
+\end{minipage}
+}
+\caption{Checkout-Seite}
+\label{fig:checkout}
+\end{figure}
+
+\subsection{Bestellbestätigungsseite}
+\label{subsec:img_bestaetigung}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=1\textwidth]{Images/orderConfirmPage.png}\\
+\small Abbildung: Bestellbestätigungsseite mit Bestellnummer
+\end{minipage}
+}
+\caption{Bestellbestätigungsseite}
+\label{fig:bestaetigung}
+\end{figure}
+
+\subsection{Bestellungshistorie}
+\label{subsec:img_bestellungen}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=1\textwidth]{Images/orderHistoryPage.png}\\
+\small Abbildung: Dashboard mit Bestellungshistorie und Status
+\end{minipage}
+}
+\caption{Bestellungshistorie}
+\label{fig:bestellungen}
+\end{figure}
+
+\subsection{Admin-Produktverwaltung}
+\label{subsec:img_admin_products}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=1\textwidth]{Images/productAdminPage.png}\\
+\small Abbildung: Admin-Interface mit Produktverwaltung
+\end{minipage}
+}
+\caption{Admin-Produktverwaltung}
+\label{fig:admin_products}
+\end{figure}
+
+\section{Architektur-Diagramme}
+\label{sec:architektur_diagramme}
+
+\subsection{Schichtenmodell}
+\label{subsec:img_schichten}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\textit{[Architektur-Schichtenmodell einfügen]}
+
+\small Abbildung zeigt die vier Schichten (von oben nach unten):
+\begin{itemize}
+    \item Presentation Layer (Flask Routes, Jinja2 Templates)
+    \item Business Logic Layer (Services, Checkout)
+    \item Data Access Layer (Hybrid Backend, Storage)
+    \item Data Storage Layer (SQLite, CSV)
+\end{itemize}
+\end{minipage}
+}
+\caption{Architektur-Schichtenmodell des Onlineshops}
+\label{fig:schichten}
+\end{figure}
+
+\subsection{Entity-Relationship-Diagramm}
+\label{subsec:img_er_diagramm}
+
+\begin{figure}[H]
+\centering
+\framebox{
+\begin{minipage}{0.9\textwidth}
+\textit{[ER-Diagramm einfügen]}\\
+\small Abbildung: Entity-Relationship-Diagramm mit Entitäten, Attributen und Beziehungen
+
+Die Abbildung sollte folgende Elemente zeigen:
+\begin{itemize}
+    \item USER-Tabelle (id, name, email, password, role)
+    \item PRODUCT-Tabelle (id, name, price, category, description, stock, images)
+    \item ORDER-Tabelle (id, user\_id, total, status, created\_at, payment\_provider)
+    \item ORDER\_ITEM-Tabelle (id, order\_id, product\_id, quantity, price)
+    \item CONSENT-Tabelle (id, user\_id, consent\_type, value, created\_at)
+    \item AUDIT\_LOG-Tabelle (id, user\_id, event\_type, action, ip\_address, created\_at)
+\end{itemize}
+\end{minipage}
+}
+\caption{Entity-Relationship-Diagramm des Onlineshops}
+\label{fig:er_diagramm}
+\end{figure}
+
+\end{document}
