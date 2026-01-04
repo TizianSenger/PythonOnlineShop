@@ -15,6 +15,7 @@
 \usepackage{fancyhdr}
 \usepackage{float}
 \usepackage{array}
+\usepackage{amssymb}
 \usepackage{longtable}
 \usepackage{booktabs}
 \usepackage{multirow}
@@ -180,9 +181,9 @@
 \section{Problemstellung und Zielsetzung}
 \label{sec:problemstellung}
 
-Der digitale Handel nimmt global eine immer größere Rolle ein. Viele Unternehmen benötigen sichere, benutzerfreundliche und rechtskonforme E-Commerce-Lösungen, um ihre Produkte online zu verkaufen. Eine solche Lösung erfordert nicht nur technische Kompetenz, sondern auch ein tiefes Verständnis für Sicherheit, Datenschutz und regulatorische Anforderungen wie die Datenschutz-Grundverordnung (DSGVO).
+Der digitale Handel nimmt global eine immer größere Rolle ein. Viele Unternehmen benötigen sichere, benutzerfreundliche und rechtskonforme E-Commerce-Lösungen, um ihre Produkte online zu verkaufen. Eine solche Lösung erfordert nicht nur technische Kompetenz, sondern auch ein tiefes Verständnis für Sicherheit, Datenschutz und regulatorische Anforderungen wie die Datenschutz-Grundverordnung (DSGVO) \cite{DSGVO}.
 
-Das Ziel dieses Projekts ist die Konzeption und Implementierung eines funktionsfähigen Onlineshops als Minimum Viable Product (MVP). Der entwickelte Shop soll folgende zentrale Anforderungen erfüllen:
+Das Ziel dieses Projekts ist die Konzeption und Implementierung eines funktionsfähigen Onlineshops als Minimum Viable Product (MVP) \cite{Aufgabenstellung}. Der entwickelte Shop soll folgende zentrale Anforderungen erfüllen:
 
 \begin{itemize}
     \item Verwaltung eines Produktkatalogs mit Kategorisierung und Detailanzeigen
@@ -226,7 +227,7 @@ Die funktionalen Anforderungen definieren die konkreten Funktionalitäten, die d
 \paragraph{Benutzerverwaltung}
 \begin{itemize}
     \item Benutzer können sich mit E-Mail und Passwort registrieren
-    \item Passwörter werden mit kryptografischen Hash-Funktionen (Werkzeug: \texttt{werkzeug.security}) gespeichert
+    \item Passwörter werden mit kryptografischen Hash-Funktionen (Werkzeug: \texttt{werkzeug.security}) \cite{Flask} gespeichert
     \item Benutzer können sich anmelden und abmelden
     \item Benutzerdaten können aktualisiert werden
     \item Admin-Registrierung ist durch eine PIN geschützt
@@ -423,13 +424,13 @@ Der Shop erhebt nur die minimal notwendigen Daten:
 
 \paragraph{Payment Card Industry Data Security Standard (PCI-DSS):}
 
-PCI-DSS ist ein internationaler Standard zur Sicherung von Zahlungskartendaten. Der Shop erkennt an, dass die Verarbeitung von Zahlungsdaten eine hohe Verantwortung trägt.
+PCI-DSS ist ein internationaler Standard zur Sicherung von Zahlungskartendaten \cite{PCI-DSS}. Der Shop erkennt an, dass die Verarbeitung von Zahlungsdaten eine hohe Verantwortung trägt.
 
 \textbf{Compliance-Strategie:} Der Shop delegiert die Verantwortung vollständig an PCI-DSS-zertifizierte Anbieter (Stripe Level 1, PayPal Level 2). Der Shop selbst speichert oder verarbeitet \textbf{keine} Kreditkartendaten, Kontodetails oder andere sensitive Zahlungsinformationen. Dies reduziert das Compliance-Risiko erheblich.
 
 \paragraph{Payment Services Directive 2 (PSD2):}
 
-Die PSD2-Richtlinie regelt Zahlungsdienste in der EU und fordert unter anderem:
+Die PSD2-Richtlinie \cite{PSD2} regelt Zahlungsdienste in der EU und fordert unter anderem:
 
 \begin{itemize}
     \item \textbf{Strong Customer Authentication (SCA):} Zwei-Faktor-Authentifizierung bei Zahlungen über €30 (wird durch Stripe/PayPal bereitgestellt)
@@ -1254,7 +1255,7 @@ Die physische Datenspeicherung erfolgt auf zwei Wegen:
 \subsection{Separation of Concerns}
 \label{subsec:soc}
 
-Das Projekt folgt dem Prinzip Separation of Concerns (SoC), das bedeutet jedes Modul hat eine klare, einzelne Verantwortung:
+Das Projekt folgt dem Prinzip Separation of Concerns (SoC), das bedeutet jedes Modul hat eine klare, einzelne Verantwortung. Dieses Architektur-Muster ist ein Best Practice in der Software-Entwicklung \\cite{Flask}:
 
 \begin{itemize}
     \item \textbf{Routes (app.py):} Nur HTTP-Handling, keine Business-Logic
@@ -1354,6 +1355,8 @@ Autorisierung bestimmt, was ein Benutzer darf:
 
 \subsection{Schutz vor Angriffsmustern}
 \label{subsec:schutz_angriffe}
+
+Der Shop implementiert Schutzmaßnahmen gegen häufige Web-Angriffsvektoren \\cite{OWASP}:
 
 \paragraph{CSRF (Cross-Site Request Forgery):}
 
@@ -2498,25 +2501,35 @@ bildet die Basis für professionelle Softwareentwicklung. Dieses Projekt ist ein
 % ============================================================================
 \begin{thebibliography}{99}
 
-\bibitem{Prüfungsleitfaden} IU Internationale Hochschule GmbH (2024). Prüfungsleitfaden zur Erstellung eines Projektberichts.
+\bibitem{Aufgabenstellung} 
+IU Internationale Hochschule GmbH (2024). \textit{Aufgabenstellung 2: Konzeption und Umsetzung eines einfachen Onlineshops}. Verfügbar unter: myCampus.
 
-\bibitem{Aufgabenstellung} IU Internationale Hochschule GmbH (2024). Aufgabenstellung 2: Konzeption und Umsetzung eines einfachen Onlineshops.
+\bibitem{Prüfungsleitfaden} 
+IU Internationale Hochschule GmbH (2024). \textit{Prüfungsleitfaden zur Erstellung eines Projektberichts}. Verfügbar unter: myCampus.
 
-\bibitem{Flask} Ronacher, A. (2024). \textit{Flask Dokumentation}. Verfügbar unter: https://flask.palletsprojects.com/
+\bibitem{Flask} 
+Ronacher, A. et al. (2024). \textit{Flask Web Development Framework -- Documentation}. Verfügbar unter: https://flask.palletsprojects.com/ [Zugegriffen: 04. Januar 2026].
 
-\bibitem{Python} Python Software Foundation (2024). \textit{Python Dokumentation}. Verfügbar unter: https://docs.python.org/
+\bibitem{Python} 
+Python Software Foundation (2024). \textit{The Python Language Reference}. Verfügbar unter: https://docs.python.org/ [Zugegriffen: 04. Januar 2026].
 
-\bibitem{SQLite} SQLite Consortium (2024). \textit{SQLite Dokumentation}. Verfügbar unter: https://www.sqlite.org/docs.html
+\bibitem{SQLite} 
+Hipp, D. R., Kennedy, D. und Wyrick, J. (2024). \textit{SQLite Database Engine -- Official Documentation}. Verfügbar unter: https://www.sqlite.org/docs.html [Zugegriffen: 04. Januar 2026].
 
-\bibitem{DSGVO} Europäisches Parlament und Rat (2016). Verordnung (EU) 2016/679 des Europäischen Parlaments und des Rates vom 27. April 2016 zum Schutz natürlicher Personen bei der Verarbeitung personenbezogener Daten (Datenschutz-Grundverordnung).
+\bibitem{DSGVO} 
+Europäisches Parlament und Rat (2016). \textit{Verordnung (EU) 2016/679 des Europäischen Parlaments und des Rates vom 27. April 2016 zum Schutz natürlicher Personen bei der Verarbeitung personenbezogener Daten (Datenschutz-Grundverordnung -- DSGVO)}. \textit{Amtsblatt der Europäischen Union}, L119, S. 1-88.
 
-\bibitem{PCI-DSS} Payment Card Industry Security Standards Council (2024). \textit{PCI Data Security Standard}. Verfügbar unter: https://www.pcisecuritystandards.org/
+\bibitem{PCI-DSS} 
+Payment Card Industry Security Standards Council (2024). \textit{PCI Data Security Standard (PCI DSS) -- Version 4.0}. Verfügbar unter: https://www.pcisecuritystandards.org/ [Zugegriffen: 04. Januar 2026].
 
-\bibitem{PSD2} Europäisches Parlament und Rat (2015). Richtlinie (EU) 2015/2366 vom 25. November 2015 über Zahlungsdienste im Binnenmarkt.
+\bibitem{PSD2} 
+Europäisches Parlament und Rat (2015). \textit{Richtlinie (EU) 2015/2366 vom 25. November 2015 über Zahlungsdienste im Binnenmarkt, zur Änderung der Richtlinien 2002/65/EG, 2009/110/EG und 2013/36/EU und zur Aufhebung der Richtlinie 2007/64/EG (PSD2)}. \textit{Amtsblatt der Europäischen Union}, L337, S. 35-127.
 
-\bibitem{OWASP} OWASP (2024). \textit{OWASP Top 10 – Web Application Security Risks}. Verfügbar unter: https://owasp.org/www-project-top-ten/
+\bibitem{OWASP} 
+OWASP Foundation (2024). \textit{OWASP Top 10 -- Web Application Security Risks}. Verfügbar unter: https://owasp.org/www-project-top-ten/ [Zugegriffen: 04. Januar 2026].
 
-% Weitere Literaturangaben können hier ergänzt werden
+\bibitem{Werkzeug}
+Ronacher, A. (2024). \textit{Werkzeug -- The Utility Library Behind Flask}. Verfügbar unter: https://werkzeug.palletsprojects.com/ [Zugegriffen: 04. Januar 2026].
 
 \end{thebibliography}
 
@@ -2851,17 +2864,17 @@ Phase 8 & Woche 8 & Dokumentation, MVP-Finalisierung \\
 \hline
 \textbf{Browser} & \textbf{Version} & \textbf{OS} & \textbf{Status} \\
 \hline
-Chrome & Aktuell & Win/Mac/Linux & ✓ Voll kompatibel \\
+Chrome & Aktuell & Win/Mac/Linux & $\checkmark$ Voll kompatibel \\
 \hline
-Firefox & Aktuell & Win/Mac/Linux & ✓ Voll kompatibel \\
+Firefox & Aktuell & Win/Mac/Linux & $\checkmark$ Voll kompatibel \\
 \hline
-Safari & Aktuell & Mac/iOS & ✓ Voll kompatibel \\
+Safari & Aktuell & Mac/iOS & $\checkmark$ Voll kompatibel \\
 \hline
-Edge & Aktuell & Win & ✓ Voll kompatibel \\
+Edge & Aktuell & Win & $\checkmark$ Voll kompatibel \\
 \hline
-Mobile Chrome & Aktuell & Android & ✓ Responsive Design \\
+Mobile Chrome & Aktuell & Android & $\checkmark$ Responsive Design \\
 \hline
-Mobile Safari & Aktuell & iOS & ✓ Responsive Design \\
+Mobile Safari & Aktuell & iOS & $\checkmark$ Responsive Design \\
 \hline
 \end{tabular}
 \end{table}
@@ -2899,23 +2912,23 @@ Schlanke Architektur & Minimale Dependencies (nur Flask, pandas, Stripe/PayPal) 
 \hline
 \textbf{Anforderung} & \textbf{Status} & \textbf{Implementierung} \\
 \hline
-Benutzerregistrierung und Login & ✓ & Vollständig mit PBKDF2 Hashing \\
+Benutzerregistrierung und Login & $\checkmark$ & Vollständig mit PBKDF2 Hashing \\
 \hline
-Produktkatalog & ✓ & Komplett mit Bildern und Kategorien \\
+Produktkatalog & $\checkmark$ & Komplett mit Bildern und Kategorien \\
 \hline
-Warenkorb-Verwaltung & ✓ & Session-basiert, AJAX-enabled \\
+Warenkorb-Verwaltung & $\checkmark$ & Session-basiert, AJAX-enabled \\
 \hline
-Zahlungsintegration & ✓ & Stripe und PayPal delegiert \\
+Zahlungsintegration & $\checkmark$ & Stripe und PayPal delegiert \\
 \hline
-Bestellverwaltung & ✓ & Vollständig mit Status-Tracking \\
+Bestellverwaltung & $\checkmark$ & Vollständig mit Status-Tracking \\
 \hline
-Admin-Oberfläche & ✓ & Produkt- und Bestell-Management \\
+Admin-Oberfläche & $\checkmark$ & Produkt- und Bestell-Management \\
 \hline
-DSGVO-Compliance & ✓ & Datenexport, Löschung, Audit-Logging \\
+DSGVO-Compliance & $\checkmark$ & Datenexport, Löschung, Audit-Logging \\
 \hline
-Sicherheit & ✓ & CSRF, XSS, SQLi Schutz \\
+Sicherheit & $\checkmark$ & CSRF, XSS, SQLi Schutz \\
 \hline
-Testing & ✓ & 50+ E2E Test Cases, Unit Tests \\
+Testing & $\checkmark$ & 50+ E2E Test Cases, Unit Tests \\
 \hline
 \end{tabular}
 \end{table}
