@@ -327,13 +327,6 @@ pytest --cov=src tests/
 
 Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe [LICENSE](LICENSE) für Details.
 
-## 🙏 Danksagungen
-
-- Flask Framework
-- SQLite Datenbank
-- Werkzeug Security
-- Alle Open-Source-Bibliotheken, die dieses Projekt ermöglichen
-
 ## 📞 Kontakt
 
 Bei Fragen oder Problemen erstelle bitte ein [Issue](https://github.com/TizianSenger/PythonOnlineShop/issues).
