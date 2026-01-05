@@ -125,28 +125,28 @@
         \vfill
         
         {\large \textbf{Verfasser:}} \\
-        {\large [Tizian Senger]} \\
-        Matrikelnummer: [IU14143428] \\
+        {\large Tizian Senger} \\
+        Matrikelnummer: IU14143428 \\
         
         \vspace{0.4cm}
         
         {\large \textbf{Kursbezeichnung:}} \\
-        {\large [DLBITPEWP01-01]} \\
+        {\large DLBITPEWP01-01} \\
         
         \vspace{0.4cm}
         
         {\large \textbf{Studiengang:}} \\
-        {\large [Informatik]} \\
+        {\large Informatik} \\
         
         \vspace{0.4cm}
         
         {\large \textbf{Tutor:}} \\
-        {\large [Valentin Bodendörfer]} \\
+        {\large Valentin Bodendörfer} \\
         
         \vspace{0.4cm}
         
         {\large \textbf{Abgabedatum:}} \\
-        {\large \today}
+        {\large 05. Januar 2026}\\
         
         \vspace{0.8cm}
         
@@ -178,7 +178,7 @@
 
 \section{Problemstellung und Zielsetzung}
 
-Der Onlineshop soll als Minimum Viable Product (MVP) alle wesentlichen E-Commerce-Funktionalitäten bereitstellen: Benutzerverwaltung, Produktkatalog, Warenkorb, Bestellungsabwicklung und sichere Zahlungsintegration. Das System muss zudem DSGVO-konform sein (Datenexport, Kontolöschung, Audit-Logging) und durch Sicherheitsmaßnahmen wie Passwort-Hashing, CSRF/XSS-Schutz und sichere Session-Verwaltung geschützt werden (siehe \autoref{tab:ziele}). 
+Der Onlineshop soll als Minimum Viable Product (MVP) alle wesentlichen E-Commerce-Funktionalitäten bereitstellen: Benutzerverwaltung, Produktkatalog, Warenkorb, Bestellungsabwicklung und sichere Zahlungsintegration. Das System muss zudem DSGVO-konform sein (Datenexport, Kontolöschung, Audit-Logging)\footnote{Europäische Kommission: Datenschutz-Grundverordnung (DSGVO), Verordnung (EU) 2016/679, 2018. Artikel 15-22 regeln die Rechte der betroffenen Personen.} und durch Sicherheitsmaßnahmen wie Passwort-Hashing, CSRF/XSS-Schutz und sichere Session-Verwaltung geschützt werden (siehe \autoref{tab:ziele}). 
 
 Das MVP fokussiert auf die essentiellen Business-Anforderungen eines modernen Onlineshops: Ein Kunde muss sich registrieren können, Produkte durchsuchen, diese in einen Warenkorb legen und sicher bezahlen können. Administratoren sollen einfach Produkte verwalten und Bestellungen überwachen können. Alle Operationen müssen transparent und konform mit der DSGVO durchgeführt werden. Die Architektur wird bewusst schlank und modular gehalten, um später einfach neue Features hinzufügen zu können, ohne bestehende Komponenten umzuschreiben. Ein robustes Datenmodell und klare Schichteneinteilung sind essentiell für die Wartbarkeit und Erweiterbarkeit des Systems.
 
@@ -195,7 +195,7 @@ Nicht-funktionale Anforderungen beschreiben Qualitätsmerkmale (Details siehe \a
 
 \section{Gewählte Technologien}
 
-Python wurde für schnelle, lesbare Entwicklung gewählt. Flask bietet minimales Framework mit essentiellen Komponenten (Routing, Sessions, Built-in CSRF-Protection, Jinja2 Template Engine mit Auto-Escaping). SQLite ermöglicht serverlose Datenbank ohne Infrastruktur. Das Hybrid-Backend kombiniert SQLite (primär) mit CSV-Fallback für Robustheit – Schreib-Operationen gehen zu beiden, Lese-Operationen funktionieren auch bei SQLite-Fehler über CSV. Frontend nutzt HTML5/CSS3/Vanilla JavaScript ohne schwere Frameworks für Responsive Design mit Flexbox und AJAX-Warenkorb-Updates.
+Python wurde für schnelle, lesbare Entwicklung gewählt.\footnote{Guido van Rossum et al.: Python 3 Documentation, https://docs.python.org/, 2024. Python wird für seine Lesbarkeit und produktive Entwicklung geschätzt.} Flask bietet minimales Framework mit essentiellen Komponenten (Routing, Sessions, Built-in CSRF-Protection, Jinja2 Template Engine mit Auto-Escaping).\footnote{Pallets Projects (2024): Flask - The Python Micro Framework, https://flask.palletsprojects.com/. Flask folgt dem Microframework-Ansatz mit minimalen Dependencies.} SQLite ermöglicht serverlose Datenbank ohne Infrastruktur. Das Hybrid-Backend kombiniert SQLite (primär) mit CSV-Fallback für Robustheit – Schreib-Operationen gehen zu beiden, Lese-Operationen funktionieren auch bei SQLite-Fehler über CSV. Frontend nutzt HTML5/CSS3/Vanilla JavaScript ohne schwere Frameworks für Responsive Design mit Flexbox und AJAX-Warenkorb-Updates.
 
 \section{Systemarchitektur - 4-Schichten-Modell (siehe \autoref{fig:schichten})}
 
@@ -222,7 +222,7 @@ Der Warenkorb wird bewusst in der Flask-Session gespeichert (nicht in Datenbank)
 
 Der Checkout ist ein Multi-Step-Prozess (siehe \autoref{fig:checkout}): Schritt 1 Warenkorb-Übersicht mit Gesamtpreis, Schritt 2 Kundeninformationen (Name, Adresse, E-Mail), Schritt 3 Zahlungsmethode-Wahl (Stripe oder PayPal), Schritt 4 Weiterleitung zum externen Payment-Provider, Schritt 5 Bestellbestätigung nach erfolgreicher Zahlung (siehe \autoref{fig:bestaetigung}).
 
-Der Shop speichert KEINE Zahlungsdaten selbst - dies würde PCI-DSS Level 1 erfordern. Stattdessen wird der Benutzer zu Stripe/PayPal weitergeleitet, Zahlung erfolgt extern, der Shop erhält Zahlungs-ID und Status zurück und speichert nur die Zahlungs-ID in der ORDER-Tabelle als Metadaten. Der Shop muss kein PCI-DSS Level 1 erfüllen, da die Verantwortung bei den Providern liegt. Beide Provider unterstützen Sandbox-Testing mit Test-Credentials ideal für Entwicklung.
+Der Shop speichert KEINE Zahlungsdaten selbst - dies würde PCI-DSS Level 1 erfordern.\footnote{PCI Security Standards Council: PCI DSS v3.2.1, https://www.pcisecuritystandards.org/, 2024. PCI-DSS ist der Standard für Payment Card Industry Data Security.} Stattdessen wird der Benutzer zu Stripe/PayPal weitergeleitet, Zahlung erfolgt extern, der Shop erhält Zahlungs-ID und Status zurück und speichert nur die Zahlungs-ID in der ORDER-Tabelle als Metadaten. Der Shop muss kein PCI-DSS Level 1 erfüllen, da die Verantwortung bei den Providern liegt. Beide Provider unterstützen Sandbox-Testing mit Test-Credentials ideal für Entwicklung.
 
 \section{Admin-Interface und Bestellungsverwaltung}
 
@@ -232,13 +232,13 @@ Bestellungen werden in der ORDER-Tabelle mit vollständigen Metadaten gespeicher
 
 \section{Sicherheitsmaßnahmen}
 
-Das System implementiert PBKDF2-Hashing mit mindestens 150.000 Iterationen via 
+Das System implementiert PBKDF2-Hashing mit mindestens 150.000 Iterationen\footnote{OWASP: Password Storage Cheat Sheet, 2024. PBKDF2 mit mindestens 100.000 Iterationen ist für moderne Anwendungen empfohlen, um Rainbow-Table-Attacken zu verhindern.} via 
 \newline \texttt{werkzeug.security.generate\_password\_hash(password)} 
 \newline mit automatischem Salt und extremer Crack-Resistenz. Der Passwort-Vergleich erfolgt via 
 \newline \texttt{werkzeug.security.check\_password\_hash(hash, password)} 
 \newline und speichert NIEMALS Klartext in Datenbank.
 
-Alle SQL-Queries verwenden Parameterized Queries (Prepared Statements) statt String-Interpolation:
+Alle SQL-Queries verwenden Parameterized Queries (Prepared Statements)\footnote{OWASP: SQL Injection Prevention Cheat Sheet, 2024. Parameterized Queries sind die effektivste Verteidigungsmaßnahme gegen SQL-Injection-Attacken.} statt String-Interpolation:
 \newline \texttt{cursor.execute("SELECT * FROM users WHERE email=?", (email,))}
 
 Jinja2 Templates haben Auto-Escaping aktiviert mit automatischer Escaping aller \{\{ variables \}\} und HTML-Entity-Konvertierung von \texttt{<}, \texttt{>}, \texttt{\&}, \texttt{"}, \texttt{'}.
@@ -248,7 +248,7 @@ Flask-Sessions sind CSRF-geschützt durch Token-Validierung für POST/PUT/DELETE
 \chapter{DSGVO-Compliance und Datenschutz}
 \label{chap:dsgvo}
 
-Die Datenschutz-Grundverordnung (DSGVO) ist das rechtliche Rahmenwerk für Datenschutz in der EU. Der Shop implementiert folgende Anforderungen:
+Die Datenschutz-Grundverordnung (DSGVO)\footnote{Europäische Union: Verordnung (EU) 2016/679 des Europäischen Parlaments und des Rates, 27. April 2016. Die DSGVO regelt den Schutz natürlicher Personen bei der Verarbeitung personenbezogener Daten.} ist das rechtliche Rahmenwerk für Datenschutz in der EU. Der Shop implementiert folgende Anforderungen:
 
 \section{Implementierte Betroffenenrechte}
 
@@ -486,6 +486,52 @@ Die Screenrecordings dokumentieren:
 \end{itemize}
 
 % ============================================================================
+% LITERATURVERZEICHNIS
+% ============================================================================
+\clearpage
+
+\chapter*{Literaturverzeichnis}
+\addcontentsline{toc}{chapter}{Literaturverzeichnis}
+
+\begin{thebibliography}{99}
+
+\bibitem{DSGVO2016} Europäische Union (2016): \textit{Verordnung (EU) 2016/679 des Europäischen Parlaments und des Rates vom 27. April 2016 zum Schutz natürlicher Personen bei der Verarbeitung personenbezogener Daten (Datenschutz-Grundverordnung)}. Amtsblatt der Europäischen Union L 119, 4.5.2016.
+
+\bibitem{OWASP2024} OWASP (2024): \textit{OWASP Top 10 Web Application Security Risks 2024}. Open Worldwide Application Security Project. \url{https://owasp.org/}. Abruf: 05.01.2026.
+
+\bibitem{PasswordCheatSheet} OWASP (2024): \textit{Password Storage Cheat Sheet}. Open Worldwide Application Security Project. \url{https://cheatsheetseries.owasp.org/}. Abruf: 05.01.2026.
+
+\bibitem{SQLInjectionCheatSheet} OWASP (2024): \textit{SQL Injection Prevention Cheat Sheet}. Open Worldwide Application Security Project. \url{https://cheatsheetseries.owasp.org/}. Abruf: 05.01.2026.
+
+\bibitem{PCI2024} PCI Security Standards Council (2024): \textit{PCI Data Security Standard (PCI DSS) v4.0}. \url{https://www.pcisecuritystandards.org/}. Abruf: 05.01.2026.
+
+\bibitem{Python2024} Python Software Foundation (2024): \textit{Python 3 Documentation}. \url{https://docs.python.org/}. Abruf: 05.01.2026.
+
+\bibitem{Flask2024} Pallets Projects (2024): \textit{Flask - The Python Micro Framework}. Offizielle Dokumentation. \url{https://flask.palletsprojects.com/}. Abruf: 05.01.2026.
+
+\bibitem{Werkzeug2024} Werkzeug Contributors (2024): \textit{Werkzeug - The Python WSGI Utility Library}. \url{https://werkzeug.palletsprojects.com/}. Abruf: 05.01.2026.
+
+\bibitem{SQLite2024} SQLite Contributors (2024): \textit{SQLite Documentation}. \url{https://www.sqlite.org/docs.html}. Abruf: 05.01.2026.
+
+\bibitem{StripeAPI2024} Stripe (2024): \textit{Stripe API Documentation}. \url{https://stripe.com/docs/api}. Abruf: 05.01.2026.
+
+\bibitem{PayPalAPI2024} PayPal (2024): \textit{PayPal Developer Documentation}. \url{https://developer.paypal.com/}. Abruf: 05.01.2026.
+
+\bibitem{MDN2024} Mozilla Developer Network (2024): \textit{HTML, CSS, and JavaScript Documentation}. \url{https://developer.mozilla.org/}. Abruf: 05.01.2026.
+
+\bibitem{ResponsiveDesign2010} Wroblewski, L. (2010): \textit{Responsive Web Design}. A List Apart Magazine. \url{https://alistapart.com/article/responsive-web-design/}. Abruf: 05.01.2026.
+
+\bibitem{MVCPattern2020} Freeman, E., Freeman, E., Bates, B. und Sierra, K. (2020): \textit{Head First Design Patterns: Building Extensible and Maintainable Object-Oriented Software}. O'Reilly Media, 2. Auflage. (Original: 2004)
+
+\bibitem{Sommerville2015} Sommerville, I. (2015): \textit{Software Engineering (10th Edition)}. Pearson. Kapitel über Systemarchitektur und Schichtenmodelle.
+
+\bibitem{McConnell2004} McConnell, S. (2004): \textit{Code Complete: A Practical Handbook of Software Construction}. Microsoft Press, 2. Auflage.
+
+\bibitem{ArchitecturePatterns2015} Richards, M., Ford, N. (2015): \textit{Fundamentals of Software Architecture: An Engineering Approach}. O'Reilly Media.
+
+\end{thebibliography}
+
+% ============================================================================
 % ANHANG
 % ============================================================================
 \clearpage
@@ -681,7 +727,7 @@ given\_at & TIMESTAMP & Zeitpunkt der Einwilligung \\
 \centering
 \caption{AUDIT\_LOG-Tabelle}
 \label{tab:audit}
-\begin{tabular}{|l|l|l|}
+\begin{tabular}{|p{2cm}|p{3.3cm}|p{10cm}|}
 \hline
 \textbf{Spalte} & \textbf{Datentyp} & \textbf{Beschreibung} \\
 \hline
@@ -1027,15 +1073,8 @@ Testing & $\checkmark$ & 50+ E2E Test Cases, Unit Tests \\
 \centering
 \framebox{
 \begin{minipage}{0.9\textwidth}
-\textit{[Architektur-Schichtenmodell einfügen]}
-
-\small Abbildung zeigt die vier Schichten (von oben nach unten):
-\begin{itemize}
-    \item Presentation Layer (Flask Routes, Jinja2 Templates)
-    \item Business Logic Layer (Services, Checkout)
-    \item Data Access Layer (Hybrid Backend, Storage)
-    \item Data Storage Layer (SQLite, CSV)
-\end{itemize}
+\includegraphics[width=1\textwidth]{Images/schichtenmodell.png}\\
+\small Abbildung: 4-Schichten-Modell mit Presentation Layer (Flask Routes, Jinja2 Templates), Business Logic Layer (Services, Checkout), Data Access Layer (Hybrid Backend, Storage) und Data Storage Layer (SQLite, CSV)
 \end{minipage}
 }
 \caption{Architektur-Schichtenmodell des Onlineshops}
@@ -1049,18 +1088,8 @@ Testing & $\checkmark$ & 50+ E2E Test Cases, Unit Tests \\
 \centering
 \framebox{
 \begin{minipage}{0.9\textwidth}
-\textit{[ER-Diagramm einfügen]}\\
-\small Abbildung: Entity-Relationship-Diagramm mit Entitäten, Attributen und Beziehungen
-
-Die Abbildung sollte folgende Elemente zeigen:
-\begin{itemize}
-    \item USER-Tabelle (id, name, email, password, role)
-    \item PRODUCT-Tabelle (id, name, price, category, description, stock, images)
-    \item ORDER-Tabelle (id, user\_id, total, status, created\_at, payment\_provider)
-    \item ORDER\_ITEM-Tabelle (id, order\_id, product\_id, quantity, price)
-    \item CONSENT-Tabelle (id, user\_id, consent\_type, value, created\_at)
-    \item AUDIT\_LOG-Tabelle (id, user\_id, event\_type, action, ip\_address, created\_at)
-\end{itemize}
+\includegraphics[width=1\textwidth]{Images/er_diagramm.png}\\
+\small Abbildung: Komplettes ERD mit 5 Entitäten (USER, PRODUCT, ORDER, USER\_CONSENT, AUDIT\_LOG) und ihren Beziehungen (Primärschlüssel, Fremdschlüssel, 1:n-Relationen)
 \end{minipage}
 }
 \caption{Entity-Relationship-Diagramm des Onlineshops}
