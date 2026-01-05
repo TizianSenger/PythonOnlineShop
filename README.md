@@ -331,6 +331,5 @@ Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe [LICENSE](LICENSE) f�
 
 Bei Fragen oder Problemen erstelle bitte ein [Issue](https://github.com/TizianSenger/PythonOnlineShop/issues).
 
----
 
 **⚠️ Hinweis**: Dieses Projekt dient zu Lern- und Demonstrationszwecken. Für den Produktiveinsatz sollten zusätzliche Sicherheits- und Performance-Optimierungen vorgenommen werden. 
